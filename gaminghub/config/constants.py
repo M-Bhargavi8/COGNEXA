@@ -183,5 +183,13 @@ CHALLENGE_TEMPLATES = [
         "description": "Score 80+ in Focus Shift.",
         "xp": 100,
         "coins": 70
+    },
+    {
+        "game_slug": "sequence-breaker",
+        "difficulty": None,
+        "criteria": {"type": "win"},
+        "description": "Solve a Sequence Breaker puzzle.",
+        "xp": 90,
+        "coins": 65
     }
 ]
