@@ -10,6 +10,7 @@ from flask_login import current_user
 
 from gaminghub.services import game_service
 from gaminghub.config.constants import TICTACTOE_REWARD
+from gaminghub.utils.helpers import flash_game_outcome
 
 tictactoe = Blueprint("tictactoe", __name__)
 
@@ -71,7 +72,7 @@ def play():
 
                 result = "Win"
 
-                game_service.complete_session(
+                outcome = game_service.complete_session(
                     session,
                     current_user,
                     outcome="win",
@@ -79,6 +80,8 @@ def play():
                     coins=TICTACTOE_REWARD["coins"],
                     score=TICTACTOE_REWARD["xp"]
                 )
+
+                flash_game_outcome(outcome)
 
             else:
 

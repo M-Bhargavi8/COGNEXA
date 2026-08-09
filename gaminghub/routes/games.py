@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 
 from gaminghub.services import game_service
+from gaminghub.utils.helpers import flash_game_outcome
 
 games = Blueprint("games", __name__)
 
@@ -74,9 +75,7 @@ def guess():
             )
 
             flash("🎉 Congratulations! You Won!", "success")
-
-            if outcome and outcome["is_new_best"]:
-                flash("🔥 New personal best!", "success")
+            flash_game_outcome(outcome)
 
             return redirect(url_for("dashboard.dashboard_home"))
 
@@ -179,7 +178,7 @@ def rps():
 
             result = "Win"
 
-            game_service.complete_session(
+            outcome = game_service.complete_session(
                 session,
                 current_user,
                 outcome="win",
@@ -187,6 +186,8 @@ def rps():
                 coins=RPS_REWARD["coins"],
                 score=RPS_REWARD["xp"]
             )
+
+            flash_game_outcome(outcome)
 
         else:
 

@@ -18,6 +18,13 @@
         return document.querySelector('meta[name="csrf-token"]').content;
     }
 
+    function formatExtras(d) {
+        const parts = [];
+        (d.achievements_unlocked || []).forEach(a => parts.push(`🏆 ${a.badge || ""} ${a.title}`.trim()));
+        if (d.challenge_completed) parts.push(`🔥 Daily Challenge Complete! +${d.challenge_completed.xp} XP · +${d.challenge_completed.coins} Coins`);
+        return parts.join(" · ");
+    }
+
     async function postJSON(url, body) {
         const res = await fetch(url, {
             method: "POST",
@@ -88,7 +95,7 @@
             resultDetails.textContent = early
                 ? "You clicked before the signal appeared."
                 : "That reaction time wasn't valid — try again.";
-            bestBadge.textContent = "";
+            bestBadge.textContent = formatExtras(d);
             return;
         }
 
@@ -100,7 +107,10 @@
         }
         resultDetails.textContent = details;
 
-        bestBadge.textContent = d.is_new_best ? "🔥 NEW PERSONAL BEST" : "";
+        const badges = [];
+        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        badges.push(formatExtras(d));
+        bestBadge.textContent = badges.filter(Boolean).join(" · ");
     }
 
     startBtn.addEventListener("click", begin);

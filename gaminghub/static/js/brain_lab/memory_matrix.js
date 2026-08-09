@@ -118,7 +118,11 @@
         }
         resultDetails.textContent = details;
 
-        bestBadge.textContent = d.is_new_best ? "🔥 NEW PERSONAL BEST" : "";
+        const badges = [];
+        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        (d.achievements_unlocked || []).forEach(a => badges.push(`🏆 ${a.badge || ""} ${a.title}`.trim()));
+        if (d.challenge_completed) badges.push(`🔥 Daily Challenge Complete! +${d.challenge_completed.xp} XP · +${d.challenge_completed.coins} Coins`);
+        bestBadge.textContent = badges.join(" · ");
     }
 
     document.querySelectorAll("[data-difficulty]").forEach(btn => {

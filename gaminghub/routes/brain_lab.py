@@ -11,6 +11,24 @@ from gaminghub.config.constants import MEMORY_MATRIX_DIFFICULTIES, REFLEX_LAB
 brain_lab = Blueprint("brain_lab", __name__, url_prefix="/brain-lab")
 
 
+def _outcome_extras(outcome):
+    """JSON-serializable achievements/challenge info from a complete_session() result."""
+
+    challenge = outcome.get("challenge_completed")
+
+    return {
+        "achievements_unlocked": [
+            {"title": a.title, "badge": a.badge}
+            for a in outcome.get("achievements_unlocked", [])
+        ],
+        "challenge_completed": {
+            "description": challenge.description,
+            "xp": challenge.xp_reward,
+            "coins": challenge.coin_reward
+        } if challenge else None
+    }
+
+
 @brain_lab.route("/")
 @login_required
 def hub():
@@ -117,7 +135,8 @@ def memory_matrix_submit():
         "xp": xp,
         "coins": coins,
         "is_new_best": result["is_new_best"],
-        "streak": streak
+        "streak": streak,
+        **_outcome_extras(result)
     })
 
 
@@ -187,7 +206,8 @@ def reflex_lab_submit():
 
         return jsonify(success=True, data={
             "valid": False,
-            "reason": "too_soon" if early else "invalid_timing"
+            "reason": "too_soon" if early else "invalid_timing",
+            **_outcome_extras(result)
         })
 
     score = max(0, round(1000 - reaction_ms))
@@ -217,5 +237,6 @@ def reflex_lab_submit():
         "xp": xp,
         "coins": coins,
         "is_new_best": result["is_new_best"],
-        "best_reaction_ms": stats["best"]
+        "best_reaction_ms": stats["best"],
+        **_outcome_extras(result)
     })
