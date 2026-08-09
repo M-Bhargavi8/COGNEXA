@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
+
+<div class="container py-5 text-center">
+
+    <h2 class="text-light mb-2">🧭 Logic Grid</h2>
+    <p class="text-light mb-4">Use the clues to work out who plays what.</p>
+
+    <div id="difficultyPicker">
+        <p class="text-light">Choose your challenge</p>
+        <button class="btn btn-success btn-lg m-2" data-difficulty="easy">Easy</button>
+        <button class="btn btn-warning btn-lg m-2" data-difficulty="medium">Medium</button>
+        <button class="btn btn-danger btn-lg m-2" data-difficulty="hard">Hard</button>
+        <button class="btn btn-dark btn-lg m-2" data-difficulty="expert">Expert</button>
+    </div>
+
+    <div id="gameArea" style="display:none;">
+
+        <div class="card dashboard-card mb-4 text-start p-3 mx-auto" style="max-width: 480px;">
+            <h5 class="text-center mb-2">Clues</h5>
+            <ul id="cluesList" class="mb-0"></ul>
+        </div>
+
+        <div id="answerRows" class="mx-auto mb-3" style="max-width: 420px;"></div>
+
+        <button id="hintBtn" class="btn btn-outline-warning m-2">Use a Hint</button>
+        <button id="submitBtn" class="btn btn-success btn-lg m-2">Submit</button>
+
+    </div>
+
+    <div id="resultArea" style="display:none;" class="mt-4">
+        <h3 id="resultHeading" class="text-light"></h3>
+        <p id="resultDetails" class="text-light"></p>
+        <p id="bestBadge" class="text-warning fw-bold brain-lab-best"></p>
+        <button id="playAgainBtn" class="btn btn-success btn-lg mt-3">
+            Play Again
+        </button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/brain_lab/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/brain_lab/logic_grid.js') }}"></script>
+
+{% endblock %}

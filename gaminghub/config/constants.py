@@ -215,5 +215,13 @@ CHALLENGE_TEMPLATES = [
         "description": "Finish a Risk & Reward run at or above the safe-play baseline.",
         "xp": 100,
         "coins": 70
+    },
+    {
+        "game_slug": "logic-grid",
+        "difficulty": None,
+        "criteria": {"type": "win"},
+        "description": "Solve a Logic Grid puzzle completely.",
+        "xp": 110,
+        "coins": 80
     }
 ]

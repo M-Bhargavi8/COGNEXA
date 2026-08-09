@@ -55,3 +55,4 @@ from gaminghub.routes.brain_lab import sequence_breaker  # noqa: E402,F401
 from gaminghub.routes.brain_lab import code_breaker  # noqa: E402,F401
 from gaminghub.routes.brain_lab import dual_task  # noqa: E402,F401
 from gaminghub.routes.brain_lab import risk_reward  # noqa: E402,F401
+from gaminghub.routes.brain_lab import logic_grid  # noqa: E402,F401
