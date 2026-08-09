@@ -28,6 +28,7 @@ def create_app():
     from gaminghub.routes.gamehub import gamehub
     from gaminghub.routes.tictactoe import tictactoe
     from gaminghub.routes.rewards import rewards
+    from gaminghub.routes.brain_lab import brain_lab
 
     # Register Blueprints
     app.register_blueprint(main)
@@ -40,5 +41,6 @@ def create_app():
     app.register_blueprint(gamehub)
     app.register_blueprint(profile)
     app.register_blueprint(rewards)
+    app.register_blueprint(brain_lab)
 
     return app
