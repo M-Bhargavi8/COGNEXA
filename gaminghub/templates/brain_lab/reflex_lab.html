@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
+
+<div class="container py-5 text-center">
+
+    <h2 class="text-light mb-2">⚡ Reflex Lab</h2>
+    <p class="text-light mb-4">Wait for the signal, then click as fast as you can.</p>
+
+    <div id="startPanel">
+        <button id="startBtn" class="btn btn-success btn-lg">
+            Start
+        </button>
+    </div>
+
+    <div id="reflexBox" class="reflex-box waiting mx-auto" style="display:none;">
+        <span id="reflexText">WAIT...</span>
+    </div>
+
+    <div id="resultArea" style="display:none;" class="mt-4">
+        <h3 id="resultHeading" class="text-light"></h3>
+        <p id="resultDetails" class="text-light"></p>
+        <p id="bestBadge" class="text-warning fw-bold brain-lab-best"></p>
+        <button id="playAgainBtn" class="btn btn-success btn-lg mt-3">
+            Try Again
+        </button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/brain_lab/reflex_lab.js') }}"></script>
+
+{% endblock %}
