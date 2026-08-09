@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
+
+<div class="container py-5 text-center">
+
+    <h2 class="text-light mb-2">🧩 Memory Matrix</h2>
+    <p class="text-light mb-4">Memorize the pattern, then reproduce it from memory.</p>
+
+    <div id="difficultyPicker">
+        <p class="text-light">Choose your challenge</p>
+        <button class="btn btn-success btn-lg m-2" data-difficulty="easy">Easy</button>
+        <button class="btn btn-warning btn-lg m-2" data-difficulty="medium">Medium</button>
+        <button class="btn btn-danger btn-lg m-2" data-difficulty="hard">Hard</button>
+        <button class="btn btn-dark btn-lg m-2" data-difficulty="expert">Expert</button>
+    </div>
+
+    <div id="gameArea" style="display:none;">
+
+        <p id="statusText" class="text-light fs-5 mb-3"></p>
+
+        <div id="grid" class="memory-grid mb-4"></div>
+
+        <button id="submitBtn" class="btn btn-success btn-lg" style="display:none;">
+            Submit
+        </button>
+
+    </div>
+
+    <div id="resultArea" style="display:none;" class="mt-4">
+        <h3 id="resultHeading" class="text-light"></h3>
+        <p id="resultDetails" class="text-light"></p>
+        <p id="bestBadge" class="text-warning fw-bold brain-lab-best"></p>
+        <button id="playAgainBtn" class="btn btn-success btn-lg mt-3">
+            Play Again
+        </button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/brain_lab/memory_matrix.js') }}"></script>
+
+{% endblock %}

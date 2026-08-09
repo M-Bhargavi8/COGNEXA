@@ -1,0 +1,62 @@
+.memory-grid {
+    display: grid;
+    gap: 8px;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.memory-cell {
+    aspect-ratio: 1 / 1;
+    background: #1c1f26;
+    border: 2px solid #333;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    cursor: pointer;
+}
+
+.memory-cell.lit {
+    background: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.memory-cell.selected {
+    background: #f1c40f;
+    border-color: #f1c40f;
+    transform: scale(0.94);
+}
+
+.reflex-box {
+    width: 100%;
+    max-width: 420px;
+    height: 260px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+}
+
+.reflex-box.waiting {
+    background: #c0392b;
+}
+
+.reflex-box.go {
+    background: #27ae60;
+}
+
+.brain-lab-best {
+    min-height: 1.5em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .memory-cell,
+    .reflex-box {
+        transition: none;
+    }
+}
