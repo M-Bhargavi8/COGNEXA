@@ -218,4 +218,37 @@ Claim Reward
 </div>
 
 </div>
+<div class="card shadow mt-4">
+
+<div class="card-header bg-danger text-white">
+
+🔥 Daily Challenge
+
+</div>
+
+<div class="card-body text-center">
+
+{% if challenge %}
+
+<h5>{{ challenge_game.icon }} {{ challenge_game.name }}{% if challenge.difficulty %} · {{ challenge.difficulty|capitalize }}{% endif %}</h5>
+
+<p>{{ challenge.description }}</p>
+
+<p class="text-warning fw-bold">+{{ challenge.xp_reward }} XP · +{{ challenge.coin_reward }} Coins</p>
+
+{% if challenge_done %}
+<p class="text-success fw-bold">✅ Completed today</p>
+{% elif challenge_url %}
+<a href="{{ challenge_url }}" class="btn btn-danger">Play Now</a>
+{% endif %}
+
+{% else %}
+
+<p>No challenge available today.</p>
+
+{% endif %}
+
+</div>
+
+</div>
 {% endblock %}
