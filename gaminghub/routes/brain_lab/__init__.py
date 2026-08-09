@@ -52,3 +52,4 @@ from gaminghub.routes.brain_lab import memory_matrix  # noqa: E402,F401
 from gaminghub.routes.brain_lab import reflex_lab  # noqa: E402,F401
 from gaminghub.routes.brain_lab import focus_shift  # noqa: E402,F401
 from gaminghub.routes.brain_lab import sequence_breaker  # noqa: E402,F401
+from gaminghub.routes.brain_lab import code_breaker  # noqa: E402,F401

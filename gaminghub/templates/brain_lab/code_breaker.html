@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
+
+<div class="container py-5 text-center">
+
+    <h2 class="text-light mb-2">🔐 Code Breaker</h2>
+    <p class="text-light mb-4">Deduce the secret code. Unique digits only.</p>
+
+    <div id="difficultyPicker">
+        <p class="text-light">Choose your challenge</p>
+        <button class="btn btn-success btn-lg m-2" data-difficulty="easy">Easy (3)</button>
+        <button class="btn btn-warning btn-lg m-2" data-difficulty="medium">Medium (4)</button>
+        <button class="btn btn-danger btn-lg m-2" data-difficulty="hard">Hard (5)</button>
+        <button class="btn btn-dark btn-lg m-2" data-difficulty="expert">Expert (6)</button>
+    </div>
+
+    <div id="gameArea" style="display:none;">
+
+        <p id="statusText" class="text-light fs-5 mb-3"></p>
+
+        <div class="mb-3">
+            <input
+                id="guessInput"
+                type="text"
+                class="form-control form-control-lg text-center mx-auto"
+                style="max-width: 260px; letter-spacing: 0.3em;"
+                placeholder="0000">
+        </div>
+
+        <button id="guessBtn" class="btn btn-success btn-lg mb-4">
+            Guess
+        </button>
+
+        <div id="history" class="text-light" style="max-width: 420px; margin: 0 auto;"></div>
+
+    </div>
+
+    <div id="resultArea" style="display:none;" class="mt-4">
+        <h3 id="resultHeading" class="text-light"></h3>
+        <p id="resultDetails" class="text-light"></p>
+        <p id="bestBadge" class="text-warning fw-bold brain-lab-best"></p>
+        <button id="playAgainBtn" class="btn btn-success btn-lg mt-3">
+            Play Again
+        </button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/brain_lab/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/brain_lab/code_breaker.js') }}"></script>
+
+{% endblock %}

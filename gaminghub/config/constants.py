@@ -191,5 +191,13 @@ CHALLENGE_TEMPLATES = [
         "description": "Solve a Sequence Breaker puzzle.",
         "xp": 90,
         "coins": 65
+    },
+    {
+        "game_slug": "code-breaker",
+        "difficulty": None,
+        "criteria": {"type": "win"},
+        "description": "Crack a Code Breaker code.",
+        "xp": 100,
+        "coins": 75
     }
 ]
