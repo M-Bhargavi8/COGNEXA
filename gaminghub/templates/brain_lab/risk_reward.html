@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
+
+<div class="container py-5 text-center">
+
+    <h2 class="text-light mb-2">🎲 Risk &amp; Reward</h2>
+    <p class="text-light mb-1">Play it safe, or push your luck.</p>
+    <p class="text-muted small mb-4">🎲 Fictional in-game points only — not real money, not gambling.</p>
+
+    <div id="difficultyPicker">
+        <p class="text-light">Choose your challenge</p>
+        <button class="btn btn-success btn-lg m-2" data-difficulty="easy">Easy</button>
+        <button class="btn btn-warning btn-lg m-2" data-difficulty="medium">Medium</button>
+        <button class="btn btn-danger btn-lg m-2" data-difficulty="hard">Hard</button>
+        <button class="btn btn-dark btn-lg m-2" data-difficulty="expert">Expert</button>
+    </div>
+
+    <div id="gameArea" style="display:none;">
+
+        <p id="roundText" class="text-light"></p>
+        <div id="scoreDisplay" class="display-4 text-light mb-2">0</div>
+        <p id="feedbackText" class="fs-5 mb-4">&nbsp;</p>
+
+        <button id="safeBtn" class="btn btn-success btn-lg m-2">SAFE</button>
+        <button id="riskBtn" class="btn btn-danger btn-lg m-2">RISK</button>
+        <p id="riskInfo" class="text-muted small mt-2"></p>
+
+    </div>
+
+    <div id="resultArea" style="display:none;" class="mt-4">
+        <h3 id="resultHeading" class="text-light"></h3>
+        <p id="resultDetails" class="text-light"></p>
+        <p id="bestBadge" class="text-warning fw-bold brain-lab-best"></p>
+        <button id="playAgainBtn" class="btn btn-success btn-lg mt-3">
+            Play Again
+        </button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/brain_lab/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/brain_lab/risk_reward.js') }}"></script>
+
+{% endblock %}

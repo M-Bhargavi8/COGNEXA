@@ -207,5 +207,13 @@ CHALLENGE_TEMPLATES = [
         "description": "Score 90+ overall in Dual Task.",
         "xp": 110,
         "coins": 80
+    },
+    {
+        "game_slug": "risk-reward",
+        "difficulty": None,
+        "criteria": {"type": "win"},
+        "description": "Finish a Risk & Reward run at or above the safe-play baseline.",
+        "xp": 100,
+        "coins": 70
     }
 ]
