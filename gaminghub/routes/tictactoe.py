@@ -3,11 +3,12 @@ import random
 from flask import Blueprint
 from flask import render_template
 from flask import request
+from flask import flash
 
 from flask_login import login_required
 from flask_login import current_user
 
-from gaminghub.services.reward_service import award
+from gaminghub.services import game_service
 from gaminghub.config.constants import TICTACTOE_REWARD
 
 tictactoe = Blueprint("tictactoe", __name__)
@@ -37,58 +38,82 @@ def check(board, symbol):
 @login_required
 def play():
 
-    board=[""]*9
+    game = game_service.get_game("tic-tac-toe")
+    session = game_service.get_active_session(current_user, game)
 
-    result=None
+    if not session:
+        session = game_service.start_session(
+            current_user,
+            "tic-tac-toe",
+            state={"board": [""] * 9}
+        )
 
-    if request.method=="POST":
+    state = game_service.get_state(session)
+    board = state["board"]
+    result = None
 
-        board=request.form.getlist("board")
+    if request.method == "POST" and session.status == "active":
 
-        move=int(request.form["move"])
+        try:
+            move = int(request.form.get("move", -1))
+        except ValueError:
+            move = -1
 
-        board[move]="X"
+        if move < 0 or move > 8 or board[move] != "":
 
-        if check(board,"X"):
-
-            result="Win"
-
-            award(
-                current_user,
-                xp=TICTACTOE_REWARD["xp"],
-                coins=TICTACTOE_REWARD["coins"],
-                outcome="win"
-            )
+            flash("Invalid move.", "warning")
 
         else:
 
-            empty=[i for i,v in enumerate(board) if v==""]
+            board[move] = "X"
 
-            if empty:
+            if check(board, "X"):
 
-                board[random.choice(empty)]="O"
+                result = "Win"
 
-            if check(board,"O"):
-
-                result="Lose"
-
-                award(
+                game_service.complete_session(
+                    session,
                     current_user,
-                    xp=0,
-                    coins=0,
-                    outcome="loss"
+                    outcome="win",
+                    xp=TICTACTOE_REWARD["xp"],
+                    coins=TICTACTOE_REWARD["coins"],
+                    score=TICTACTOE_REWARD["xp"]
                 )
 
-            elif "" not in board:
+            else:
 
-                result="Draw"
+                empty = [i for i, v in enumerate(board) if v == ""]
 
-                award(
-                    current_user,
-                    xp=0,
-                    coins=0,
-                    outcome="draw"
-                )
+                if empty:
+                    board[random.choice(empty)] = "O"
+
+                if check(board, "O"):
+
+                    result = "Lose"
+
+                    game_service.complete_session(
+                        session,
+                        current_user,
+                        outcome="loss",
+                        xp=0,
+                        coins=0,
+                        score=0
+                    )
+
+                elif "" not in board:
+
+                    result = "Draw"
+
+                    game_service.complete_session(
+                        session,
+                        current_user,
+                        outcome="draw",
+                        xp=0,
+                        coins=0,
+                        score=0
+                    )
+
+            game_service.set_state(session, {"board": board})
 
     return render_template(
         "games/tictactoe.html",
