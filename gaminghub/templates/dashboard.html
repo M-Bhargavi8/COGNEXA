@@ -164,9 +164,9 @@ Level {{ current_user.level }}
 
 <div
 class="progress-bar bg-success"
-style="width: {{ current_user.xp % 100 }}%;">
+style="width: {{ xp_percent }}%;">
 
-{{ current_user.xp % 100 }}%
+{{ xp_percent }}%
 
 </div>
 
@@ -174,7 +174,7 @@ style="width: {{ current_user.xp % 100 }}%;">
 
 <p class="mt-2">
 
-{{ current_user.xp }} XP
+{{ current_user.xp }} / {{ xp_needed }} XP
 
 </p>
 
