@@ -1,7 +1,9 @@
 import random
-from gaminghub.services.reward_service import award
-from flask import Blueprint, render_template, request, session, redirect, url_for, flash
+
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
+
+from gaminghub.services import game_service
 
 games = Blueprint("games", __name__)
 
@@ -15,64 +17,82 @@ from gaminghub.config.constants import (
 @login_required
 def guess():
 
-    if "game" not in session:
+    game = game_service.get_game("guess-the-number")
+    session = game_service.get_active_session(current_user, game)
+
+    if not session:
         return render_template(
             "games/guessing.html",
             game=None,
             message=""
         )
 
-    game = session["game"]
+    state = game_service.get_state(session)
     message = ""
 
     if request.method == "POST":
 
-        guess_val = int(request.form["guess"])
-        secret = game["secret"]
+        try:
+            guess_val = int(request.form["guess"])
+        except (KeyError, ValueError):
+            flash("Enter a valid number.", "warning")
+            return render_template(
+                "games/guessing.html",
+                game=state,
+                message=""
+            )
+
+        secret = state["secret"]
 
         if guess_val < secret:
 
             message = "📉 Too Low!"
-            game["attempts_left"] -= 1
+            state["attempts_left"] -= 1
 
-            session["game"] = game
-            session.modified = True
+            game_service.set_state(session, state)
 
         elif guess_val > secret:
 
             message = "📈 Too High!"
-            game["attempts_left"] -= 1
+            state["attempts_left"] -= 1
 
-            session["game"] = game
-            session.modified = True
+            game_service.set_state(session, state)
 
         else:
 
-            award(
-                current_user,
-                xp=game["xp"],
-                coins=game["coins"],
-                outcome="win"
-            )
+            reward = DIFFICULTIES[session.difficulty]
+            attempts_used = state["max_attempts"] - state["attempts_left"] + 1
 
-            session.pop("game")
+            outcome = game_service.complete_session(
+                session,
+                current_user,
+                outcome="win",
+                xp=reward["xp"],
+                coins=reward["coins"],
+                score=reward["xp"],
+                attempts=attempts_used
+            )
 
             flash("🎉 Congratulations! You Won!", "success")
 
+            if outcome and outcome["is_new_best"]:
+                flash("🔥 New personal best!", "success")
+
             return redirect(url_for("dashboard.dashboard_home"))
 
-        if game["attempts_left"] <= 0:
+        if state["attempts_left"] <= 0:
 
-            award(
+            game_service.complete_session(
+                session,
                 current_user,
+                outcome="loss",
                 xp=0,
                 coins=0,
-                outcome="loss"
+                score=0,
+                attempts=state["max_attempts"]
             )
 
-            answer = game["secret"]
-
-            session.pop("game")
+            answer = secret
 
             flash(
                 f"💀 Game Over! The number was {answer}",
@@ -83,7 +103,7 @@ def guess():
 
     return render_template(
         "games/guessing.html",
-        game=game,
+        game=state,
         message=message
     )
 
@@ -94,26 +114,29 @@ def start_guess():
 
     difficulty = request.form.get("difficulty", "easy")
 
+    if difficulty not in DIFFICULTIES:
+        flash("Invalid difficulty.", "danger")
+        return redirect(url_for("games.guess"))
+
     settings = DIFFICULTIES[difficulty]
 
-    session["game"] = {
-        "secret": random.randint(1, 100),
-        "difficulty": difficulty,
-        "attempts_left": settings["attempts"],
-        "max_attempts": settings["attempts"],
-        "coins": settings["coins"],
-        "xp": settings["xp"]
-    }
-
-    session.modified = True
+    game_service.start_session(
+        current_user,
+        "guess-the-number",
+        difficulty=difficulty,
+        state={
+            "secret": random.randint(1, 100),
+            "attempts_left": settings["attempts"],
+            "max_attempts": settings["attempts"]
+        }
+    )
 
     return redirect(url_for("games.guess"))
+
 
 @games.route("/rps", methods=["GET", "POST"])
 @login_required
 def rps():
-
-    import random
 
     choices = ["Rock", "Paper", "Scissors"]
 
@@ -123,19 +146,27 @@ def rps():
 
     if request.method == "POST":
 
-        player = request.form["choice"]
+        player = request.form.get("choice")
+
+        if player not in choices:
+            flash("Invalid choice.", "danger")
+            return redirect(url_for("games.rps"))
 
         computer = random.choice(choices)
+
+        session = game_service.start_session(current_user, "rock-paper-scissors")
 
         if player == computer:
 
             result = "Draw"
 
-            award(
+            game_service.complete_session(
+                session,
                 current_user,
+                outcome="draw",
                 xp=0,
                 coins=0,
-                outcome="draw"
+                score=0
             )
 
         elif (
@@ -148,22 +179,26 @@ def rps():
 
             result = "Win"
 
-            award(
+            game_service.complete_session(
+                session,
                 current_user,
+                outcome="win",
                 xp=RPS_REWARD["xp"],
                 coins=RPS_REWARD["coins"],
-                outcome="win"
+                score=RPS_REWARD["xp"]
             )
 
         else:
 
             result = "Lose"
 
-            award(
+            game_service.complete_session(
+                session,
                 current_user,
+                outcome="loss",
                 xp=0,
                 coins=0,
-                outcome="loss"
+                score=0
             )
 
     return render_template(
