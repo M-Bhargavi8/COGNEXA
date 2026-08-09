@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="text-light mb-4">
+        🛠️ Admin Dashboard
+    </h2>
+
+    <div class="card dashboard-card">
+
+        <div class="card-body">
+
+            <p>
+                Signed in as <strong>{{ current_user.username }}</strong>
+                (role: {{ current_user.role }}).
+            </p>
+
+            <p class="mb-0">
+                This page exists to prove the role-based access gate works
+                end-to-end. User management, game/achievement/challenge
+                management, and analytics land in a later phase.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

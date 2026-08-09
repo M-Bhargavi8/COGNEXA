@@ -104,6 +104,16 @@ href="{{ url_for('rewards.daily') }}">
 
 </li>
 
+    {% if current_user.is_admin %}
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin.admin_dashboard') }}">
+            🛠️ Admin
+        </a>
+    </li>
+
+    {% endif %}
+
     <li class="nav-item">
         <a class="btn btn-danger ms-2"
            href="{{ url_for('auth.logout') }}">

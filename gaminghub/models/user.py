@@ -11,6 +11,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), default="player", nullable=False)
 
     coins = db.Column(db.Integer, default=100)
     xp = db.Column(db.Integer, default=0)
@@ -36,7 +37,11 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"<User {self.username}>"
-    
+
+    @property
+    def is_admin(self):
+        return self.role == "admin"
+
     achievements = db.relationship(
     "Achievement",
     secondary="user_achievements",
