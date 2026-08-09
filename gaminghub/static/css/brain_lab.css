@@ -25,6 +25,19 @@
     transform: scale(0.94);
 }
 
+.focus-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+}
+
+.focus-cell.selected {
+    background: #34495e;
+    border-color: #f1c40f;
+    box-shadow: 0 0 0 2px #f1c40f inset;
+}
+
 .reflex-box {
     width: 100%;
     max-width: 420px;

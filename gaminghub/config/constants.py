@@ -82,6 +82,59 @@ REFLEX_LAB = {
 }
 
 
+FOCUS_SHIFT_DIFFICULTIES = {
+    "easy": {"object_count": 6, "change_count": 1, "reveal_ms": 2500, "xp": 30, "coins": 40, "multiplier": 1},
+    "medium": {"object_count": 9, "change_count": 1, "reveal_ms": 2000, "xp": 50, "coins": 70, "multiplier": 1.5},
+    "hard": {"object_count": 12, "change_count": 2, "reveal_ms": 1800, "xp": 80, "coins": 110, "multiplier": 2},
+    "expert": {"object_count": 16, "change_count": 2, "reveal_ms": 1500, "xp": 120, "coins": 160, "multiplier": 3}
+}
+
+FOCUS_SHIFT_PALETTE = ["🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "⚪", "⚫", "🟤"]
+
+
+SEQUENCE_BREAKER_DIFFICULTIES = {
+    "easy": {"types": ["arithmetic"], "terms_shown": 4, "xp": 25, "coins": 35, "multiplier": 1},
+    "medium": {"types": ["arithmetic", "letters"], "terms_shown": 4, "xp": 40, "coins": 55, "multiplier": 1.5},
+    "hard": {"types": ["arithmetic", "letters", "geometric"], "terms_shown": 5, "xp": 65, "coins": 90, "multiplier": 2},
+    "expert": {"types": ["geometric", "fibonacci", "letters"], "terms_shown": 5, "xp": 100, "coins": 140, "multiplier": 3}
+}
+
+
+CODE_BREAKER_DIFFICULTIES = {
+    "easy": {"digits": 3, "attempts": 10, "xp": 40, "coins": 55, "multiplier": 1},
+    "medium": {"digits": 4, "attempts": 10, "xp": 65, "coins": 90, "multiplier": 1.5},
+    "hard": {"digits": 5, "attempts": 10, "xp": 100, "coins": 140, "multiplier": 2},
+    "expert": {"digits": 6, "attempts": 12, "xp": 150, "coins": 200, "multiplier": 3}
+}
+
+
+DUAL_TASK_DIFFICULTIES = {
+    "easy": {"sequence_length": 3, "reveal_ms": 2500, "xp": 35, "coins": 45, "multiplier": 1},
+    "medium": {"sequence_length": 4, "reveal_ms": 2200, "xp": 55, "coins": 75, "multiplier": 1.5},
+    "hard": {"sequence_length": 5, "reveal_ms": 2000, "xp": 85, "coins": 115, "multiplier": 2},
+    "expert": {"sequence_length": 6, "reveal_ms": 1800, "xp": 130, "coins": 170, "multiplier": 3}
+}
+
+
+RISK_REWARD_DIFFICULTIES = {
+    "easy": {"rounds": 8, "safe_gain": 20, "risk_win_chance": 0.6, "risk_gain": 60, "risk_loss": 30, "xp": 30, "coins": 40},
+    "medium": {"rounds": 10, "safe_gain": 20, "risk_win_chance": 0.5, "risk_gain": 80, "risk_loss": 40, "xp": 50, "coins": 70},
+    "hard": {"rounds": 12, "safe_gain": 20, "risk_win_chance": 0.45, "risk_gain": 100, "risk_loss": 50, "xp": 80, "coins": 110},
+    "expert": {"rounds": 15, "safe_gain": 15, "risk_win_chance": 0.4, "risk_gain": 120, "risk_loss": 60, "xp": 120, "coins": 160}
+}
+
+
+LOGIC_GRID_DIFFICULTIES = {
+    "easy": {"size": 3, "xp": 40, "coins": 55, "multiplier": 1},
+    "medium": {"size": 4, "xp": 65, "coins": 90, "multiplier": 1.5},
+    "hard": {"size": 5, "xp": 100, "coins": 140, "multiplier": 2},
+    "expert": {"size": 6, "xp": 150, "coins": 200, "multiplier": 3}
+}
+
+LOGIC_GRID_PLAYERS = ["Alex", "Sam", "Jordan", "Casey", "Riley", "Morgan"]
+LOGIC_GRID_GAMES = ["Chess", "Poker", "Darts", "Bowling", "Tennis", "Golf"]
+
+
 CHALLENGE_TEMPLATES = [
     {
         "game_slug": "memory-matrix",
@@ -122,5 +175,13 @@ CHALLENGE_TEMPLATES = [
         "description": "Beat the computer at Tic Tac Toe.",
         "xp": 80,
         "coins": 60
+    },
+    {
+        "game_slug": "focus-shift",
+        "difficulty": None,
+        "criteria": {"type": "score_at_least", "value": 80},
+        "description": "Score 80+ in Focus Shift.",
+        "xp": 100,
+        "coins": 70
     }
 ]
