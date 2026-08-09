@@ -1,3 +1,6 @@
 from gaminghub.models.user import User
 from gaminghub.models.achievement import Achievement
 from gaminghub.models.user_achievement import UserAchievement
+from gaminghub.models.game import Game
+from gaminghub.models.game_session import GameSession
+from gaminghub.models.game_result import GameResult
