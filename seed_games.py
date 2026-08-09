@@ -26,6 +26,20 @@ GAMES = [
         "classic-arcade",
         "❌",
     ),
+    (
+        "Memory Matrix",
+        "memory-matrix",
+        "Memorize the pattern before it disappears, then reproduce it.",
+        "brain-lab",
+        "🧩",
+    ),
+    (
+        "Reflex Lab",
+        "reflex-lab",
+        "Wait for the signal, then click as fast as you can.",
+        "brain-lab",
+        "⚡",
+    ),
 ]
 
 with app.app_context():

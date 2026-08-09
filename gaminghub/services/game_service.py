@@ -113,3 +113,40 @@ def complete_session(session, user, *, outcome, xp=0, coins=0, score=0,
     is_new_best = previous_best is None or score > previous_best
 
     return {"result": result, "is_new_best": is_new_best}
+
+
+def get_current_streak(user, game):
+    """Consecutive wins for (user, game), most recent first."""
+
+    recent = GameResult.query.filter_by(
+        user_id=user.id,
+        game_id=game.id
+    ).order_by(GameResult.created_at.desc()).limit(50).all()
+
+    streak = 0
+
+    for r in recent:
+        if r.result != "win":
+            break
+        streak += 1
+
+    return streak
+
+
+def get_reaction_stats(user, game):
+    results = GameResult.query.filter(
+        GameResult.user_id == user.id,
+        GameResult.game_id == game.id,
+        GameResult.reaction_time.isnot(None)
+    ).all()
+
+    if not results:
+        return {"best": None, "average": None, "attempts": 0}
+
+    times = [r.reaction_time for r in results]
+
+    return {
+        "best": min(times),
+        "average": round(sum(times) / len(times)),
+        "attempts": len(times)
+    }
