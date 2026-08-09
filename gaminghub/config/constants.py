@@ -199,5 +199,13 @@ CHALLENGE_TEMPLATES = [
         "description": "Crack a Code Breaker code.",
         "xp": 100,
         "coins": 75
+    },
+    {
+        "game_slug": "dual-task",
+        "difficulty": None,
+        "criteria": {"type": "score_at_least", "value": 90},
+        "description": "Score 90+ overall in Dual Task.",
+        "xp": 110,
+        "coins": 80
     }
 ]

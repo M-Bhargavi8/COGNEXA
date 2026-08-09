@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
+
+<div class="container py-5 text-center">
+
+    <h2 class="text-light mb-2">🧮 Dual Task</h2>
+    <p class="text-light mb-4">Hold the sequence in memory, solve the math, then recall the sequence.</p>
+
+    <div id="difficultyPicker">
+        <p class="text-light">Choose your challenge</p>
+        <button class="btn btn-success btn-lg m-2" data-difficulty="easy">Easy</button>
+        <button class="btn btn-warning btn-lg m-2" data-difficulty="medium">Medium</button>
+        <button class="btn btn-danger btn-lg m-2" data-difficulty="hard">Hard</button>
+        <button class="btn btn-dark btn-lg m-2" data-difficulty="expert">Expert</button>
+    </div>
+
+    <div id="sequencePhase" style="display:none;">
+        <p class="text-light fs-5">Memorize this sequence...</p>
+        <div id="sequenceDisplay" class="display-4 text-light"></div>
+    </div>
+
+    <div id="mathPhase" style="display:none;">
+        <p class="text-light fs-5">Quick — solve this:</p>
+        <div id="mathProblem" class="display-4 text-light mb-3"></div>
+        <input id="mathInput" type="text" class="form-control form-control-lg text-center mx-auto mb-3" style="max-width: 220px;" placeholder="?">
+        <button id="mathSubmitBtn" class="btn btn-success btn-lg">Next</button>
+    </div>
+
+    <div id="recallPhase" style="display:none;">
+        <p class="text-light fs-5">Now recall the sequence, in order:</p>
+        <input id="recallInput" type="text" class="form-control form-control-lg text-center mx-auto mb-3" style="max-width: 260px;" placeholder="e.g. 7 3 9">
+        <button id="recallSubmitBtn" class="btn btn-success btn-lg">Submit</button>
+    </div>
+
+    <div id="resultArea" style="display:none;" class="mt-4">
+        <h3 id="resultHeading" class="text-light"></h3>
+        <p id="resultDetails" class="text-light"></p>
+        <p id="bestBadge" class="text-warning fw-bold brain-lab-best"></p>
+        <button id="playAgainBtn" class="btn btn-success btn-lg mt-3">
+            Play Again
+        </button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/brain_lab/common.js') }}"></script>
+<script src="{{ url_for('static', filename='js/brain_lab/dual_task.js') }}"></script>
+
+{% endblock %}
