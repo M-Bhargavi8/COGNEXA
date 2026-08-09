@@ -40,6 +40,48 @@ GAMES = [
         "brain-lab",
         "⚡",
     ),
+    (
+        "Focus Shift",
+        "focus-shift",
+        "Spot which object changed before it's gone.",
+        "brain-lab",
+        "👁️",
+    ),
+    (
+        "Sequence Breaker",
+        "sequence-breaker",
+        "Crack the pattern and predict what comes next.",
+        "brain-lab",
+        "🔢",
+    ),
+    (
+        "Code Breaker",
+        "code-breaker",
+        "Deduce the secret code from position and digit clues.",
+        "brain-lab",
+        "🔐",
+    ),
+    (
+        "Dual Task",
+        "dual-task",
+        "Hold a sequence in memory while solving a math problem.",
+        "brain-lab",
+        "🧮",
+    ),
+    (
+        "Risk & Reward",
+        "risk-reward",
+        "Play it safe or push your luck across a run of decisions.",
+        "brain-lab",
+        "🎲",
+    ),
+    (
+        "Logic Grid",
+        "logic-grid",
+        "Use the clues to deduce who's who.",
+        "brain-lab",
+        "🧭",
+    ),
 ]
 
 with app.app_context():
