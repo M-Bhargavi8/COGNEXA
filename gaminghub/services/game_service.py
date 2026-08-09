@@ -2,15 +2,33 @@ import json
 import uuid
 from datetime import datetime
 
+from flask import url_for
+
 from gaminghub.database.database import db
 from gaminghub.models.game import Game
 from gaminghub.models.game_session import GameSession
 from gaminghub.models.game_result import GameResult
 from gaminghub.services.reward_service import award
+from gaminghub.services import achievement_service
+from gaminghub.services import challenge_service
+
+
+GAME_PLAY_ENDPOINTS = {
+    "guess-the-number": "games.guess",
+    "rock-paper-scissors": "games.rps",
+    "tic-tac-toe": "tictactoe.play",
+    "memory-matrix": "brain_lab.memory_matrix",
+    "reflex-lab": "brain_lab.reflex_lab",
+}
 
 
 def get_game(slug):
     return Game.query.filter_by(slug=slug).first()
+
+
+def get_play_url(slug):
+    endpoint = GAME_PLAY_ENDPOINTS.get(slug)
+    return url_for(endpoint) if endpoint else None
 
 
 def get_active_session(user, game):
@@ -80,7 +98,7 @@ def complete_session(session, user, *, outcome, xp=0, coins=0, score=0,
     session.status = "completed"
     session.ended_at = datetime.utcnow()
 
-    award(user, xp=xp, coins=coins, outcome=outcome)
+    achievements_unlocked = award(user, xp=xp, coins=coins, outcome=outcome)
 
     duration = (session.ended_at - session.started_at).total_seconds()
 
@@ -110,9 +128,17 @@ def complete_session(session, user, *, outcome, xp=0, coins=0, score=0,
     db.session.add(result)
     db.session.commit()
 
+    achievements_unlocked += achievement_service.check_game_achievements(user, result)
+    challenge_completed = challenge_service.check_challenge_completion(user, result)
+
     is_new_best = previous_best is not None and score > previous_best
 
-    return {"result": result, "is_new_best": is_new_best}
+    return {
+        "result": result,
+        "is_new_best": is_new_best,
+        "achievements_unlocked": achievements_unlocked,
+        "challenge_completed": challenge_completed
+    }
 
 
 def get_current_streak(user, game):

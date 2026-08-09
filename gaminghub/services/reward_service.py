@@ -29,6 +29,8 @@ def award(user, *, xp=0, coins=0, outcome=None):
     outcome: "win" | "loss" | "draw" | None
         None leaves games_played/wins/losses untouched (e.g. non-game
         rewards like the daily streak claim).
+
+    Returns the list of newly-unlocked Achievements (may be empty).
     """
 
     if outcome is not None:
@@ -51,6 +53,4 @@ def award(user, *, xp=0, coins=0, outcome=None):
 
     db.session.commit()
 
-    check_achievements(user)
-
-    return user
+    return check_achievements(user)

@@ -1,7 +1,7 @@
 import random
 from datetime import datetime
 
-from flask import Blueprint, render_template, request, jsonify, url_for
+from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
 
 from gaminghub.services import game_service
@@ -9,12 +9,6 @@ from gaminghub.models.game import Game
 from gaminghub.config.constants import MEMORY_MATRIX_DIFFICULTIES, REFLEX_LAB
 
 brain_lab = Blueprint("brain_lab", __name__, url_prefix="/brain-lab")
-
-
-GAME_URL_ENDPOINTS = {
-    "memory-matrix": "brain_lab.memory_matrix",
-    "reflex-lab": "brain_lab.reflex_lab",
-}
 
 
 @brain_lab.route("/")
@@ -27,9 +21,11 @@ def hub():
     ).all()
 
     game_cards = [
-        {"game": g, "url": url_for(GAME_URL_ENDPOINTS[g.slug])}
-        for g in games if g.slug in GAME_URL_ENDPOINTS
+        {"game": g, "url": game_service.get_play_url(g.slug)}
+        for g in games
     ]
+
+    game_cards = [c for c in game_cards if c["url"]]
 
     return render_template("brain_lab/hub.html", game_cards=game_cards)
 
