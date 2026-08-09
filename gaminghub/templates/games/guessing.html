@@ -17,6 +17,8 @@
         <form method="POST"
               action="{{ url_for('games.start_guess') }}">
 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <button
                 class="btn btn-success btn-lg m-2"
                 name="difficulty"
@@ -102,6 +104,8 @@
         <!-- Guess Form -->
 
         <form method="POST">
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <div class="mb-3">
 

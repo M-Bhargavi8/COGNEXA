@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from gaminghub.database.database import db, bcrypt, login_manager, migrate
+from gaminghub.database.database import db, bcrypt, login_manager, migrate, csrf
 
 def create_app():
     app = Flask(__name__)
@@ -12,6 +12,7 @@ def create_app():
     bcrypt.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
+    csrf.init_app(app)
 
     # Import models so SQLAlchemy/Alembic can see all tables
     from gaminghub import models
