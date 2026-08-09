@@ -19,6 +19,12 @@ GAME_PLAY_ENDPOINTS = {
     "tic-tac-toe": "tictactoe.play",
     "memory-matrix": "brain_lab.memory_matrix",
     "reflex-lab": "brain_lab.reflex_lab",
+    "focus-shift": "brain_lab.focus_shift",
+    "sequence-breaker": "brain_lab.sequence_breaker",
+    "code-breaker": "brain_lab.code_breaker",
+    "dual-task": "brain_lab.dual_task",
+    "risk-reward": "brain_lab.risk_reward",
+    "logic-grid": "brain_lab.logic_grid",
 }
 
 
