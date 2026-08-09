@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from flask import Blueprint, flash, redirect, url_for
 from flask_login import login_required, current_user
 
-from gaminghub.database import db
+from gaminghub.services.reward_service import award
 
 rewards = Blueprint("rewards", __name__)
 
@@ -30,11 +30,9 @@ def daily():
 
     reward = current_user.daily_streak * 20
 
-    current_user.coins += reward
-
     current_user.last_claim = today
 
-    db.session.commit()
+    award(current_user, coins=reward)
 
     flash(
         f"🎁 Daily Reward Claimed! +{reward} Coins",

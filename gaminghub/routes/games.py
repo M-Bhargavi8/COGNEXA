@@ -1,16 +1,13 @@
 import random
-from gaminghub.utils.reward_engine import reward_player
+from gaminghub.services.reward_service import award
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from flask_login import login_required, current_user
-
-from gaminghub.database.database import db
 
 games = Blueprint("games", __name__)
 
 from gaminghub.config.constants import (
     DIFFICULTIES,
-    RPS_REWARD,
-    TICTACTOE_REWARD
+    RPS_REWARD
 )
 
 
@@ -51,12 +48,12 @@ def guess():
 
         else:
 
-            reward_player(
-    current_user,
-    xp=RPS_REWARD["xp"],
-    coins=RPS_REWARD["coins"],
-    win=True
-)
+            award(
+                current_user,
+                xp=game["xp"],
+                coins=game["coins"],
+                outcome="win"
+            )
 
             session.pop("game")
 
@@ -66,12 +63,12 @@ def guess():
 
         if game["attempts_left"] <= 0:
 
-            reward_player(
-    user=current_user,
-    xp=0,
-    coins=0,
-    win=False
-)
+            award(
+                current_user,
+                xp=0,
+                coins=0,
+                outcome="loss"
+            )
 
             answer = game["secret"]
 
@@ -134,6 +131,13 @@ def rps():
 
             result = "Draw"
 
+            award(
+                current_user,
+                xp=0,
+                coins=0,
+                outcome="draw"
+            )
+
         elif (
             (player == "Rock" and computer == "Scissors")
             or
@@ -144,22 +148,22 @@ def rps():
 
             result = "Win"
 
-            reward_player(
+            award(
                 current_user,
-                xp=20,
-                coins=15,
-                win=True
+                xp=RPS_REWARD["xp"],
+                coins=RPS_REWARD["coins"],
+                outcome="win"
             )
 
         else:
 
             result = "Lose"
 
-            reward_player(
+            award(
                 current_user,
                 xp=0,
                 coins=0,
-                win=False
+                outcome="loss"
             )
 
     return render_template(

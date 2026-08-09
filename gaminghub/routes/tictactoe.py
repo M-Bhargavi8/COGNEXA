@@ -7,7 +7,8 @@ from flask import request
 from flask_login import login_required
 from flask_login import current_user
 
-from gaminghub.database.database import db
+from gaminghub.services.reward_service import award
+from gaminghub.config.constants import TICTACTOE_REWARD
 
 tictactoe = Blueprint("tictactoe", __name__)
 
@@ -52,12 +53,12 @@ def play():
 
             result="Win"
 
-            current_user.games_played+=1
-            current_user.wins+=1
-            current_user.coins+=25
-            current_user.xp+=30
-
-            db.session.commit()
+            award(
+                current_user,
+                xp=TICTACTOE_REWARD["xp"],
+                coins=TICTACTOE_REWARD["coins"],
+                outcome="win"
+            )
 
         else:
 
@@ -71,14 +72,23 @@ def play():
 
                 result="Lose"
 
-                current_user.games_played+=1
-                current_user.losses+=1
-
-                db.session.commit()
+                award(
+                    current_user,
+                    xp=0,
+                    coins=0,
+                    outcome="loss"
+                )
 
             elif "" not in board:
 
                 result="Draw"
+
+                award(
+                    current_user,
+                    xp=0,
+                    coins=0,
+                    outcome="draw"
+                )
 
     return render_template(
         "games/tictactoe.html",

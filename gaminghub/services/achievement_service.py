@@ -20,14 +20,11 @@ def unlock(user, achievement_name):
     if already:
         return
 
-    unlocked = UserAchievement(
+    db.session.add(UserAchievement(
         user_id=user.id,
         achievement_id=achievement.id
-    )
+    ))
 
-    db.session.add(unlocked)
-
-    # reward user
     user.coins += achievement.coin_reward
     user.xp += achievement.xp_reward
 
