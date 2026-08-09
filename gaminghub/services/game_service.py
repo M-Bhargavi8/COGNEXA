@@ -110,7 +110,7 @@ def complete_session(session, user, *, outcome, xp=0, coins=0, score=0,
     db.session.add(result)
     db.session.commit()
 
-    is_new_best = previous_best is None or score > previous_best
+    is_new_best = previous_best is not None and score > previous_best
 
     return {"result": result, "is_new_best": is_new_best}
 
