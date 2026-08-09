@@ -80,3 +80,47 @@ REFLEX_LAB = {
     "timing_tolerance_ms": 150,
     "good_reaction_ms": 400
 }
+
+
+CHALLENGE_TEMPLATES = [
+    {
+        "game_slug": "memory-matrix",
+        "difficulty": "hard",
+        "criteria": {"type": "win"},
+        "description": "Win a Hard difficulty Memory Matrix round.",
+        "xp": 150,
+        "coins": 100
+    },
+    {
+        "game_slug": "reflex-lab",
+        "difficulty": None,
+        "criteria": {"type": "score_at_least", "value": 700},
+        "description": "Score 700+ in Reflex Lab (react in under 300ms).",
+        "xp": 150,
+        "coins": 100
+    },
+    {
+        "game_slug": "guess-the-number",
+        "difficulty": None,
+        "criteria": {"type": "win"},
+        "description": "Win a round of Guess The Number.",
+        "xp": 80,
+        "coins": 60
+    },
+    {
+        "game_slug": "rock-paper-scissors",
+        "difficulty": None,
+        "criteria": {"type": "win"},
+        "description": "Win a round of Rock Paper Scissors.",
+        "xp": 60,
+        "coins": 50
+    },
+    {
+        "game_slug": "tic-tac-toe",
+        "difficulty": None,
+        "criteria": {"type": "win"},
+        "description": "Beat the computer at Tic Tac Toe.",
+        "xp": 80,
+        "coins": 60
+    }
+]
