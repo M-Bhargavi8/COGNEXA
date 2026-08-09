@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card shadow-lg rounded-4 p-5">
+
+        <h1 class="text-center display-4 mb-4">
+            ❌ Tic Tac Toe ⭕
+        </h1>
+
+        <p class="text-center text-muted">
+            Beat the Computer AI and earn rewards!
+        </p>
+
+        <hr>
+
+        {% if result %}
+
+            {% if result=="Win" %}
+                <div class="alert alert-success text-center fs-3">
+                    🎉 You Won!
+                    <br>
+                    +30 XP
+                    <br>
+                    +25 Coins
+                </div>
+
+            {% elif result=="Lose" %}
+                <div class="alert alert-danger text-center fs-3">
+                    😢 Computer Wins
+                </div>
+
+            {% else %}
+                <div class="alert alert-warning text-center fs-3">
+                    🤝 Draw
+                </div>
+            {% endif %}
+
+        {% endif %}
+
+        <form method="POST">
+
+            <div class="board">
+
+                {% for cell in board %}
+
+                    <button
+                        type="submit"
+                        name="move"
+                        value="{{ loop.index0 }}"
+                        class="cell"
+
+                        {% if cell!="" or result %}
+                        disabled
+                        {% endif %}>
+
+                        {{ cell }}
+
+                    </button>
+
+                    <input
+                        type="hidden"
+                        name="board"
+                        value="{{ cell }}">
+
+                {% endfor %}
+
+            </div>
+
+        </form>
+
+        <div class="text-center mt-4">
+
+            <a href="{{ url_for('tictactoe.play') }}"
+               class="btn btn-primary btn-lg">
+
+                🔄 New Game
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

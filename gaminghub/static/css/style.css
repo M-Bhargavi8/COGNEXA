@@ -1,0 +1,229 @@
+body{
+
+    background:#101414;
+
+    color:white;
+
+    font-family:Arial,sans-serif;
+
+}
+
+/* Hero */
+
+.hero{
+
+    height:90vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    background:linear-gradient(135deg,#101414,#1d3325);
+
+}
+
+/* Buttons */
+
+.btn-success{
+
+    background:#9FE2BF;
+
+    border:none;
+
+    color:black;
+
+    font-weight:bold;
+
+}
+
+.btn-success:hover{
+
+    background:#b8f5d5;
+
+}
+
+/* Cards */
+
+.game-card{
+
+    background:#1b1b1b;
+
+    border-radius:15px;
+
+    padding:40px;
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+    transition:.3s;
+
+    box-shadow:0 0 20px rgba(159,226,191,.15);
+
+}
+
+.game-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 0 30px rgba(159,226,191,.45);
+
+}
+
+/* Footer */
+
+footer{
+
+    background:#0d0d0d;
+
+    color:#999;
+
+}
+
+.game-card h1{
+    color:white !important;
+}
+
+.game-card p{
+    color:#e8e8e8 !important;
+}
+.reward-popup{
+
+position:fixed;
+
+top:45%;
+
+left:50%;
+
+transform:translate(-50%,-50%);
+
+background:#28a745;
+
+color:white;
+
+padding:20px;
+
+font-size:30px;
+
+border-radius:15px;
+
+z-index:9999;
+
+animation:reward 2s ease;
+
+}
+
+@keyframes reward{
+
+0%{
+
+opacity:0;
+
+transform:translate(-50%,50px);
+
+}
+
+50%{
+
+opacity:1;
+
+}
+
+100%{
+
+opacity:0;
+
+transform:translate(-50%,-150px);
+
+}
+
+}
+.board{
+
+display:grid;
+
+grid-template-columns:repeat(3,120px);
+
+gap:12px;
+
+justify-content:center;
+
+margin-top:30px;
+
+}
+
+.cell{
+
+width:120px;
+
+height:120px;
+
+font-size:60px;
+
+font-weight:bold;
+
+border:none;
+
+border-radius:20px;
+
+background:#1f2937;
+
+color:white;
+
+transition:.3s;
+
+}
+
+.cell:hover{
+
+background:#10b981;
+
+transform:scale(1.05);
+
+}
+
+.cell:disabled{
+
+cursor:not-allowed;
+
+opacity:.9;
+
+}
+
+.card{
+
+background:#111827;
+
+color:white;
+
+}
+
+.alert{
+
+animation:pop .5s;
+
+}
+
+@keyframes pop{
+
+0%{
+
+transform:scale(.5);
+
+opacity:0;
+
+}
+
+100%{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+}

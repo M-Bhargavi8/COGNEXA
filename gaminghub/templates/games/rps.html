@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card shadow-lg p-5 rounded-4">
+
+        <h1 class="text-center mb-4">
+            ✊ Rock Paper Scissors
+        </h1>
+
+        <form method="POST">
+
+            <div class="row text-center">
+
+                <div class="col-md-4 mb-3">
+
+                    <button
+                        name="choice"
+                        value="Rock"
+                        class="btn btn-outline-danger btn-lg w-100">
+
+                        <div class="display-2">✊</div>
+
+                        Rock
+
+                    </button>
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <button
+                        name="choice"
+                        value="Paper"
+                        class="btn btn-outline-success btn-lg w-100">
+
+                        <div class="display-2">✋</div>
+
+                        Paper
+
+                    </button>
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <button
+                        name="choice"
+                        value="Scissors"
+                        class="btn btn-outline-primary btn-lg w-100">
+
+                        <div class="display-2">✌️</div>
+
+                        Scissors
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+        {% if result %}
+
+        <hr>
+
+        <div class="text-center">
+
+            <div
+                id="countdown"
+                class="display-2 fw-bold text-primary">
+
+                Ready...
+
+            </div>
+
+            <div id="battle" style="display:none;">
+
+                <div class="row mt-4">
+
+                    <div class="col-md-6">
+
+                        <h3>You</h3>
+
+                        <div class="display-1">
+
+                            {% if player=="Rock" %}
+                            ✊
+                            {% elif player=="Paper" %}
+                            ✋
+                            {% else %}
+                            ✌️
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <h3>Computer</h3>
+
+                        <div class="display-1">
+
+                            {% if computer=="Rock" %}
+                            ✊
+                            {% elif computer=="Paper" %}
+                            ✋
+                            {% else %}
+                            ✌️
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <br>
+
+                {% if result=="Win" %}
+
+                <div class="alert alert-success fs-4">
+
+                    🎉 YOU WIN!
+
+                    <br>
+
+                    +20 XP
+
+                    <br>
+
+                    +15 Coins
+
+                </div>
+
+                {% elif result=="Lose" %}
+
+                <div class="alert alert-danger fs-4">
+
+                    😢 YOU LOST
+
+                </div>
+
+                {% else %}
+
+                <div class="alert alert-warning fs-4">
+
+                    🤝 DRAW
+
+                </div>
+
+                {% endif %}
+
+                <a
+                    href="{{ url_for('games.rps') }}"
+                    class="btn btn-dark btn-lg mt-3">
+
+                    🔄 Play Again
+
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- Sounds -->
+
+<audio id="winSound">
+    <source src="{{ url_for('static', filename='sounds/win.mp3') }}" type="audio/mpeg">
+</audio>
+
+<audio id="loseSound">
+    <source src="{{ url_for('static', filename='sounds/lose.mp3') }}" type="audio/mpeg">
+</audio>
+
+<!-- Reward Script -->
+
+<script src="{{ url_for('static', filename='js/reward.js') }}"></script>
+
+<script>
+
+const countdown = document.getElementById("countdown");
+const battle = document.getElementById("battle");
+
+if (countdown){
+
+    let number = 3;
+
+    countdown.innerHTML = number;
+
+    let timer = setInterval(function(){
+
+        number--;
+
+        if(number > 0){
+
+            countdown.innerHTML = number;
+
+        }
+
+        else if(number == 0){
+
+            countdown.innerHTML = "GO!";
+
+        }
+
+        else{
+
+            clearInterval(timer);
+
+            countdown.style.display = "none";
+
+            battle.style.display = "block";
+
+            {% if result=="Win" %}
+
+                document.getElementById("winSound").play();
+
+                showReward(20,15);
+
+            {% elif result=="Lose" %}
+
+                document.getElementById("loseSound").play();
+
+            {% endif %}
+
+        }
+
+    },1000);
+
+}
+
+</script>
+
+{% endblock %}

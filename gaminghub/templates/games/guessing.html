@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    {% if not game %}
+
+    <div class="card shadow-lg p-5 rounded-4 text-center">
+
+        <h2>🎯 Select Difficulty</h2>
+
+        <p class="text-muted">
+            Choose your challenge
+        </p>
+
+        <form method="POST"
+              action="{{ url_for('games.start_guess') }}">
+
+            <button
+                class="btn btn-success btn-lg m-2"
+                name="difficulty"
+                value="easy">
+
+                Easy
+
+            </button>
+
+            <button
+                class="btn btn-warning btn-lg m-2"
+                name="difficulty"
+                value="medium">
+
+                Medium
+
+            </button>
+
+            <button
+                class="btn btn-danger btn-lg m-2"
+                name="difficulty"
+                value="hard">
+
+                Hard
+
+            </button>
+
+        </form>
+
+    </div>
+
+    {% else %}
+
+    <div class="card shadow-lg p-5 rounded-4 game-card">
+
+        <h1 class="display-4 text-center text-white fw-bold mb-3">
+
+            🎯 Guess The Number
+
+        </h1>
+
+        <p class="text-center text-light fs-5">
+
+            Can you guess the secret number?
+
+        </p>
+
+        <hr>
+
+        <!-- Hearts -->
+
+        <div class="text-center mb-4">
+
+            {% for i in range(game.attempts_left) %}
+
+                <span class="heart fs-2">❤️</span>
+
+            {% endfor %}
+
+            {% for i in range(game.max_attempts - game.attempts_left) %}
+
+                <span class="heart fs-2">🤍</span>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- Progress -->
+
+        <div class="progress mb-4" style="height:30px;">
+
+            <div
+                class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                role="progressbar"
+                style="width: {{ (game.attempts_left * 100 / game.max_attempts) }}%;">
+
+                {{ game.attempts_left }}/{{ game.max_attempts }}
+
+            </div>
+
+        </div>
+
+        <!-- Guess Form -->
+
+        <form method="POST">
+
+            <div class="mb-3">
+
+                <input
+                    type="number"
+                    name="guess"
+                    class="form-control form-control-lg"
+                    placeholder="Enter your guess"
+                    required>
+
+            </div>
+
+            <button class="btn btn-success btn-lg w-100">
+
+                Guess
+
+            </button>
+
+        </form>
+
+        <!-- Message -->
+
+        {% if message %}
+
+            <div class="mt-4">
+
+                {% if "Correct" in message %}
+
+                    <div class="alert alert-success text-center">
+
+                        🎉 {{ message }}
+
+                    </div>
+
+                {% elif "High" in message %}
+
+                    <div class="alert alert-danger text-center">
+
+                        📈 {{ message }}
+
+                    </div>
+
+                {% elif "Low" in message %}
+
+                    <div class="alert alert-primary text-center">
+
+                        📉 {{ message }}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="alert alert-warning text-center">
+
+                        ⚠ {{ message }}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- Reward Popup -->
+
+<div
+    id="reward"
+    class="reward text-center"
+    style="display:none;">
+
+    +25 Coins
+
+    <br>
+
+    +50 XP
+
+</div>
+
+<!-- Sounds -->
+
+<audio id="winSound">
+    <source src="{{ url_for('static', filename='sounds/win.mp3') }}" type="audio/mpeg">
+</audio>
+
+<audio id="loseSound">
+    <source src="{{ url_for('static', filename='sounds/lose.mp3') }}" type="audio/mpeg">
+</audio>
+
+<audio id="clickSound">
+    <source src="{{ url_for('static', filename='sounds/click.mp3') }}" type="audio/mpeg">
+</audio>
+
+{% endblock %}

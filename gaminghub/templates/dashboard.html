@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="text-center text-light mb-5">
+        🎮 Welcome, {{ current_user.username }}
+    </h2>
+
+    <div class="row g-4">
+
+        <!-- Player Profile -->
+        <div class="col-lg-4">
+
+            <div class="card dashboard-card text-center">
+
+                <img
+                    src="{{ url_for('static', filename='images/avatar.png') }}"
+                    class="avatar mx-auto mt-4">
+
+                <div class="card-body">
+
+                    <h3>{{ current_user.username }}</h3>
+
+                    <p>{{ current_user.email }}</p>
+
+                    <hr>
+
+                    <h5>⭐ Level {{ current_user.level }}</h5>
+
+                    <h5>💰 {{ current_user.coins }} Coins</h5>
+
+                    <h5>⚡ {{ current_user.xp }} XP</h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Statistics -->
+
+        <div class="col-lg-8">
+
+            <div class="card dashboard-card">
+
+                <div class="card-body">
+
+                    <h3 class="mb-4">
+                        📊 Statistics
+                    </h3>
+
+                    <div class="row text-center">
+
+                        <div class="col">
+                            <h2>{{ current_user.games_played }}</h2>
+                            <p>Games</p>
+                        </div>
+
+                        <div class="col">
+                            <h2>{{ current_user.wins }}</h2>
+                            <p>Wins</p>
+                        </div>
+
+                        <div class="col">
+                            <h2>{{ current_user.losses }}</h2>
+                            <p>Losses</p>
+                        </div>
+
+                        <div class="col">
+                            <h2>{{ current_user.high_score }}</h2>
+                            <p>High Score</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<div class="col-md-4">
+
+    <div class="card shadow p-4 text-center">
+
+        <a
+href="{{ url_for('gamehub.games_home') }}"
+class="btn btn-lg btn-success">
+
+🎮 Browse Games
+
+</a>
+
+    </div>
+
+</div>
+<div class="card shadow mt-4">
+
+<div class="card-header bg-warning text-dark">
+
+🏅 Achievements
+
+</div>
+
+<div class="card-body">
+
+{% if current_user.achievements %}
+
+{% for achievement in current_user.achievements[-5:] %}
+
+<div class="mb-2">
+
+<h5>
+
+{{ achievement.badge }}
+
+{{ achievement.title }}
+
+</h5>
+
+<small>
+
+{{ achievement.description }}
+
+</small>
+
+</div>
+
+<hr>
+
+{% endfor %}
+
+{% else %}
+
+<p>No achievements yet.</p>
+
+{% endif %}
+
+</div>
+
+</div>
+<div class="card shadow mt-4">
+
+<div class="card-header">
+
+⭐ Current Level
+
+</div>
+
+<div class="card-body">
+
+<h2>
+
+Level {{ current_user.level }}
+
+</h2>
+
+<div class="progress">
+
+<div
+class="progress-bar bg-success"
+style="width: {{ current_user.xp % 100 }}%;">
+
+{{ current_user.xp % 100 }}%
+
+</div>
+
+</div>
+
+<p class="mt-2">
+
+{{ current_user.xp }} XP
+
+</p>
+
+</div>
+
+</div>
+<div class="card shadow mt-4">
+
+<div class="card-header bg-success text-white">
+
+🔥 Daily Streak
+
+</div>
+
+<div class="card-body text-center">
+
+<h2>
+
+{{ current_user.daily_streak }}
+
+Days
+
+</h2>
+
+<a href="{{ url_for('rewards.daily') }}"
+
+class="btn btn-success">
+
+Claim Reward
+
+</a>
+
+</div>
+
+</div>
+{% endblock %}

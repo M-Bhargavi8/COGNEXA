@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<h1 class="display-4 text-center mb-5">
+
+🎮 Gaming Hub
+
+</h1>
+
+<div class="row g-4">
+
+<div class="col-md-4">
+
+<div class="card shadow h-100 text-center p-4">
+
+<h2>🎯</h2>
+
+<h4>Guess The Number</h4>
+
+<p>
+Earn XP and Coins by guessing correctly.
+</p>
+
+<a
+href="{{ url_for('games.guess') }}"
+class="btn btn-success">
+
+Play
+
+</a>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100 text-center p-4">
+
+<h2>✊</h2>
+
+<h4>Rock Paper Scissors</h4>
+
+<p>
+Beat the Computer.
+</p>
+
+<a
+href="{{ url_for('games.rps') }}"
+class="btn btn-primary">
+
+Play
+
+</a>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100 text-center p-4">
+
+<h2>❌</h2>
+
+<h4>Tic Tac Toe</h4>
+
+<p>
+Play against AI.
+</p>
+
+<a
+href="{{ url_for('tictactoe.play') }}"
+class="btn btn-danger">
+
+Play
+
+</a>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100 text-center p-4">
+
+<h2>🧠</h2>
+
+<h4>Quiz Challenge</h4>
+
+<p>
+
+Coming Soon
+
+</p>
+
+<button
+class="btn btn-secondary"
+disabled>
+
+Coming Soon
+
+</button>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow h-100 text-center p-4">
+
+<h2>🔤</h2>
+
+<h4>Hangman</h4>
+
+<p>
+
+Coming Soon
+
+</p>
+
+<button
+class="btn btn-secondary"
+disabled>
+
+Coming Soon
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
