@@ -92,6 +92,36 @@ href="{{ url_for('static', filename='css/game.css') }}">
 
     {% if current_user.is_authenticated %}
 
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            🔔 Notifications
+            {% if nav_unread_count > 0 %}
+            <span class="badge bg-danger">{{ nav_unread_count }}</span>
+            {% endif %}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end notification-dropdown">
+            {% if nav_recent_notifications %}
+            {% for n in nav_recent_notifications %}
+            <li>
+                <a class="dropdown-item {{ '' if n.is_read else 'fw-bold' }}" href="{{ url_for('notifications.open_notification', notification_id=n.id) }}">
+                    {{ n.icon or '🔔' }} {{ n.title }}
+                </a>
+            </li>
+            {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li class="px-3 pb-2">
+                <form method="POST" action="{{ url_for('notifications.mark_all_read') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-sm btn-outline-light w-100" type="submit">Mark all read</button>
+                </form>
+            </li>
+            <li><a class="dropdown-item text-center" href="{{ url_for('notifications.notifications_home') }}">View All</a></li>
+            {% else %}
+            <li><span class="dropdown-item-text text-muted">No notifications yet.</span></li>
+            {% endif %}
+        </ul>
+    </li>
+
     <li class="nav-item">
         <a class="nav-link"
            href="{{ url_for('profile.profile_page') }}">

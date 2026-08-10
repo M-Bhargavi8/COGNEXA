@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-light mb-0">🔔 Notifications</h2>
+
+        {% if notifications %}
+        <form method="POST" action="{{ url_for('notifications.mark_all_read') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-outline-light btn-sm" type="submit">Mark all read</button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if not notifications %}
+
+    <div class="card dashboard-card text-center p-5">
+        <p class="text-light fs-5 mb-1">No notifications yet.</p>
+        <p class="text-muted mb-0">Achievements, level-ups, and personal bests will show up here.</p>
+    </div>
+
+    {% else %}
+
+    <div class="card dashboard-card p-0">
+        <div class="list-group list-group-flush">
+            {% for n in notifications %}
+            <div class="list-group-item bg-transparent text-light py-3 {{ 'notification-unread' if not n.is_read }}">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+
+                    <div>
+                        <div class="{{ 'fw-bold' if not n.is_read }}">
+                            {{ n.icon or '🔔' }} {{ n.title }}
+                            {% if not n.is_read %}<span class="badge bg-primary ms-1">new</span>{% endif %}
+                        </div>
+                        {% if n.message %}
+                        <div class="text-muted small mt-1">{{ n.message }}</div>
+                        {% endif %}
+                        <div class="text-muted small mt-1">{{ n.created_at.strftime('%b %d, %Y %H:%M') }}</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {% if n.link %}
+                        <a href="{{ url_for('notifications.open_notification', notification_id=n.id) }}" class="btn btn-sm btn-outline-success">View</a>
+                        {% endif %}
+                        {% if not n.is_read %}
+                        <form method="POST" action="{{ url_for('notifications.mark_read', notification_id=n.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-sm btn-outline-secondary" type="submit">Mark read</button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

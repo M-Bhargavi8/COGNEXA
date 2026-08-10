@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_login import current_user
 from config import Config
 from gaminghub.database.database import db, bcrypt, login_manager, migrate, csrf
 
@@ -30,6 +31,7 @@ def create_app():
     from gaminghub.routes.rewards import rewards
     from gaminghub.routes.brain_lab import brain_lab
     from gaminghub.routes.analytics import analytics
+    from gaminghub.routes.notifications import notifications
 
     # Register Blueprints
     app.register_blueprint(main)
@@ -44,5 +46,17 @@ def create_app():
     app.register_blueprint(rewards)
     app.register_blueprint(brain_lab)
     app.register_blueprint(analytics)
+    app.register_blueprint(notifications)
+
+    from gaminghub.services import notification_service
+
+    @app.context_processor
+    def inject_notifications():
+        if current_user.is_authenticated:
+            return {
+                "nav_unread_count": notification_service.get_unread_count(current_user),
+                "nav_recent_notifications": notification_service.get_recent(current_user, limit=6)
+            }
+        return {"nav_unread_count": 0, "nav_recent_notifications": []}
 
     return app

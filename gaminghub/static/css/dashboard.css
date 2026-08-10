@@ -53,3 +53,15 @@ h2,h3,h5{
     padding:20px;
 
 }
+
+.notification-unread {
+    background: rgba(13, 110, 253, 0.08);
+}
+
+.notification-dropdown {
+    max-width: 340px;
+}
+
+.notification-dropdown .dropdown-item {
+    white-space: normal;
+}
