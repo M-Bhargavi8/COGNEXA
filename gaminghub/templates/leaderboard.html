@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="text-light mb-4">{{ title }}</h2>
+
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item">
+            <a class="nav-link {{ 'active' if view == 'global' }}" href="{{ url_for('leaderboard.leaderboard_home') }}">🌍 Global</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ 'active' if view == 'daily' }}" href="{{ url_for('leaderboard.daily') }}">📅 Daily</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ 'active' if view == 'weekly' }}" href="{{ url_for('leaderboard.weekly') }}">🗓️ Weekly</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {{ 'active' if view == 'game' }}" href="#" data-bs-toggle="dropdown">🎮 By Game</a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+                {% for g in games %}
+                <li><a class="dropdown-item" href="{{ url_for('leaderboard.by_game', slug=g.slug) }}">{{ g.icon }} {{ g.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {{ 'active' if view == 'category' }}" href="#" data-bs-toggle="dropdown">📂 By Category</a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+                {% for c in categories %}
+                <li><a class="dropdown-item" href="{{ url_for('leaderboard.by_category', category=c) }}">{{ category_labels.get(c, c) }}</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>
+
+    <div class="card dashboard-card p-3 mb-4 text-center">
+        {% if my_rank %}
+        <span class="text-light fs-5">You're ranked <strong>#{{ my_rank }}</strong>{% if my_value is not none %} &middot; {{ value_label }}: {{ my_value }}{% endif %}</span>
+        {% else %}
+        <span class="text-muted">Not ranked yet on this board &mdash; play a round to get on it.</span>
+        {% endif %}
+    </div>
+
+    <div class="card dashboard-card p-3">
+
+        {% if entries %}
+        <div class="table-responsive">
+            <table class="table table-dark table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>{{ value_label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr class="{{ 'table-warning text-dark' if entry.user.id == current_user.id }}">
+                        <td>
+                            {% if entry.rank == 1 %}🥇
+                            {% elif entry.rank == 2 %}🥈
+                            {% elif entry.rank == 3 %}🥉
+                            {% else %}{{ entry.rank }}
+                            {% endif %}
+                        </td>
+                        <td>{{ entry.user.username }}{% if entry.user.id == current_user.id %} (you){% endif %}</td>
+                        <td>{{ entry.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center mb-0">No results yet for this leaderboard.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
