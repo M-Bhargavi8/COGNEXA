@@ -1,20 +1,38 @@
+import re
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user
 
-from gaminghub.database.database import db, bcrypt
+from gaminghub.database.database import db, bcrypt, limiter
 from gaminghub.models.user import User
 
 auth = Blueprint("auth", __name__)
 
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
 @auth.route("/register", methods=["GET", "POST"])
+@limiter.limit("5 per hour")
 def register():
 
     if request.method == "POST":
 
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        confirm_password = request.form.get("confirm_password")
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not (3 <= len(username) <= 30):
+            flash("Username must be between 3 and 30 characters.", "danger")
+            return redirect(url_for("auth.register"))
+
+        if not EMAIL_RE.match(email) or len(email) > 120:
+            flash("Enter a valid email address.", "danger")
+            return redirect(url_for("auth.register"))
+
+        if len(password) < 8:
+            flash("Password must be at least 8 characters.", "danger")
+            return redirect(url_for("auth.register"))
 
         if password != confirm_password:
             flash("Passwords do not match.", "danger")
@@ -47,6 +65,7 @@ def register():
 
 
 @auth.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per minute")
 def login():
 
     if request.method == "POST":
