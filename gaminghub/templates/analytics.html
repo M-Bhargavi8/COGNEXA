@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="text-light mb-4">📊 My Analytics</h2>
+
+    {% if overview.games_played == 0 %}
+
+    <div class="card dashboard-card text-center p-5">
+        <p class="text-light fs-5 mb-3">No games played yet.</p>
+        <p class="text-muted mb-4">Play a few rounds and your performance data will show up here.</p>
+        <a href="{{ url_for('brain_lab.hub') }}" class="btn btn-success btn-lg mx-auto" style="max-width: 240px;">
+            🧠 Head to Brain Lab
+        </a>
+    </div>
+
+    {% else %}
+
+    <div class="row g-3 mb-4">
+
+        {% set stats = [
+            ('⭐', 'Level', overview.level),
+            ('⚡', 'XP', overview.xp),
+            ('💰', 'Coins', overview.coins),
+            ('🔥', 'Streak', overview.streak ~ ' days'),
+            ('🎮', 'Games Played', overview.games_played),
+            ('🏆', 'Win Rate', (overview.win_rate ~ '%') if overview.win_rate is not none else '—'),
+            ('📈', 'Avg Score', overview.avg_score if overview.avg_score is not none else '—'),
+            ('🥇', 'Best Score', overview.best_score if overview.best_score is not none else '—'),
+            ('🎯', 'Accuracy', (overview.avg_accuracy ~ '%') if overview.avg_accuracy is not none else '—'),
+            ('⏱️', 'Avg Reaction', (overview.avg_reaction_time ~ ' ms') if overview.avg_reaction_time is not none else '—'),
+        ] %}
+
+        {% for icon, label, value in stats %}
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card dashboard-card text-center p-3 h-100">
+                <div class="fs-3">{{ icon }}</div>
+                <div class="fs-5 fw-bold text-light">{{ value }}</div>
+                <div class="text-muted small">{{ label }}</div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-6">
+            <div class="card dashboard-card p-3">
+                <h5 class="text-center mb-2">Games Played (last 14 days)</h5>
+                <canvas id="gamesChart" height="180"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card dashboard-card p-3">
+                <h5 class="text-center mb-2">XP Earned (last 14 days)</h5>
+                <canvas id="xpChart" height="180"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    {% if skill_profile %}
+    <div class="card dashboard-card p-3 mb-4">
+        <h5 class="text-center mb-2">Skill Profile</h5>
+        <p class="text-muted text-center small mb-3">
+            Win rate on skill-relevant games. A game-performance profile, not a psychological or medical assessment.
+        </p>
+        <canvas id="skillChart" height="140"></canvas>
+    </div>
+    {% endif %}
+
+    <div class="card dashboard-card p-3 mb-4">
+        <h5 class="mb-3">Per-Game Performance</h5>
+        <div class="table-responsive">
+            <table class="table table-dark table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Game</th>
+                        <th>Plays</th>
+                        <th>Win Rate</th>
+                        <th>Best Score</th>
+                        <th>Avg Score</th>
+                        <th>Accuracy</th>
+                        <th>Avg Reaction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in per_game %}
+                    <tr>
+                        <td>
+                            {% if g.url %}
+                            <a href="{{ g.url }}" class="text-light text-decoration-none">{{ g.icon }} {{ g.name }}</a>
+                            {% else %}
+                            {{ g.icon }} {{ g.name }}
+                            {% endif %}
+                        </td>
+                        <td>{{ g.plays }}</td>
+                        <td>{{ g.win_rate }}%</td>
+                        <td>{{ g.best_score }}</td>
+                        <td>{{ g.avg_score }}</td>
+                        <td>{{ g.avg_accuracy ~ '%' if g.avg_accuracy is not none else '—' }}</td>
+                        <td>{{ g.avg_reaction_time ~ ' ms' if g.avg_reaction_time is not none else '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if recommendations %}
+    <div class="card dashboard-card p-3">
+        <h5 class="mb-3">Recommended For You</h5>
+        <div class="row g-3">
+            {% for rec in recommendations %}
+            <div class="col-md-4">
+                <div class="card dashboard-card h-100 text-center p-3">
+                    <div class="display-6 mb-2">{{ rec.game.icon }}</div>
+                    <h6>{{ rec.game.name }}</h6>
+                    <p class="text-muted small">{{ rec.reason }}</p>
+                    <a href="{{ rec.url }}" class="btn btn-success mt-auto">Play Now</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    if (typeof Chart === "undefined") return;
+
+    const activityLabels = {{ activity.labels | tojson }};
+    const gamesData = {{ activity.games_played | tojson }};
+    const xpData = {{ activity.xp_earned | tojson }};
+
+    const shortLabels = activityLabels.map(d => d.slice(5));
+
+    const gamesEl = document.getElementById("gamesChart");
+    if (gamesEl) {
+        new Chart(gamesEl, {
+            type: "line",
+            data: {
+                labels: shortLabels,
+                datasets: [{
+                    label: "Games Played",
+                    data: gamesData,
+                    borderColor: "#2ecc71",
+                    backgroundColor: "rgba(46, 204, 113, 0.15)",
+                    tension: 0.25,
+                    fill: true
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    const xpEl = document.getElementById("xpChart");
+    if (xpEl) {
+        new Chart(xpEl, {
+            type: "line",
+            data: {
+                labels: shortLabels,
+                datasets: [{
+                    label: "XP Earned",
+                    data: xpData,
+                    borderColor: "#f1c40f",
+                    backgroundColor: "rgba(241, 196, 15, 0.15)",
+                    tension: 0.25,
+                    fill: true
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    const skillEl = document.getElementById("skillChart");
+    if (skillEl) {
+        const skillProfile = {{ skill_profile | tojson }};
+        new Chart(skillEl, {
+            type: "bar",
+            data: {
+                labels: skillProfile.map(s => s.skill),
+                datasets: [{
+                    label: "Win Rate",
+                    data: skillProfile.map(s => s.score),
+                    backgroundColor: "#5865f2"
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                scales: { x: { beginAtZero: true, max: 100 } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+})();
+</script>
+
+{% endblock %}
