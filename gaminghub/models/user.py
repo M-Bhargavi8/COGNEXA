@@ -25,8 +25,12 @@ class User(db.Model, UserMixin):
     bio = db.Column(db.String(300), default="I love strategy games.")
     country = db.Column(db.String(50), default="India")
     favorite_game = db.Column(db.String(100), default="Guess The Number")
-    avatar = db.Column(db.String(200), default="default.png")
+    avatar = db.Column(db.String(200), default="avatar1.png")
     title = db.Column(db.String(100), default="Beginner")
+
+    equipped_frame = db.Column(db.String(50))
+    equipped_badge = db.Column(db.String(10))
+    xp_booster_expires_at = db.Column(db.DateTime)
 
     login_streak = db.Column(db.Integer, default=1)
     daily_streak = db.Column(db.Integer, default=0)

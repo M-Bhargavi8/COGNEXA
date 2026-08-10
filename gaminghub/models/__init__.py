@@ -6,3 +6,5 @@ from gaminghub.models.game_session import GameSession
 from gaminghub.models.game_result import GameResult
 from gaminghub.models.challenge import Challenge
 from gaminghub.models.user_challenge import UserChallenge
+from gaminghub.models.shop_item import ShopItem
+from gaminghub.models.user_inventory import UserInventory
