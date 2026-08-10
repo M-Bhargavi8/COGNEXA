@@ -4,25 +4,82 @@
 
 <div class="container py-5">
 
-    <h2 class="text-light mb-4">
-        🛠️ Admin Dashboard
-    </h2>
+    <h2 class="text-light mb-4">🛠️ Admin Dashboard</h2>
 
-    <div class="card dashboard-card">
+    {% set view = 'overview' %}
+    {% include "admin/_nav.html" %}
 
-        <div class="card-body">
+    <div class="row g-3 mb-4">
 
-            <p>
-                Signed in as <strong>{{ current_user.username }}</strong>
-                (role: {{ current_user.role }}).
-            </p>
+        {% set cards = [
+            ('👥', 'Total Users', stats.total_users),
+            ('🆕', 'New Users (7d)', stats.new_users_7d),
+            ('🛡️', 'Admins', stats.total_admins),
+            ('🎮', 'Games Played', stats.total_games_played),
+            ('🟢', 'Active Sessions', stats.active_sessions),
+            ('⚡', 'Total Lifetime XP', stats.total_lifetime_xp),
+            ('🕹️', 'Active Games', stats.active_games ~ ' / ' ~ stats.total_games),
+            ('🛍️', 'Active Shop Items', stats.active_shop_items ~ ' / ' ~ stats.total_shop_items),
+        ] %}
 
-            <p class="mb-0">
-                This page exists to prove the role-based access gate works
-                end-to-end. User management, game/achievement/challenge
-                management, and analytics land in a later phase.
-            </p>
+        {% for icon, label, value in cards %}
+        <div class="col-6 col-md-3">
+            <div class="card dashboard-card text-center p-3 h-100">
+                <div class="fs-3">{{ icon }}</div>
+                <div class="fs-5 fw-bold text-light">{{ value }}</div>
+                <div class="text-muted small">{{ label }}</div>
+            </div>
+        </div>
+        {% endfor %}
 
+    </div>
+
+    {% if stats.most_played_game %}
+    <div class="card dashboard-card p-3 mb-4 text-center">
+        <span class="text-light">🔥 Most played game: <strong>{{ stats.most_played_game.icon }} {{ stats.most_played_game.name }}</strong> ({{ stats.most_played_game.plays }} plays)</span>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="mb-3">🆕 Recent Signups</h5>
+                    {% if recent_signups %}
+                    <ul class="list-group list-group-flush">
+                        {% for u in recent_signups %}
+                        <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                            <span>{{ u.username }} <span class="badge bg-secondary">{{ u.role }}</span></span>
+                            <span class="text-muted small">{{ u.created_at.strftime('%b %d, %Y') if u.created_at else '—' }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted mb-0">No signups yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="mb-3">🕹️ Recent Game Results</h5>
+                    {% if recent_results %}
+                    <ul class="list-group list-group-flush">
+                        {% for result, u, g in recent_results %}
+                        <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                            <span>{{ u.username }} &middot; {{ g.icon }} {{ g.name }} &middot; {{ result.result }}</span>
+                            <span class="text-muted small">{{ result.created_at.strftime('%b %d, %H:%M') if result.created_at else '—' }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted mb-0">No games played yet.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
     </div>

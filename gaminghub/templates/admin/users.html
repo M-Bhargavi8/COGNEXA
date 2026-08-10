@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="text-light mb-4">🛠️ Admin Dashboard</h2>
+
+    {% set view = 'users' %}
+    {% include "admin/_nav.html" %}
+
+    <form method="GET" class="mb-4 d-flex gap-2" style="max-width: 400px;">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by username...">
+        <button class="btn btn-outline-light" type="submit">Search</button>
+        {% if query %}
+        <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary">Clear</a>
+        {% endif %}
+    </form>
+
+    <div class="card dashboard-card p-3">
+
+        {% if users %}
+        <div class="table-responsive">
+            <table class="table table-dark table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Level</th>
+                        <th>Coins</th>
+                        <th>Games Played</th>
+                        <th>Joined</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>{{ u.username }}{% if u.id == current_user.id %} (you){% endif %}</td>
+                        <td>{{ u.email }}</td>
+                        <td><span class="badge {{ 'bg-warning text-dark' if u.role == 'admin' else 'bg-secondary' }}">{{ u.role }}</span></td>
+                        <td>{{ u.level }}</td>
+                        <td>{{ u.coins }}</td>
+                        <td>{{ u.games_played }}</td>
+                        <td>{{ u.created_at.strftime('%b %d, %Y') if u.created_at else '—' }}</td>
+                        <td>
+                            {% if u.id == current_user.id %}
+                            <span class="text-muted small">can't edit yourself</span>
+                            {% else %}
+                            <form method="POST" action="{{ url_for('admin.toggle_user_role', user_id=u.id, q=query) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                {% if u.role == 'admin' %}
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Demote to player</button>
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-warning" type="submit">Promote to admin</button>
+                                {% endif %}
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center mb-0">No users found{% if query %} for "{{ query }}"{% endif %}.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
