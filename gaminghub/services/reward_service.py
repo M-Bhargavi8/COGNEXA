@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from gaminghub.database.database import db
-from gaminghub.config.constants import LEVEL_XP
+from gaminghub.config.constants import LEVEL_XP, XP_BOOSTER
 from gaminghub.services.achievement_service import check_achievements
 
 
@@ -32,6 +34,9 @@ def award(user, *, xp=0, coins=0, outcome=None):
 
     Returns the list of newly-unlocked Achievements (may be empty).
     """
+
+    if xp and user.xp_booster_expires_at and user.xp_booster_expires_at > datetime.utcnow():
+        xp *= XP_BOOSTER["multiplier"]
 
     if outcome is not None:
 

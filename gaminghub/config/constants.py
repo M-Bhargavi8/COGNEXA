@@ -24,6 +24,12 @@ DIFFICULTIES = {
 LEVEL_XP = 100
 
 
+XP_BOOSTER = {
+    "duration_hours": 1,
+    "multiplier": 2
+}
+
+
 RPS_REWARD = {
     "coins": 15,
     "xp": 20
