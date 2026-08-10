@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from gaminghub.database.database import db
 from gaminghub.config.constants import LEVEL_XP, XP_BOOSTER
@@ -71,3 +71,29 @@ def award(user, *, xp=0, coins=0, outcome=None):
     notification_service.notify_achievements(user, achievements_unlocked)
 
     return achievements_unlocked
+
+
+def claim_daily_reward(user):
+    """
+    Returns (success, message, coins_awarded). Centralizes the streak
+    bookkeeping so the web /daily route and the REST API's daily-claim
+    endpoint share one implementation instead of two copies that could
+    drift apart.
+    """
+
+    today = date.today()
+
+    if user.last_claim == today:
+        return False, "You already claimed today's reward!", 0
+
+    if user.last_claim == today - timedelta(days=1):
+        user.daily_streak += 1
+    else:
+        user.daily_streak = 1
+
+    reward = user.daily_streak * 20
+    user.last_claim = today
+
+    award(user, coins=reward)
+
+    return True, f"🎁 Daily Reward Claimed! +{reward} Coins", reward
