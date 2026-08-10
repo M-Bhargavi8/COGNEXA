@@ -3,6 +3,7 @@ from datetime import datetime
 from gaminghub.database.database import db
 from gaminghub.config.constants import LEVEL_XP, XP_BOOSTER
 from gaminghub.services.achievement_service import check_achievements
+from gaminghub.services import notification_service
 
 
 def _apply_level_ups(user):
@@ -48,6 +49,8 @@ def award(user, *, xp=0, coins=0, outcome=None):
             user.losses += 1
         # "draw" still counts as a game played, but isn't a win or a loss
 
+    level_before = user.level
+
     user.xp += xp
     user.coins += coins
 
@@ -58,4 +61,13 @@ def award(user, *, xp=0, coins=0, outcome=None):
 
     db.session.commit()
 
-    return check_achievements(user)
+    if user.level > level_before:
+        notification_service.create(
+            user, "level_up", f"Level Up! You reached Level {user.level}",
+            icon="⬆️", link="/dashboard"
+        )
+
+    achievements_unlocked = check_achievements(user)
+    notification_service.notify_achievements(user, achievements_unlocked)
+
+    return achievements_unlocked

@@ -11,6 +11,7 @@ from gaminghub.models.game_result import GameResult
 from gaminghub.services.reward_service import award
 from gaminghub.services import achievement_service
 from gaminghub.services import challenge_service
+from gaminghub.services import notification_service
 
 
 GAME_PLAY_ENDPOINTS = {
@@ -134,10 +135,27 @@ def complete_session(session, user, *, outcome, xp=0, coins=0, score=0,
     db.session.add(result)
     db.session.commit()
 
-    achievements_unlocked += achievement_service.check_game_achievements(user, result)
+    game_achievements = achievement_service.check_game_achievements(user, result)
+    notification_service.notify_achievements(user, game_achievements)
+    achievements_unlocked += game_achievements
+
     challenge_completed = challenge_service.check_challenge_completion(user, result)
 
     is_new_best = previous_best is not None and score > previous_best
+
+    game = Game.query.get(session.game_id)
+
+    if is_new_best:
+        notification_service.create(
+            user, "personal_best", f"New Personal Best in {game.name}!",
+            message=f"Score: {score}", icon="🎯", link=get_play_url(game.slug)
+        )
+
+    if challenge_completed:
+        notification_service.create(
+            user, "challenge", "Daily Challenge Complete!",
+            message=challenge_completed.description, icon="🔥", link="/dashboard"
+        )
 
     return {
         "result": result,
