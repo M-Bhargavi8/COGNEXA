@@ -9,3 +9,4 @@ from gaminghub.models.user_challenge import UserChallenge
 from gaminghub.models.shop_item import ShopItem
 from gaminghub.models.user_inventory import UserInventory
 from gaminghub.models.notification import Notification
+from gaminghub.models.api_token import ApiToken
