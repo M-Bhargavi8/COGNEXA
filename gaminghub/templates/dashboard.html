@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shop.css') }}">
+
 <div class="container py-5">
 
     <h2 class="text-center text-light mb-5">
@@ -15,9 +17,13 @@
 
             <div class="card dashboard-card text-center">
 
-                <img
-                    src="{{ url_for('static', filename='images/avatars/avatar1.png') }}"
-                    class="avatar mx-auto mt-4">
+                <div class="avatar-wrap mx-auto mt-4 {{ current_user.equipped_frame or '' }}">
+                    <img src="{{ url_for('static', filename='images/avatars/' ~ current_user.avatar) }}">
+                </div>
+
+                {% if current_user.equipped_badge %}
+                <div class="equipped-badge mt-1">{{ current_user.equipped_badge }}</div>
+                {% endif %}
 
                 <div class="card-body">
 

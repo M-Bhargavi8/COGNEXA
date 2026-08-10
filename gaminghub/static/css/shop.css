@@ -1,0 +1,56 @@
+.avatar-wrap {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    padding: 4px;
+    display: inline-block;
+    background: #333;
+}
+
+.avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.frame-bronze { background: linear-gradient(135deg, #cd7f32, #8c5a2b); }
+.frame-silver { background: linear-gradient(135deg, #e0e0e0, #8c8c8c); }
+.frame-gold { background: linear-gradient(135deg, #ffd700, #b8860b); }
+.frame-neon { background: linear-gradient(135deg, #39ff14, #00c8ff); box-shadow: 0 0 16px #39ff14; }
+.frame-diamond { background: linear-gradient(135deg, #b9f2ff, #6dd5ed, #ffffff); box-shadow: 0 0 20px #6dd5ed; }
+
+.equipped-badge {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.shop-item-card {
+    height: 100%;
+}
+
+.shop-item-preview {
+    font-size: 2.5rem;
+}
+
+.shop-avatar-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.shop-frame-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    padding: 4px;
+    margin: 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .frame-neon, .frame-diamond {
+        box-shadow: none;
+    }
+}
