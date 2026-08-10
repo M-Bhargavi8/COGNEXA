@@ -34,16 +34,46 @@ def _period_start(period):
     raise ValueError("period must be 'daily' or 'weekly'")
 
 
+def _assign_ranks(rows):
+    """
+    rows: (user, value) tuples already ordered by value desc (by the DB).
+    Assigns competition-style ranks -- ties share a rank and the next
+    distinct value skips accordingly (1, 2, 2, 4) -- so the table
+    matches what _my_rank/get_my_global_rank compute (count of
+    strictly-higher values + 1). A plain sequential 1,2,3,4 numbering
+    would silently disagree with that on any tie. This is a single
+    linear pass over rows the database already sorted, not a re-sort.
+    """
+
+    entries = []
+    previous_value = None
+    previous_rank = 0
+
+    for i, (user, value) in enumerate(rows):
+        value = value or 0
+
+        if value == previous_value:
+            rank = previous_rank
+        else:
+            rank = i + 1
+
+        entries.append({"rank": rank, "user": user, "value": value})
+        previous_value = value
+        previous_rank = rank
+
+    return entries
+
+
 def _ranked_leaderboard(value_query, limit):
     rows = (
         db.session.query(User, value_query.c.value)
         .join(value_query, value_query.c.user_id == User.id)
-        .order_by(desc(value_query.c.value))
+        .order_by(desc(value_query.c.value), User.id)
         .limit(limit)
         .all()
     )
 
-    return [{"rank": i + 1, "user": u, "value": v or 0} for i, (u, v) in enumerate(rows)]
+    return _assign_ranks(rows)
 
 
 def _my_rank(value_query, my_value):
@@ -63,12 +93,12 @@ def _my_rank(value_query, my_value):
 def get_global_leaderboard(limit=20):
     rows = (
         db.session.query(User, TOTAL_XP_EXPR.label("total_xp"))
-        .order_by(desc("total_xp"))
+        .order_by(desc("total_xp"), User.id)
         .limit(limit)
         .all()
     )
 
-    return [{"rank": i + 1, "user": u, "value": int(txp)} for i, (u, txp) in enumerate(rows)]
+    return _assign_ranks([(u, int(txp)) for u, txp in rows])
 
 
 def get_my_global_rank(user):
