@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, jsonify, request
 from flask_login import current_user
 from config import Config
 from gaminghub.database.database import db, bcrypt, login_manager, migrate, csrf, limiter
@@ -33,6 +33,7 @@ def create_app():
     from gaminghub.routes.brain_lab import brain_lab
     from gaminghub.routes.analytics import analytics
     from gaminghub.routes.notifications import notifications
+    from gaminghub.routes.api import api
 
     # Register Blueprints
     app.register_blueprint(main)
@@ -48,6 +49,13 @@ def create_app():
     app.register_blueprint(brain_lab)
     app.register_blueprint(analytics)
     app.register_blueprint(notifications)
+    app.register_blueprint(api)
+
+    # Token-authenticated API requests have no session cookie, so they
+    # can't be forged by a cross-site request the way cookie auth can --
+    # CSRF protection doesn't apply here and would just reject every
+    # legitimate API call for lacking a CSRF token it has no way to get.
+    csrf.exempt(api)
 
     from gaminghub.services import notification_service
 
@@ -85,5 +93,20 @@ def create_app():
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
         return response
+
+    # A 404 from an unmatched URL happens before Flask ever picks a
+    # blueprint, so a blueprint-scoped errorhandler can't catch it --
+    # only an app-level one can, hence checking the path prefix here.
+    @app.errorhandler(404)
+    def handle_404(error):
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "Not found."}), 404
+        return error
+
+    @app.errorhandler(500)
+    def handle_500(error):
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "Internal server error."}), 500
+        return error
 
     return app
