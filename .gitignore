@@ -1,3 +1,4 @@
+@"
 # Byte-compiled / cache
 __pycache__/
 *.py[cod]
@@ -19,7 +20,13 @@ instance/
 .env.*
 !.env.example
 
-# Editor/OS
+# Testing / coverage
+.coverage
+.pytest_cache/
+htmlcov/
+.coverage.*
+
+# Editor / OS
 .vscode/
 .idea/
 .DS_Store
@@ -27,3 +34,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Claude local files
+.claude/
+"@ | Set-Content .gitignore
