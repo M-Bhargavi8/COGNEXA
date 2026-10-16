@@ -1,7 +1,7 @@
 """Initial database
 
 Revision ID: 89dfbd636ba6
-Revises: 
+Revises: 1f0c9a7e3b21
 Create Date: 2026-06-27 18:24:46.187287
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '89dfbd636ba6'
-down_revision = None
+down_revision = '1f0c9a7e3b21'
 branch_labels = None
 depends_on = None
 
