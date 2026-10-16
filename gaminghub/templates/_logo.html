@@ -1,0 +1,58 @@
+{#
+    COGNEXA logo, from the real source artwork.
+
+    Two earlier passes hand-drew the mark as SVG (crescent, brain, node
+    lattice, wordmark in a display font) trying to approximate the
+    source image. Both were rejected -- a flat-gradient vector redraw
+    can't reproduce the photorealistic gloss/chrome lighting the
+    original was rendered with, and guessing at the wordmark's font was
+    its own source of mismatch. This uses the actual artwork instead.
+
+    static/images/logo-mark.png and logo-lockup.png are real crops of
+    static/images/cognexa-social.png (the source file, also used as the
+    og:image), background-keyed to transparent and bounding-boxed by
+    sampling actual pixel brightness rather than eyeballed coordinates
+    -- see the extraction script this was built with if these ever need
+    re-cutting from a new source. mark = icon only, square. lockup =
+    icon + wordmark + tagline together, exactly as composed in the
+    source, at its natural (roughly square-ish) aspect ratio.
+
+    There is no vector version any more, so none of this recolors with
+    the theme -- expected for a logo, which is normally one fixed asset
+    rather than something that restyles with the page.
+#}
+
+{% macro mark(size=32) %}
+<img class="cx-mark" src="{{ url_for('static', filename='images/logo-mark.png') }}"
+     width="{{ size }}" height="{{ size }}" alt="" aria-hidden="true">
+{% endmacro %}
+
+
+{#
+    Icon + "COGNEXA" as plain live text -- for the navbar, the one
+    placement where the source's tall, stacked composition (icon over
+    wordmark over tagline) doesn't fit a thin horizontal bar. Rather
+    than gamble on a second display-font approximation for the text
+    half, this keeps it deliberately plain: bold body-font, one colour,
+    no gradient. The exact-fidelity wordmark lives in lockup() below,
+    wherever there's room for the real image.
+#}
+{% macro wordmark(size=32, show_text=true) %}
+<span class="cx-logo d-inline-flex align-items-center gap-2">
+    {{ mark(size) }}
+    {% if show_text %}<span class="cx-logo-text">COGNEXA</span>{% endif %}
+</span>
+{% endmacro %}
+
+
+{#
+    The full real lockup image (icon + wordmark + tagline, exactly as
+    in the source) -- for placements with room for that taller, stacked
+    shape: the footer, error pages, and other one-per-page brand
+    moments. `size` is the rendered height; width follows the source's
+    own aspect ratio so nothing stretches.
+#}
+{% macro lockup(size=120) %}
+<img class="cx-lockup-img" src="{{ url_for('static', filename='images/logo-lockup.png') }}"
+     height="{{ size }}" alt="COGNEXA -- Think. Play. Perform.">
+{% endmacro %}

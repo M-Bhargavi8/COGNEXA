@@ -64,7 +64,7 @@ def award(user, *, xp=0, coins=0, outcome=None):
     if user.level > level_before:
         notification_service.create(
             user, "level_up", f"Level Up! You reached Level {user.level}",
-            icon="⬆️", link="/dashboard"
+            icon="level-up", link="/dashboard"
         )
 
     achievements_unlocked = check_achievements(user)
@@ -96,4 +96,4 @@ def claim_daily_reward(user):
 
     award(user, coins=reward)
 
-    return True, f"🎁 Daily Reward Claimed! +{reward} Coins", reward
+    return True, f"Daily Reward Claimed! +{reward} Coins", reward

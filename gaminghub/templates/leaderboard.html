@@ -1,31 +1,37 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, game_icon, rank_medal %}
+
+{% block title %}Leaderboard -- COGNEXA{% endblock %}
 
 {% block content %}
 
 <div class="container py-5">
 
-    <h2 class="text-light mb-4">{{ title }}</h2>
+    <div class="cx-section-header mb-4" style="text-align: left; margin: 0 0 2rem;">
+        <span class="cx-eyebrow">Compete. Improve. Climb the ranks.</span>
+        <h2 class="mb-0 d-flex align-items-center gap-2">{{ icon('trophy', 30, 'icon--amber') }} {{ title }}</h2>
+    </div>
 
-    <ul class="nav nav-pills mb-4">
+    <ul class="nav nav-pills mb-4 gap-2">
         <li class="nav-item">
-            <a class="nav-link {{ 'active' if view == 'global' }}" href="{{ url_for('leaderboard.leaderboard_home') }}">🌍 Global</a>
+            <a class="nav-link {{ 'active' if view == 'global' }}" href="{{ url_for('leaderboard.leaderboard_home') }}">{{ icon("users", 16) }} Global</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ 'active' if view == 'daily' }}" href="{{ url_for('leaderboard.daily') }}">📅 Daily</a>
+            <a class="nav-link {{ 'active' if view == 'daily' }}" href="{{ url_for('leaderboard.daily') }}">{{ icon("clock", 16) }} Daily</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ 'active' if view == 'weekly' }}" href="{{ url_for('leaderboard.weekly') }}">🗓️ Weekly</a>
+            <a class="nav-link {{ 'active' if view == 'weekly' }}" href="{{ url_for('leaderboard.weekly') }}">{{ icon("analytics", 16) }} Weekly</a>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ 'active' if view == 'game' }}" href="#" data-bs-toggle="dropdown">🎮 By Game</a>
+            <a class="nav-link dropdown-toggle {{ 'active' if view == 'game' }}" href="#" data-bs-toggle="dropdown">{{ icon("arcade", 16) }} By Game</a>
             <ul class="dropdown-menu dropdown-menu-dark">
                 {% for g in games %}
-                <li><a class="dropdown-item" href="{{ url_for('leaderboard.by_game', slug=g.slug) }}">{{ g.icon }} {{ g.name }}</a></li>
+                <li><a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('leaderboard.by_game', slug=g.slug) }}">{{ game_icon(g.slug, 16, tile=false) }} {{ g.name }}</a></li>
                 {% endfor %}
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {{ 'active' if view == 'category' }}" href="#" data-bs-toggle="dropdown">📂 By Category</a>
+            <a class="nav-link dropdown-toggle {{ 'active' if view == 'category' }}" href="#" data-bs-toggle="dropdown">{{ icon("grid", 16) }} By Category</a>
             <ul class="dropdown-menu dropdown-menu-dark">
                 {% for c in categories %}
                 <li><a class="dropdown-item" href="{{ url_for('leaderboard.by_category', category=c) }}">{{ category_labels.get(c, c) }}</a></li>
@@ -34,17 +40,35 @@
         </li>
     </ul>
 
-    <div class="card dashboard-card p-3 mb-4 text-center">
+    <div class="cx-card p-3 mb-4 text-center">
         {% if my_rank %}
-        <span class="text-light fs-5">You're ranked <strong>#{{ my_rank }}</strong>{% if my_value is not none %} &middot; {{ value_label }}: {{ my_value }}{% endif %}</span>
+        <span class="fs-5">You're ranked <strong class="text-gradient">#{{ my_rank }}</strong>{% if my_value is not none %} &middot; {{ value_label }}: {{ my_value }}{% endif %}</span>
         {% else %}
         <span class="text-muted">Not ranked yet on this board &mdash; play a round to get on it.</span>
         {% endif %}
     </div>
 
-    <div class="card dashboard-card p-3">
+    {% if entries %}
 
-        {% if entries %}
+    <div class="row g-3 mb-4">
+        {% for entry in entries[:3] %}
+        <div class="col-md-4">
+            <div class="cx-card p-4 text-center {{ 'border-warning' if entry.user.id == current_user.id }}">
+                <div class="display-5 mb-2">
+                    {{ rank_medal(entry.rank, 44) }}
+                </div>
+                <h5 class="mb-1">{{ entry.user.username }}{% if entry.user.id == current_user.id %} (you){% endif %}</h5>
+                <p class="text-muted mb-0">{{ value_label }}: {{ entry.value }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% endif %}
+
+    {% if entries[3:] %}
+    <div class="cx-card p-3">
+
         <div class="table-responsive">
             <table class="table table-dark table-striped align-middle mb-0">
                 <thead>
@@ -55,15 +79,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for entry in entries %}
+                    {% for entry in entries[3:] %}
                     <tr class="{{ 'table-warning text-dark' if entry.user.id == current_user.id }}">
-                        <td>
-                            {% if entry.rank == 1 %}🥇
-                            {% elif entry.rank == 2 %}🥈
-                            {% elif entry.rank == 3 %}🥉
-                            {% else %}{{ entry.rank }}
-                            {% endif %}
-                        </td>
+                        <td>{{ entry.rank }}</td>
                         <td>{{ entry.user.username }}{% if entry.user.id == current_user.id %} (you){% endif %}</td>
                         <td>{{ entry.value }}</td>
                     </tr>
@@ -71,11 +89,15 @@
                 </tbody>
             </table>
         </div>
-        {% else %}
-        <p class="text-muted text-center mb-0">No results yet for this leaderboard.</p>
-        {% endif %}
 
     </div>
+    {% elif not entries %}
+    <div class="cx-card p-5 text-center">
+        {{ icon('trophy', 32, 'icon--muted') }}
+        <p class="text-muted mb-0 mt-3">No results yet for this leaderboard.</p>
+        <p class="text-muted small mb-0">Play a round to be the first one ranked.</p>
+    </div>
+    {% endif %}
 
 </div>
 

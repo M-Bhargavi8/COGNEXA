@@ -1,44 +1,86 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, notification_icon %}
+
+{% block title %}Notifications -- COGNEXA{% endblock %}
 
 {% block content %}
 
+{% set category_icons = {
+    'all': 'grid',
+    'achievements': 'achievement',
+    'rewards': 'reward',
+    'game_activity': 'arcade',
+    'system': 'clock',
+} %}
+
 <div class="container py-5">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-light mb-0">🔔 Notifications</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <span class="cx-eyebrow">Notifications</span>
+            <h2 class="mb-0 d-flex align-items-center gap-2">{{ icon('bell', 26) }} Notifications</h2>
+        </div>
 
-        {% if notifications %}
-        <form method="POST" action="{{ url_for('notifications.mark_all_read') }}">
+        {% if total_unread > 0 %}
+        <form method="POST" action="{{ url_for('notifications.mark_all_read') }}" class="text-end">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button class="btn btn-outline-light btn-sm" type="submit">Mark all read</button>
+            <button class="btn btn-cx-outline btn-sm" type="submit">Mark all read</button>
+            {% if category != 'all' %}
+            <div class="text-muted mt-1" style="font-size: .72rem;">Clears unread across all categories</div>
+            {% endif %}
         </form>
         {% endif %}
     </div>
 
+    <ul class="nav nav-pills mb-4 gap-2 flex-wrap">
+        {% for cat_key, cat_label in category_labels.items() %}
+        <li class="nav-item">
+            <a class="nav-link d-flex align-items-center gap-2 {{ 'active' if category == cat_key }}"
+               href="{{ url_for('notifications.notifications_home', category=cat_key) }}">
+                {{ icon(category_icons.get(cat_key, 'bell'), 16) }}
+                {{ cat_label }}
+                {% if category_counts.get(cat_key, 0) > 0 %}
+                <span class="badge bg-danger">{{ category_counts[cat_key] }}</span>
+                {% endif %}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
     {% if not notifications %}
 
-    <div class="card dashboard-card text-center p-5">
-        <p class="text-light fs-5 mb-1">No notifications yet.</p>
+    <div class="cx-card text-center p-5">
+        {% if has_any_notifications %}
+        {{ icon(category_icons.get(category, 'bell'), 32, 'icon--muted') }}
+        <p class="fs-5 mb-1 mt-3">No {{ category_labels.get(category, '') ~ ' ' if category != 'all' }}notifications yet.</p>
+        <p class="text-muted mb-0">Try a different tab, or check back after your next session.</p>
+        {% else %}
+        {{ icon('bell', 32, 'icon--muted') }}
+        <p class="fs-5 mb-1 mt-3">No notifications yet.</p>
         <p class="text-muted mb-0">Achievements, level-ups, and personal bests will show up here.</p>
+        {% endif %}
     </div>
 
     {% else %}
 
-    <div class="card dashboard-card p-0">
+    <div class="cx-card p-0">
         <div class="list-group list-group-flush">
             {% for n in notifications %}
-            <div class="list-group-item bg-transparent text-light py-3 {{ 'notification-unread' if not n.is_read }}">
+            <div class="list-group-item bg-transparent py-3 {{ 'notification-unread' if not n.is_read }}" style="border-color: var(--border-color); color: var(--text-primary);">
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
 
-                    <div>
-                        <div class="{{ 'fw-bold' if not n.is_read }}">
-                            {{ n.icon or '🔔' }} {{ n.title }}
-                            {% if not n.is_read %}<span class="badge bg-primary ms-1">new</span>{% endif %}
+                    <div class="d-flex gap-3">
+                        {{ notification_icon(n.type, 18, badge=true) }}
+                        <div>
+                            <div class="{{ 'fw-bold' if not n.is_read }}">
+                                {{ n.title }}
+                                {% if not n.is_read %}<span class="badge bg-primary ms-1">new</span>{% endif %}
+                            </div>
+                            {% if n.message %}
+                            <div class="text-muted small mt-1">{{ n.message }}</div>
+                            {% endif %}
+                            <div class="text-muted small mt-1">{{ n.created_at.strftime('%b %d, %Y %H:%M') }}</div>
                         </div>
-                        {% if n.message %}
-                        <div class="text-muted small mt-1">{{ n.message }}</div>
-                        {% endif %}
-                        <div class="text-muted small mt-1">{{ n.created_at.strftime('%b %d, %Y %H:%M') }}</div>
                     </div>
 
                     <div class="d-flex gap-2">

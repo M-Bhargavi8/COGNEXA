@@ -1,7 +1,18 @@
-from flask import Flask, jsonify, request
+import mimetypes
+
+from flask import Flask, jsonify, render_template, request
 from flask_login import current_user
 from config import Config
 from gaminghub.database.database import db, bcrypt, login_manager, migrate, csrf, limiter
+
+# Werkzeug's static file serving derives Content-Type from Python's
+# mimetypes module, whose registered extensions come from the OS --
+# .webp is missing from that database on at least one dev machine this
+# app has run on, so /static/images/*.webp was served as
+# application/octet-stream. Registering it explicitly makes the
+# Content-Type correct regardless of the host's own mimetypes config.
+mimetypes.add_type("image/webp", ".webp")
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -59,6 +70,17 @@ def create_app(config_class=Config):
 
     from gaminghub.services import notification_service
 
+    # Every surface that lists games (landing page, hubs, dashboard,
+    # analytics) needs the same slug -> play URL lookup. Exposing the
+    # one in game_service as a Jinja global keeps that mapping in a
+    # single place instead of each route hand-building URLs into its
+    # own context, and lets a template link a game it only has a slug
+    # for. Returns None for an unknown/unplayable slug, so callers
+    # guard with {% if %} the same way the routes already do.
+    from gaminghub.services.game_service import get_play_url
+
+    app.jinja_env.globals["play_url"] = get_play_url
+
     @app.context_processor
     def inject_notifications():
         if current_user.is_authenticated:
@@ -82,9 +104,9 @@ def create_app(config_class=Config):
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
             "img-src 'self' data:; "
-            "font-src 'self' https://cdn.jsdelivr.net; "
+            "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; "
             "connect-src 'self'; "
             "frame-ancestors 'none';"
         )
@@ -101,12 +123,22 @@ def create_app(config_class=Config):
     def handle_404(error):
         if request.path.startswith("/api/"):
             return jsonify({"error": "Not found."}), 404
-        return error
+        return render_template("errors/404.html"), 404
+
+    @app.errorhandler(403)
+    def handle_403(error):
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "Forbidden."}), 403
+        return render_template("errors/403.html"), 403
 
     @app.errorhandler(500)
     def handle_500(error):
         if request.path.startswith("/api/"):
             return jsonify({"error": "Internal server error."}), 500
-        return error
+        # errors/500.html deliberately doesn't extend base.html: if this
+        # fired because the database is unreachable, base.html's nav
+        # (which queries notifications for current_user) would just
+        # fail again while rendering the error page itself.
+        return render_template("errors/500.html"), 500
 
     return app

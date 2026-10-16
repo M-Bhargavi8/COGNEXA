@@ -15,7 +15,7 @@ def get_overview_stats():
     since_7d = datetime.utcnow() - timedelta(days=7)
 
     most_played = (
-        db.session.query(Game.name, Game.icon, func.count(GameResult.id).label("plays"))
+        db.session.query(Game.name, Game.icon, Game.slug, func.count(GameResult.id).label("plays"))
         .join(GameResult, GameResult.game_id == Game.id)
         .group_by(Game.id)
         .order_by(func.count(GameResult.id).desc())
@@ -29,7 +29,7 @@ def get_overview_stats():
         "total_games_played": GameResult.query.count(),
         "active_sessions": GameSession.query.filter_by(status="active").count(),
         "total_lifetime_xp": int(db.session.query(func.sum(TOTAL_XP_EXPR)).scalar() or 0),
-        "most_played_game": {"name": most_played[0], "icon": most_played[1], "plays": most_played[2]} if most_played else None,
+        "most_played_game": {"name": most_played[0], "icon": most_played[1], "slug": most_played[2], "plays": most_played[3]} if most_played else None,
         "active_games": Game.query.filter_by(is_active=True).count(),
         "total_games": Game.query.count(),
         "active_shop_items": ShopItem.query.filter_by(is_active=True).count(),

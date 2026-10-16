@@ -27,7 +27,7 @@
         answerInput.value = "";
         phase = "answering";
 
-        sequenceDisplay.textContent = res.data.sequence.join(" → ") + " → ?";
+        sequenceDisplay.textContent = res.data.sequence.join(" → ") + " → ? ";
         answerInput.focus();
     }
 
@@ -49,16 +49,16 @@
         gameArea.style.display = "none";
         resultArea.style.display = "block";
 
-        resultHeading.textContent = d.correct ? "🎉 Correct!" : `Not quite — it was ${d.correct_answer}`;
+        resultHeading.textContent = d.correct ? "Correct!" : `Not quite — it was ${d.correct_answer}`;
 
         let details = `Score ${d.score} · +${d.xp} XP · +${d.coins} Coins`;
         if (d.streak > 1) {
-            details += ` · 🔥 ${d.streak} in a row`;
+            details += ` · ${d.streak} in a row`;
         }
         resultDetails.textContent = details;
 
         const badges = [];
-        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        if (d.is_new_best) badges.push("NEW PERSONAL BEST");
         badges.push(BrainLab.formatExtras(d));
         bestBadge.textContent = badges.filter(Boolean).join(" · ");
     }

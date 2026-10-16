@@ -1,18 +1,24 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, game_icon %}
+
+{% block title %}My Analytics -- COGNEXA{% endblock %}
 
 {% block content %}
 
 <div class="container py-5">
 
-    <h2 class="text-light mb-4">📊 My Analytics</h2>
+    <div class="cx-section-header mb-4" style="text-align: left; margin: 0 0 2rem;">
+        <span class="cx-eyebrow">Analytics</span>
+        <h2 class="mb-0 d-flex align-items-center gap-2">{{ icon('analytics', 28, 'icon--cyan') }} My Analytics</h2>
+    </div>
 
     {% if overview.games_played == 0 %}
 
-    <div class="card dashboard-card text-center p-5">
-        <p class="text-light fs-5 mb-3">No games played yet.</p>
+    <div class="cx-card text-center p-5">
+        <p class="fs-5 mb-3">No games played yet.</p>
         <p class="text-muted mb-4">Play a few rounds and your performance data will show up here.</p>
-        <a href="{{ url_for('brain_lab.hub') }}" class="btn btn-success btn-lg mx-auto" style="max-width: 240px;">
-            🧠 Head to Brain Lab
+        <a href="{{ url_for('brain_lab.hub') }}" class="btn btn-cx-primary btn-lg mx-auto" style="max-width: 240px;">
+            {{ icon('brain', 18) }} Head to Brain Lab
         </a>
     </div>
 
@@ -21,24 +27,24 @@
     <div class="row g-3 mb-4">
 
         {% set stats = [
-            ('⭐', 'Level', overview.level),
-            ('⚡', 'XP', overview.xp),
-            ('💰', 'Coins', overview.coins),
-            ('🔥', 'Streak', overview.streak ~ ' days'),
-            ('🎮', 'Games Played', overview.games_played),
-            ('🏆', 'Win Rate', (overview.win_rate ~ '%') if overview.win_rate is not none else '—'),
-            ('📈', 'Avg Score', overview.avg_score if overview.avg_score is not none else '—'),
-            ('🥇', 'Best Score', overview.best_score if overview.best_score is not none else '—'),
-            ('🎯', 'Accuracy', (overview.avg_accuracy ~ '%') if overview.avg_accuracy is not none else '—'),
-            ('⏱️', 'Avg Reaction', (overview.avg_reaction_time ~ ' ms') if overview.avg_reaction_time is not none else '—'),
+            ('achievement', 'icon--violet', 'Level', overview.level),
+            ('lightning', 'icon--indigo', 'XP', overview.xp),
+            ('coin', 'icon--amber', 'Coins', overview.coins),
+            ('flame', 'icon--amber', 'Streak', overview.streak ~ ' days'),
+            ('arcade', 'icon--teal', 'Games Played', overview.games_played),
+            ('trophy', 'icon--amber', 'Win Rate', (overview.win_rate ~ '%') if overview.win_rate is not none else '—'),
+            ('analytics', 'icon--cyan', 'Avg Score', overview.avg_score if overview.avg_score is not none else '—'),
+            ('trophy', 'icon--amber', 'Best Score', overview.best_score if overview.best_score is not none else '—'),
+            ('focus', 'icon--teal', 'Accuracy', (overview.avg_accuracy ~ '%') if overview.avg_accuracy is not none else '—'),
+            ('reaction', 'icon--indigo', 'Avg Reaction', (overview.avg_reaction_time ~ ' ms') if overview.avg_reaction_time is not none else '—'),
         ] %}
 
-        {% for icon, label, value in stats %}
+        {% for icon_name, icon_color, label, value in stats %}
         <div class="col-6 col-md-4 col-lg-2">
-            <div class="card dashboard-card text-center p-3 h-100">
-                <div class="fs-3">{{ icon }}</div>
-                <div class="fs-5 fw-bold text-light">{{ value }}</div>
-                <div class="text-muted small">{{ label }}</div>
+            <div class="cx-stat-tile h-100">
+                <div class="cx-stat-icon">{{ icon(icon_name, 22, icon_color) }}</div>
+                <div class="cx-stat-value">{{ value }}</div>
+                <div class="cx-stat-label">{{ label }}</div>
             </div>
         </div>
         {% endfor %}
@@ -48,14 +54,14 @@
     <div class="row g-4 mb-4">
 
         <div class="col-lg-6">
-            <div class="card dashboard-card p-3">
+            <div class="cx-card p-3">
                 <h5 class="text-center mb-2">Games Played (last 14 days)</h5>
                 <canvas id="gamesChart" height="180"></canvas>
             </div>
         </div>
 
         <div class="col-lg-6">
-            <div class="card dashboard-card p-3">
+            <div class="cx-card p-3">
                 <h5 class="text-center mb-2">XP Earned (last 14 days)</h5>
                 <canvas id="xpChart" height="180"></canvas>
             </div>
@@ -64,7 +70,7 @@
     </div>
 
     {% if skill_profile %}
-    <div class="card dashboard-card p-3 mb-4">
+    <div class="cx-card p-3 mb-4">
         <h5 class="text-center mb-2">Skill Profile</h5>
         <p class="text-muted text-center small mb-3">
             Win rate on skill-relevant games. A game-performance profile, not a psychological or medical assessment.
@@ -73,7 +79,7 @@
     </div>
     {% endif %}
 
-    <div class="card dashboard-card p-3 mb-4">
+    <div class="cx-card p-3 mb-4">
         <h5 class="mb-3">Per-Game Performance</h5>
         <div class="table-responsive">
             <table class="table table-dark table-striped align-middle mb-0">
@@ -93,9 +99,9 @@
                     <tr>
                         <td>
                             {% if g.url %}
-                            <a href="{{ g.url }}" class="text-light text-decoration-none">{{ g.icon }} {{ g.name }}</a>
+                            <a href="{{ g.url }}" class="text-decoration-none d-inline-flex align-items-center gap-2">{{ game_icon(g.slug, 16, tile=false) }} {{ g.name }}</a>
                             {% else %}
-                            {{ g.icon }} {{ g.name }}
+                            <span class="d-inline-flex align-items-center gap-2">{{ game_icon(g.slug, 16, tile=false) }} {{ g.name }}</span>
                             {% endif %}
                         </td>
                         <td>{{ g.plays }}</td>
@@ -112,17 +118,17 @@
     </div>
 
     {% if recommendations %}
-    <div class="card dashboard-card p-3">
+    <div class="cx-card p-3">
         <h5 class="mb-3">Recommended For You</h5>
         <div class="row g-3">
             {% for rec in recommendations %}
             <div class="col-md-4">
-                <div class="card dashboard-card h-100 text-center p-3">
-                    <div class="display-6 mb-2">{{ rec.game.icon }}</div>
+                <a class="cx-game-tile text-center align-items-center" href="{{ rec.url }}">
+                    {{ game_icon(rec.game.slug) }}
                     <h6>{{ rec.game.name }}</h6>
-                    <p class="text-muted small">{{ rec.reason }}</p>
-                    <a href="{{ rec.url }}" class="btn btn-success mt-auto">Play Now</a>
-                </div>
+                    <p class="small">{{ rec.reason }}</p>
+                    <span class="btn btn-cx-primary mt-auto w-100">Play Now</span>
+                </a>
             </div>
             {% endfor %}
         </div>
@@ -153,8 +159,8 @@
                 datasets: [{
                     label: "Games Played",
                     data: gamesData,
-                    borderColor: "#2ecc71",
-                    backgroundColor: "rgba(46, 204, 113, 0.15)",
+                    borderColor: "#34D399",
+                    backgroundColor: "rgba(52, 211, 153, 0.15)",
                     tension: 0.25,
                     fill: true
                 }]
@@ -175,8 +181,8 @@
                 datasets: [{
                     label: "XP Earned",
                     data: xpData,
-                    borderColor: "#f1c40f",
-                    backgroundColor: "rgba(241, 196, 15, 0.15)",
+                    borderColor: "#FBBF24",
+                    backgroundColor: "rgba(251, 191, 36, 0.15)",
                     tension: 0.25,
                     fill: true
                 }]
@@ -198,7 +204,7 @@
                 datasets: [{
                     label: "Win Rate",
                     data: skillProfile.map(s => s.score),
-                    backgroundColor: "#5865f2"
+                    backgroundColor: "#5B8CFF"
                 }]
             },
             options: {

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+{% from "_icons.html" import icon %}
+{% from "_logo.html" import mark, wordmark %}
+
+<head>
+{% include "_head.html" %}
+<title>{% block title %}Admin -- COGNEXA{% endblock %}</title>
+</head>
+
+<body class="cx-admin-body">
+
+<a class="cx-skip-link" href="#main-content">Skip to main content</a>
+
+<div class="cx-admin-backdrop" id="adminBackdrop"></div>
+
+<div class="cx-admin-shell">
+
+    <aside class="cx-admin-sidebar" id="adminSidebar">
+
+        <div class="cx-admin-brand">
+            {{ mark(38) }}
+            <div>
+                <div class="fw-bold" style="font-size: .95rem; line-height: 1.1;">COGNEXA</div>
+                <div class="cx-admin-brand-label">Admin</div>
+            </div>
+        </div>
+
+        <nav class="cx-admin-nav">
+            <a class="cx-admin-nav-link {{ 'active' if active_page == 'overview' }}" href="{{ url_for('admin.admin_dashboard') }}">
+                {{ icon('analytics', 20, 'icon--cyan') }} Overview
+            </a>
+            <a class="cx-admin-nav-link {{ 'active' if active_page == 'users' }}" href="{{ url_for('admin.users') }}">
+                {{ icon('users', 20, 'icon--indigo') }} Users
+            </a>
+            <a class="cx-admin-nav-link {{ 'active' if active_page == 'games' }}" href="{{ url_for('admin.games') }}">
+                {{ icon('arcade', 20, 'icon--violet') }} Games
+            </a>
+            <a class="cx-admin-nav-link {{ 'active' if active_page == 'shop' }}" href="{{ url_for('admin.shop') }}">
+                {{ icon('reward', 20, 'icon--amber') }} Shop
+            </a>
+        </nav>
+
+        <div class="cx-admin-sidebar-footer">
+            <a class="cx-admin-nav-link" href="{{ url_for('main.home') }}">
+                {{ icon('external-link', 18) }} Back to COGNEXA
+            </a>
+            <a class="cx-admin-nav-link" href="{{ url_for('auth.logout') }}">
+                {{ icon('close', 18) }} Logout
+            </a>
+        </div>
+
+    </aside>
+
+    <div class="cx-admin-main">
+
+        <header class="cx-admin-header">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-cx-outline btn-sm cx-admin-sidebar-toggle" id="adminSidebarToggle" aria-label="Toggle admin menu" aria-expanded="false" aria-controls="adminSidebar">
+                    {{ icon('grid', 18) }}
+                </button>
+                <div>
+                    <div class="cx-eyebrow mb-0">Admin Portal</div>
+                    <h1 class="mb-0" style="font-size: 1.4rem;">{% block page_title %}Overview{% endblock %}</h1>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 text-muted small">
+                {{ icon('shield', 16, 'icon--green') }} {{ current_user.username }}
+            </div>
+        </header>
+
+        <main class="cx-admin-content" id="main-content">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mb-3">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block admin_content %}{% endblock %}
+
+        </main>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    const sidebar = document.getElementById('adminSidebar');
+    const toggle = document.getElementById('adminSidebarToggle');
+    const backdrop = document.getElementById('adminBackdrop');
+
+    function closeSidebar() {
+        sidebar.classList.remove('show');
+        backdrop.classList.remove('show');
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    if (toggle) {
+        toggle.addEventListener('click', function () {
+            const isOpen = sidebar.classList.toggle('show');
+            backdrop.classList.toggle('show', isOpen);
+            toggle.setAttribute('aria-expanded', String(isOpen));
+        });
+    }
+    if (backdrop) {
+        backdrop.addEventListener('click', closeSidebar);
+    }
+})();
+</script>
+
+</body>
+
+</html>

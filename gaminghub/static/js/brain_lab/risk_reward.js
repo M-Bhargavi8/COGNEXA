@@ -55,11 +55,11 @@
         scoreDisplay.textContent = d.score;
 
         if (d.round_outcome === "safe") {
-            feedbackText.textContent = `✅ Safe. +${config.safe_gain}`;
+            feedbackText.textContent = `Safe. +${config.safe_gain}`;
         } else if (d.round_outcome === "risk_win") {
-            feedbackText.textContent = `🎉 Risk paid off! +${config.risk_gain}`;
+            feedbackText.textContent = `Risk paid off! +${config.risk_gain}`;
         } else {
-            feedbackText.textContent = `💥 Risk failed. -${config.risk_loss}`;
+            feedbackText.textContent = `Risk failed. -${config.risk_loss}`;
         }
 
         if (d.game_over) {
@@ -85,7 +85,7 @@
         resultDetails.textContent = details;
 
         const badges = [];
-        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        if (d.is_new_best) badges.push("NEW PERSONAL BEST");
         badges.push(BrainLab.formatExtras(d));
         bestBadge.textContent = badges.filter(Boolean).join(" · ");
     }

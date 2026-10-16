@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Reflex Lab -- COGNEXA{% endblock %}
 
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
-
 <div class="container py-5 text-center">
 
-    <h2 class="text-light mb-2">⚡ Reflex Lab</h2>
+    <h2 class="text-light mb-2 d-flex align-items-center justify-content-center gap-2">{{ icon('reaction', 28, 'icon--violet') }} Reflex Lab</h2>
     <p class="text-light mb-4">Wait for the signal, then click as fast as you can.</p>
 
     <div id="startPanel">

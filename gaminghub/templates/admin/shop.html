@@ -1,56 +1,56 @@
-{% extends "base.html" %}
+{% extends "admin/_admin_base.html" %}
+{% from "_icons.html" import icon %}
 
-{% block content %}
+{% set active_page = 'shop' %}
 
-<div class="container py-5">
+{% block title %}Shop -- Admin -- COGNEXA{% endblock %}
+{% block page_title %}Shop{% endblock %}
 
-    <h2 class="text-light mb-4">🛠️ Admin Dashboard</h2>
+{% block admin_content %}
 
-    {% set view = 'shop' %}
-    {% include "admin/_nav.html" %}
+<p class="text-muted small mb-3 d-flex align-items-center gap-2">
+    {{ icon('info', 16, 'icon--muted') }}
+    Inactive items disappear from the shop immediately and can't be bought or equipped, even by a resubmitted request.
+</p>
 
-    <p class="text-muted small mb-3">Inactive items disappear from the shop immediately and can't be bought or equipped, even by a resubmitted request.</p>
+<div class="cx-card p-3">
 
-    <div class="card dashboard-card p-3">
-
-        <div class="table-responsive">
-            <table class="table table-dark table-striped align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Type</th>
-                        <th>Cost</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.item_type }}</td>
-                        <td>💰 {{ item.cost }}</td>
-                        <td>
-                            <span class="badge {{ 'bg-success' if item.is_active else 'bg-secondary' }}">
-                                {{ 'active' if item.is_active else 'inactive' }}
-                            </span>
-                        </td>
-                        <td>
-                            <form method="POST" action="{{ url_for('admin.toggle_shop_item', item_id=item.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                {% if item.is_active %}
-                                <button class="btn btn-sm btn-outline-danger" type="submit">Deactivate</button>
-                                {% else %}
-                                <button class="btn btn-sm btn-outline-success" type="submit">Activate</button>
-                                {% endif %}
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
+    <div class="table-responsive">
+        <table class="table table-dark table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Type</th>
+                    <th>Cost</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.item_type }}</td>
+                    <td class="d-flex align-items-center gap-1">{{ icon('coin', 14, 'icon--amber') }} {{ item.cost }}</td>
+                    <td>
+                        <span class="badge {{ 'bg-success' if item.is_active else 'bg-secondary' }}">
+                            {{ 'active' if item.is_active else 'inactive' }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.toggle_shop_item', item_id=item.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% if item.is_active %}
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Deactivate</button>
+                            {% else %}
+                            <button class="btn btn-sm btn-outline-success" type="submit">Activate</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
 </div>

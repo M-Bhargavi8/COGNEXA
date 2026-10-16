@@ -1,43 +1,48 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, shop_badge %}
+
+{% block title %}Reward Shop -- COGNEXA{% endblock %}
 
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shop.css') }}">
-
 <div class="container py-5">
 
-    <h2 class="text-light mb-2">🛍️ Reward Shop</h2>
-    <p class="text-light mb-1">💰 {{ current_user.coins }} Coins</p>
+    <div class="cx-section-header mb-4" style="text-align: left; margin: 0 0 1.5rem;">
+        <span class="cx-eyebrow">Rewards</span>
+        <h2 class="mb-1 d-flex align-items-center gap-2">{{ icon('reward', 28, 'icon--amber') }} Reward Shop</h2>
+        <p class="mb-0 d-flex align-items-center gap-1">{{ icon('coin', 16, 'icon--amber') }} {{ current_user.coins }} Coins</p>
+    </div>
+
     <p class="text-muted small mb-4">Fictional cosmetic items only &mdash; no real-money purchases.</p>
 
     {% if booster_active %}
-    <div class="alert alert-success">⚡ Your 2x XP booster is active right now!</div>
+    <div class="alert alert-success d-flex align-items-center gap-2">{{ icon('lightning', 18, 'icon--amber') }} Your 2x XP booster is active right now!</div>
     {% endif %}
 
     {% macro item_card(item, section) %}
     <div class="col-sm-6 col-md-4 col-lg-3">
-        <div class="card dashboard-card shop-item-card text-center p-3">
+        <div class="cx-card shop-item-card text-center p-3">
 
             {% if section == 'avatar' %}
-            <img src="{{ url_for('static', filename='images/avatars/' ~ item.asset) }}" class="shop-avatar-preview mx-auto mb-2">
+            <img src="{{ url_for('static', filename='images/avatars/' ~ item.asset) }}" class="shop-avatar-preview mx-auto mb-2" alt="{{ item.name }} preview">
             {% elif section == 'frame' %}
             <div class="shop-frame-preview {{ item.asset }} mb-2">
-                <img src="{{ url_for('static', filename='images/avatars/avatar1.png') }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                <img src="{{ url_for('static', filename='images/avatars/avatar1.png') }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" alt="{{ item.name }} frame preview">
             </div>
             {% elif section == 'badge' %}
-            <div class="shop-item-preview mb-2">{{ item.asset }}</div>
+            <div class="shop-item-preview mb-2">{{ shop_badge(item.asset, 40) }}</div>
             {% else %}
-            <div class="shop-item-preview mb-2">⚡</div>
+            <div class="shop-item-preview mb-2">{{ icon('lightning', 40, 'icon--amber') }}</div>
             {% endif %}
 
             <h6>{{ item.name }}</h6>
             <p class="text-muted small">{{ item.description }}</p>
-            <p class="fw-bold">💰 {{ item.cost }}</p>
+            <p class="fw-bold d-flex align-items-center justify-content-center gap-1">{{ icon('coin', 16, 'icon--amber') }} {{ item.cost }}</p>
 
             {% if section == 'booster' %}
             <form method="POST" action="{{ url_for('rewards.buy', item_id=item.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button class="btn btn-success btn-sm w-100" {{ 'disabled' if current_user.coins < item.cost }}>Buy</button>
+                <button class="btn btn-cx-primary btn-sm w-100" {{ 'disabled' if current_user.coins < item.cost }}>Buy</button>
             </form>
             {% elif item.id in owned_ids %}
                 {% set is_equipped = (
@@ -46,17 +51,17 @@
                     (section == 'badge' and current_user.equipped_badge == item.asset)
                 ) %}
                 {% if is_equipped %}
-                <span class="badge bg-success w-100 py-2">✅ Equipped</span>
+                <span class="badge bg-success w-100 py-2 d-inline-flex align-items-center justify-content-center gap-1">{{ icon('check', 14) }} Equipped</span>
                 {% else %}
                 <form method="POST" action="{{ url_for('rewards.equip', item_id=item.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button class="btn btn-outline-light btn-sm w-100">Equip</button>
+                    <button class="btn btn-cx-outline btn-sm w-100">Equip</button>
                 </form>
                 {% endif %}
             {% else %}
             <form method="POST" action="{{ url_for('rewards.buy', item_id=item.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button class="btn btn-success btn-sm w-100" {{ 'disabled' if current_user.coins < item.cost }}>Buy</button>
+                <button class="btn btn-cx-primary btn-sm w-100" {{ 'disabled' if current_user.coins < item.cost }}>Buy</button>
             </form>
             {% endif %}
 
@@ -64,9 +69,9 @@
     </div>
     {% endmacro %}
 
-    {% for section, label in [('avatar', '🖼️ Avatars'), ('frame', '🖼️ Frames'), ('badge', '🏷️ Badges'), ('booster', '⚡ Boosters')] %}
+    {% for section, label, sec_icon, sec_color in [('avatar', 'Avatars', 'image', 'icon--indigo'), ('frame', 'Frames', 'grid', 'icon--cyan'), ('badge', 'Badges', 'tag', 'icon--violet'), ('booster', 'Boosters', 'lightning', 'icon--amber')] %}
     {% if grouped.get(section) %}
-    <h5 class="text-light mt-4 mb-3">{{ label }}</h5>
+    <h5 class="mt-4 mb-3 d-flex align-items-center gap-2">{{ icon(sec_icon, 20, sec_color) }} {{ label }}</h5>
     <div class="row g-3 mb-2">
         {% for item in grouped[section] %}
         {{ item_card(item, section) }}
@@ -76,7 +81,7 @@
     {% if section in ('frame', 'badge') %}
     <form method="POST" action="{{ url_for('rewards.unequip', item_type=section) }}" class="mb-3">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button class="btn btn-outline-secondary btn-sm">Remove equipped {{ section }}</button>
+        <button class="btn btn-cx-outline btn-sm">Remove equipped {{ section }}</button>
     </form>
     {% endif %}
 

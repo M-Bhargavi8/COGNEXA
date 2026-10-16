@@ -45,7 +45,7 @@
         setTimeout(() => {
             hideAll();
             mathPhase.style.display = "block";
-            mathProblem.textContent = d.math_problem + " = ?";
+            mathProblem.textContent = d.math_problem + " = ? ";
             mathInput.value = "";
             phase = "math";
             mathInput.focus();
@@ -89,15 +89,15 @@
         hideAll();
         resultArea.style.display = "block";
 
-        resultHeading.textContent = d.overall >= 50 ? "🎉 Nice multitasking!" : "Keep practicing";
+        resultHeading.textContent = d.overall >= 50 ? "Nice multitasking!" : "Keep practicing";
 
         resultDetails.textContent =
-            `Math ${d.math_correct ? "✅" : "❌ (" + d.math_answer + ")"} · ` +
+            `Math ${d.math_correct ? "correct" : "wrong (" + d.math_answer + ")"} · ` +
             `Memory ${d.memory_accuracy}% · Overall ${d.overall}% · ` +
             `Score ${d.score} · +${d.xp} XP · +${d.coins} Coins`;
 
         const badges = [];
-        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        if (d.is_new_best) badges.push("NEW PERSONAL BEST");
         badges.push(BrainLab.formatExtras(d));
         bestBadge.textContent = badges.filter(Boolean).join(" · ");
     }

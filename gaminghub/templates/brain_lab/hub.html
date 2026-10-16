@@ -1,31 +1,49 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, game_icon %}
+
+{% block title %}Brain Lab -- COGNEXA{% endblock %}
 
 {% block content %}
 
 <div class="container py-5">
 
-    <h2 class="text-light mb-2">🧠 Brain Lab</h2>
-    <p class="text-light mb-4">Cognitive challenges that track your real performance.</p>
+    <div class="row align-items-center g-5 mb-5">
+
+        <div class="col-lg-6">
+            <div class="cx-section-header mb-0" style="text-align: left; margin: 0;">
+                <span class="cx-eyebrow">Brain Lab</span>
+                <h2 class="d-flex align-items-center gap-2">{{ icon('brain', 32, 'icon--violet') }} Brain Lab</h2>
+                <p class="mb-0">Cognitive training. Challenge your memory, logic, focus and reaction.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-6 text-center">
+            <img src="{{ url_for('static', filename='images/brain-lab-hologram.webp') }}"
+                 alt="" aria-hidden="true" class="cx-brain-hologram">
+        </div>
+
+    </div>
 
     <div class="row g-4">
 
         {% for card in game_cards %}
 
         <div class="col-md-6 col-lg-4">
-            <div class="card dashboard-card h-100 text-center p-4">
-                <div class="display-4 mb-3">{{ card.game.icon }}</div>
+            <a class="cx-game-tile" href="{{ card.url }}">
+                <span class="cx-badge cx-badge-brain">Brain Lab</span>
+                {{ game_icon(card.game.slug) }}
                 <h4>{{ card.game.name }}</h4>
-                <p class="text-muted">{{ card.game.description }}</p>
-                <a href="{{ card.url }}" class="btn btn-success mt-auto">
-                    Play
-                </a>
-            </div>
+                <p>{{ card.game.description }}</p>
+                <span class="btn btn-cx-primary mt-2">
+                    Play Challenge
+                </span>
+            </a>
         </div>
 
         {% endfor %}
 
         {% if not game_cards %}
-        <p class="text-light">No Brain Lab games available yet.</p>
+        <div class="col-12 text-center text-muted py-5">No Brain Lab games available yet.</div>
         {% endif %}
 
     </div>

@@ -1,26 +1,31 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Tic Tac Toe -- COGNEXA{% endblock %}
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
-    <div class="card shadow-lg rounded-4 p-5">
+    <a href="{{ url_for('gamehub.games_home') }}" class="btn btn-cx-outline btn-sm mb-4">← Back to Casual Games</a>
 
-        <h1 class="text-center display-4 mb-4">
-            ❌ Tic Tac Toe ⭕
+    <div class="cx-card p-5 mx-auto" style="max-width: 560px;">
+
+        <h1 class="text-center fw-bold mb-2">
+            {{ icon("close", 26, "icon--danger") }} Tic Tac Toe {{ icon("circle-o", 26, "icon--cyan") }}
         </h1>
 
         <p class="text-center text-muted">
-            Beat the Computer AI and earn rewards!
+            Challenge the computer and claim three in a row.
         </p>
 
-        <hr>
+        <hr style="border-color: var(--border-color);">
 
         {% if result %}
 
             {% if result=="Win" %}
                 <div class="alert alert-success text-center fs-3">
-                    🎉 You Won!
+                    {{ icon("trophy", 24, "icon--amber") }} You Won!
                     <br>
                     +30 XP
                     <br>
@@ -29,12 +34,12 @@
 
             {% elif result=="Lose" %}
                 <div class="alert alert-danger text-center fs-3">
-                    😢 Computer Wins
+                    {{ icon("close", 24) }} Computer Wins
                 </div>
 
             {% else %}
                 <div class="alert alert-warning text-center fs-3">
-                    🤝 Draw
+                    {{ icon("hands", 24) }} Draw
                 </div>
             {% endif %}
 
@@ -71,9 +76,9 @@
         <div class="text-center mt-4">
 
             <a href="{{ url_for('tictactoe.play') }}"
-               class="btn btn-primary btn-lg">
+               class="btn btn-cx-primary btn-lg">
 
-                🔄 New Game
+                {{ icon("level-up", 18) }} New Game
 
             </a>
 

@@ -4,7 +4,7 @@ let div=document.createElement("div");
 
 div.className="reward-popup";
 
-div.innerHTML=`+${xp} XP<br>+${coins} Coins`;
+div.innerHTML = `+${xp} XP<br>+${coins} Coins`;
 
 document.body.appendChild(div);
 

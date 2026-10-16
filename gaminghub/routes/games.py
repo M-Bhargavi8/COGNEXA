@@ -47,14 +47,14 @@ def guess():
 
         if guess_val < secret:
 
-            message = "📉 Too Low!"
+            message = "Too Low!"
             state["attempts_left"] -= 1
 
             game_service.set_state(session, state)
 
         elif guess_val > secret:
 
-            message = "📈 Too High!"
+            message = "Too High!"
             state["attempts_left"] -= 1
 
             game_service.set_state(session, state)
@@ -74,7 +74,7 @@ def guess():
                 attempts=attempts_used
             )
 
-            flash("🎉 Congratulations! You Won!", "success")
+            flash("Congratulations! You Won!", "success")
             flash_game_outcome(outcome)
 
             return redirect(url_for("dashboard.dashboard_home"))
@@ -94,7 +94,7 @@ def guess():
             answer = secret
 
             flash(
-                f"💀 Game Over! The number was {answer}",
+                f"Game Over! The number was {answer}",
                 "danger"
             )
 

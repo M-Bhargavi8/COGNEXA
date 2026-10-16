@@ -1,0 +1,91 @@
+{#
+    Skill radar. Takes the dict from utils/radar.build_radar() and draws
+    it as inline SVG -- no charting library, so it paints with the first
+    byte and inherits the design tokens like everything else.
+
+    Colour lives here, geometry lives in the Python. The gradient id is
+    parameterised because two radars on one page would otherwise share
+    (and fight over) a single <defs> id.
+
+    Usage: {{ radar(data) }}
+       or: {{ radar(data, uid='hero', compare_label='Platform average') }}
+#}
+
+{% macro radar(data, uid='radar', label='Your profile', compare_label=None) %}
+{%- if data -%}
+{# The description says "not measured" for empty axes rather than "0%",
+   so a screen reader gets the same distinction the dimmed labels make
+   visually -- otherwise it reports an untried skill as a failed one. #}
+<svg class="cx-radar" viewBox="{{ data.view_box }}" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="{{ label }}, win rate by skill: {% for a in data.axes %}{{ a.label }} {{ 'not measured' if a.empty else a.score ~ '%' }}{{ ', ' if not loop.last }}{% endfor %}">
+
+    <title>Skill profile across {{ data.axes|length }} cognitive skills</title>
+
+    <defs>
+        <radialGradient id="cx-radar-fill-{{ uid }}" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="var(--accent-cyan)"    stop-opacity=".38"/>
+            <stop offset="100%" stop-color="var(--accent-secondary)" stop-opacity=".22"/>
+        </radialGradient>
+    </defs>
+
+    {# Grid: one polygon per ring, faintest in the middle so the eye
+       reads outward as "better" without needing axis numbers. #}
+    <g class="cx-radar-grid">
+        {% for ring in data.rings %}
+        <polygon points="{{ ring }}" style="opacity: {{ 0.10 + loop.index0 * 0.035 }};"/>
+        {% endfor %}
+    </g>
+
+    <g class="cx-radar-spokes">
+        {% for axis in data.axes %}
+        <line x1="{{ data.centre }}" y1="{{ data.centre }}" x2="{{ axis.x }}" y2="{{ axis.y }}"/>
+        {% endfor %}
+    </g>
+
+    {# Comparison ring first, so the player's own shape sits on top. #}
+    {% if data.compare_points and data.compare_has_data %}
+    <polygon class="cx-radar-compare" points="{{ data.compare_points }}"/>
+    {% endif %}
+
+    {% if data.has_data %}
+    <polygon class="cx-radar-area" points="{{ data.points }}"
+             fill="url(#cx-radar-fill-{{ uid }})"/>
+    {% for dot in data.dots %}
+    <circle class="cx-radar-dot" cx="{{ dot.x }}" cy="{{ dot.y }}" r="3.5"/>
+    {% endfor %}
+    {% else %}
+    {# Not enough measured axes for a polygon. Mark the axes that do
+       have data so the chart still shows progress toward a shape,
+       instead of going completely blank. #}
+    {% for axis in data.axes %}
+    {%- if not axis.empty %}
+    <circle class="cx-radar-dot is-partial" cx="{{ data.dots[loop.index0].x }}" cy="{{ data.dots[loop.index0].y }}" r="3.5"/>
+    {%- endif %}
+    {% endfor %}
+    <text class="cx-radar-empty" x="{{ data.centre }}" y="{{ data.centre + 5 }}" text-anchor="middle">
+        {{ data.measured }} of {{ data.axes|length }} measured
+    </text>
+    {% endif %}
+
+    <g class="cx-radar-labels">
+        {% for axis in data.axes %}
+        <text x="{{ axis.label_x }}" y="{{ axis.label_y }}"
+              text-anchor="{{ axis.anchor }}"
+              class="{{ 'is-empty' if axis.empty }}">{{ axis.short }}</text>
+        {% endfor %}
+    </g>
+
+</svg>
+
+{% if data.has_data or compare_label %}
+<div class="cx-radar-legend">
+    {% if data.has_data %}
+    <span class="cx-radar-key"><i class="cx-radar-swatch"></i>{{ label }}</span>
+    {% endif %}
+    {% if compare_label and data.compare_has_data %}
+    <span class="cx-radar-key"><i class="cx-radar-swatch is-compare"></i>{{ compare_label }}</span>
+    {% endif %}
+</div>
+{% endif %}
+{%- endif -%}
+{% endmacro %}

@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Code Breaker -- COGNEXA{% endblock %}
 
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
-
 <div class="container py-5 text-center">
 
-    <h2 class="text-light mb-2">🔐 Code Breaker</h2>
+    <h2 class="text-light mb-2 d-flex align-items-center justify-content-center gap-2">{{ icon('logic', 28, 'icon--violet') }} Code Breaker</h2>
     <p class="text-light mb-4">Deduce the secret code. Unique digits only.</p>
 
     <div id="difficultyPicker">
@@ -27,7 +28,8 @@
                 type="text"
                 class="form-control form-control-lg text-center mx-auto"
                 style="max-width: 260px; letter-spacing: 0.3em;"
-                placeholder="0000">
+                placeholder="0000"
+                aria-label="Your code guess">
         </div>
 
         <button id="guessBtn" class="btn btn-success btn-lg mb-4">

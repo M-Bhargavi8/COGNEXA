@@ -95,7 +95,11 @@ FOCUS_SHIFT_DIFFICULTIES = {
     "expert": {"object_count": 16, "change_count": 2, "reveal_ms": 1500, "xp": 120, "coins": 160, "multiplier": 3}
 }
 
-FOCUS_SHIFT_PALETTE = ["🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "⚪", "⚫", "🟤"]
+# Colour slugs rather than emoji discs: the grid renders these as CSS
+# dots, which stay perfectly circular and identically sized across
+# platforms. Emoji rendering varies enough between fonts that two
+# swatches could read as different shapes, not just different colours.
+FOCUS_SHIFT_PALETTE = ["red", "orange", "amber", "green", "cyan", "violet", "white", "slate", "rose"]
 
 
 SEQUENCE_BREAKER_DIFFICULTIES = {

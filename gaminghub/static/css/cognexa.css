@@ -1,0 +1,1568 @@
+/* ==========================================================================
+   COGNEXA design system
+   The single stylesheet for the whole app: design tokens, shared
+   components, and the feature styles that used to live in style.css,
+   game.css, dashboard.css, shop.css and brain_lab.css (all now folded
+   into the "Feature styles, consolidated" section at the bottom).
+   Loaded once from _head.html, after Bootstrap, so it overrides cleanly.
+   ========================================================================== */
+
+:root {
+    --bg-primary: #070B14;
+    --bg-secondary: #0B1020;
+    --card-bg: #111827;
+    --card-elevated: #151D2E;
+
+    --accent-primary: #5B8CFF;
+    --accent-secondary: #7C5CFC;
+    --accent-cyan: #22D3EE;
+    --success: #34D399;
+    --warning: #FBBF24;
+    --danger: #F87171;
+
+    --text-primary: #F8FAFC;
+    --text-muted: #94A3B8;
+    --border-color: rgba(248, 250, 252, 0.08);
+    --border-color-strong: rgba(248, 250, 252, 0.16);
+
+    --accent-teal: #2DD4BF;
+
+    --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    --gradient-cyan: linear-gradient(135deg, var(--accent-cyan), var(--accent-primary));
+
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, .35);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, .40);
+    --shadow-glow: 0 0 40px rgba(91, 140, 255, .18);
+
+    --transition-fast: .18s ease;
+    --transition-med: .3s cubic-bezier(.4, 0, .2, 1);
+
+    --font-main: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ---------------------------------------------------------------- base */
+
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+}
+
+/* Custom button/nav classes (.btn-cx-*, .cx-admin-nav-link, ...) override
+   background/border/color but not focus styling, so keyboard focus would
+   otherwise fall back to Bootstrap's default ring -- tuned for a light
+   background and easy to lose against --bg-primary. One rule, applied
+   everywhere, instead of a per-component fix that's easy to miss on the
+   next new component. */
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 2px;
+}
+
+.cx-skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    z-index: 2000;
+    background: var(--accent-primary);
+    color: #fff;
+    font-weight: 600;
+    padding: .6rem 1rem;
+    border-radius: var(--radius-sm);
+    transition: top var(--transition-fast);
+}
+
+.cx-skip-link:focus {
+    top: 1rem;
+    color: #fff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-main);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+a {
+    color: var(--accent-primary);
+}
+
+a:hover {
+    color: var(--accent-cyan);
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.cx-section {
+    padding: 4rem 0;
+}
+
+.cx-section-header {
+    max-width: 640px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+}
+
+.cx-section-header h2 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    margin-bottom: .75rem;
+}
+
+.cx-section-header p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+.cx-eyebrow {
+    display: inline-block;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    margin-bottom: .75rem;
+}
+
+/* ------------------------------------------------------------- navbar */
+
+.navbar-cognexa {
+    background: rgba(7, 11, 20, 0.85) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-cognexa .navbar-brand {
+    font-family: var(--font-main);
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+    color: var(--text-primary) !important;
+}
+
+/* Mark: the real cropped artwork (see _logo.html), not a redrawn
+   approximation -- object-fit guards against distortion if a caller
+   ever sets width != height. No added filter/glow: the source image
+   already carries its own lighting, and stacking a second glow on top
+   of a photorealistic one just muddies it. */
+.cx-mark {
+    object-fit: contain;
+}
+
+/* Wordmark text, used only in the navbar/admin sidebar where the
+   source lockup's tall stacked shape (icon over word over tagline)
+   doesn't fit a thin horizontal bar. Deliberately plain -- bold body
+   font, one colour, no gradient -- rather than a second guess at the
+   source's display face. The real wordmark, pixel-exact, is the
+   lockup() image below wherever there's room to show it. */
+.cx-logo-text {
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+}
+
+.cx-lockup-img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+}
+
+.navbar-cognexa .nav-link {
+    color: var(--text-muted) !important;
+    font-weight: 500;
+    font-size: .95rem;
+    padding: .5rem .9rem !important;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.navbar-cognexa .nav-link:hover,
+.navbar-cognexa .nav-link.active {
+    color: var(--text-primary) !important;
+    background: rgba(255, 255, 255, .04);
+}
+
+.navbar-cognexa .dropdown-menu {
+    background: var(--card-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-cognexa .dropdown-item {
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    margin: 2px 6px;
+    width: calc(100% - 12px);
+}
+
+.navbar-cognexa .dropdown-item:hover,
+.navbar-cognexa .dropdown-item:focus {
+    background: rgba(91, 140, 255, .12);
+    color: var(--text-primary);
+}
+
+.navbar-cognexa .dropdown-divider {
+    border-color: var(--border-color);
+}
+
+.btn-cx-primary {
+    background: var(--gradient-primary);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    padding: .55rem 1.3rem;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+}
+
+.btn-cx-primary:hover {
+    color: #fff;
+    filter: brightness(1.08);
+    box-shadow: 0 6px 20px rgba(91, 140, 255, .35);
+    transform: translateY(-1px);
+}
+
+.btn-cx-outline {
+    background: transparent;
+    border: 1px solid var(--border-color-strong);
+    color: var(--text-primary);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    padding: .55rem 1.3rem;
+    transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-cx-outline:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    background: rgba(91, 140, 255, .08);
+    transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------- hero */
+
+.cx-hero {
+    position: relative;
+    padding: 6rem 0 5rem;
+    overflow: hidden;
+    background:
+        radial-gradient(600px 400px at 15% 20%, rgba(91, 140, 255, .16), transparent 60%),
+        radial-gradient(600px 400px at 85% 10%, rgba(124, 92, 252, .14), transparent 60%),
+        radial-gradient(800px 500px at 50% 100%, rgba(34, 211, 238, .08), transparent 60%),
+        var(--bg-primary);
+}
+
+.cx-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle, rgba(248, 250, 252, .06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 40%, transparent 90%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 40%, transparent 90%);
+    pointer-events: none;
+}
+
+.cx-hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.cx-hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.25rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
+}
+
+.cx-hero .lead {
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    color: var(--text-muted);
+    max-width: 640px;
+    margin: 0 auto 2.25rem;
+}
+
+.cx-hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cx-hero-nodes {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: .55;
+    pointer-events: none;
+}
+
+@keyframes cx-pulse {
+    0%, 100% { opacity: .35; }
+    50% { opacity: .9; }
+}
+
+.cx-hero-nodes circle {
+    animation: cx-pulse 3.5s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------- cards */
+
+.cx-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    transition: transform var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-med);
+}
+
+.cx-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--border-color-strong);
+    box-shadow: var(--shadow-md);
+}
+
+/* ---------------------------------------------- dashboard tiering */
+
+.cx-tier-label {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: .75rem;
+}
+
+.cx-dashboard-hero {
+    position: relative;
+    overflow: hidden;
+    border-color: var(--border-color-strong);
+}
+
+.cx-dashboard-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+}
+
+.cx-dashboard-hero:hover {
+    transform: none;
+}
+
+.cx-feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    height: 100%;
+    transition: transform var(--transition-med), box-shadow var(--transition-med);
+}
+
+.cx-feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.cx-feature-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: rgba(91, 140, 255, .12);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.cx-step-card {
+    position: relative;
+}
+
+.cx-step-number {
+    position: absolute;
+    top: 1.4rem;
+    right: 1.5rem;
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    color: var(--text-muted);
+}
+
+/* ------------------------------------------------------------ game tiles */
+
+/* A tile is an <a> wherever the game is playable, so the whole card is
+   one large hit target rather than a hover effect that leads nowhere.
+   The colour/decoration resets are what stop the global `a` rule from
+   turning every tile's body text accent-blue. */
+.cx-game-tile {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-med);
+}
+
+.cx-game-tile:hover,
+.cx-game-tile:focus-visible {
+    transform: translateY(-6px);
+    border-color: rgba(91, 140, 255, .4);
+    box-shadow: var(--shadow-glow);
+    color: var(--text-primary);
+}
+
+.cx-game-tile:hover .cx-game-icon,
+.cx-game-tile:focus-visible .cx-game-icon {
+    transform: scale(1.08) rotate(-2deg);
+}
+
+/* The "Play >" line only exists on tiles that are links. It sits muted
+   until the tile is hovered/focused so a grid of them stays calm, then
+   confirms the whole card is clickable. */
+.cx-game-tile-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: 1rem;
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color var(--transition-fast), gap var(--transition-fast);
+}
+
+.cx-game-tile:hover .cx-game-tile-cta,
+.cx-game-tile:focus-visible .cx-game-tile-cta {
+    color: var(--accent-primary);
+    gap: .6rem;
+}
+
+/* Game icons are the _icons.html game_icon() macro, which emits
+   .cx-icon-badge + .cx-game-icon together so the per-accent tinted
+   backgrounds are defined once on .cx-icon-badge (see the icon system
+   section) rather than duplicated here. The two-class selector is what
+   lets this override .cx-icon-badge's 44px regardless of which block
+   comes first in the file. */
+.cx-icon-badge.cx-game-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    transition: transform var(--transition-med);
+}
+
+.cx-game-tile h4 {
+    font-size: 1.15rem;
+    margin-bottom: .4rem;
+}
+
+.cx-game-tile p {
+    color: var(--text-muted);
+    font-size: .92rem;
+    flex-grow: 1;
+}
+
+.cx-badge {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    padding: .28rem .65rem;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, .12);
+    color: var(--text-muted);
+    margin-bottom: .75rem;
+    width: fit-content;
+}
+
+.cx-badge-brain {
+    background: rgba(124, 92, 252, .15);
+    color: #c4b5fd;
+}
+
+.cx-badge-casual {
+    background: rgba(34, 211, 238, .15);
+    color: #67e8f9;
+}
+
+.cx-badge-soon {
+    background: rgba(148, 163, 184, .1);
+    color: var(--text-muted);
+}
+
+/* ----------------------------------------------------------- stat tiles */
+
+.cx-stat-tile {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    text-align: center;
+    height: 100%;
+}
+
+.cx-stat-tile .cx-stat-icon {
+    font-size: 1.5rem;
+}
+
+.cx-stat-tile .cx-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: .25rem 0;
+}
+
+.cx-stat-tile .cx-stat-label {
+    color: var(--text-muted);
+    font-size: .82rem;
+}
+
+/* -------------------------------------------------------------- auth */
+
+.cx-auth-wrap {
+    min-height: calc(100vh - 300px);
+    display: flex;
+    align-items: center;
+    padding: 3rem 0;
+}
+
+.cx-auth-card {
+    background: var(--card-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 2.5rem;
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.cx-auth-card .form-control {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color-strong);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    padding: .65rem .9rem;
+}
+
+.cx-auth-card .form-control:focus {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(91, 140, 255, .18);
+}
+
+.cx-auth-card label {
+    color: var(--text-muted);
+    font-size: .88rem;
+    font-weight: 500;
+    margin-bottom: .35rem;
+}
+
+/* ------------------------------------------------------------- footer */
+
+.cx-footer {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 3rem 0 1.75rem;
+}
+
+.cx-footer .brand-mark {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+
+.cx-footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.cx-footer a:hover {
+    color: var(--text-primary);
+}
+
+.cx-footer hr {
+    border-color: var(--border-color);
+    margin: 2rem 0 1.25rem;
+}
+
+/* ---------------------------------------------------------- utilities */
+
+.cx-fade-in {
+    animation: cx-fade-in .5s ease both;
+}
+
+@keyframes cx-fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 767.98px) {
+    .cx-section { padding: 2.75rem 0; }
+    .cx-hero { padding: 4rem 0 3rem; }
+}
+
+/* -------------------------------------------------------------------
+   Bootstrap semantic-class overrides. Most templates in this app were
+   never rewritten below -- they already use .btn-success/.btn-danger/
+   .btn-warning/.btn-primary and .card/.alert-* throughout (dashboard,
+   admin, shop, notifications, leaderboard, ...). Overriding Bootstrap's
+   own classes here means those pages inherit the COGNEXA palette without
+   needing every template's markup touched individually.
+   ------------------------------------------------------------------- */
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-success {
+    background: var(--success);
+    border-color: var(--success);
+    color: #06281c;
+    font-weight: 600;
+}
+
+.btn-success:hover, .btn-success:focus {
+    background: #2bbd8a;
+    border-color: #2bbd8a;
+    color: #06281c;
+}
+
+.btn-outline-success {
+    color: var(--success);
+    border-color: var(--success);
+}
+
+.btn-outline-success:hover {
+    background: var(--success);
+    color: #06281c;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    font-weight: 600;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    filter: brightness(1.08);
+    box-shadow: 0 6px 20px rgba(91, 140, 255, .3);
+}
+
+.btn-danger {
+    background: var(--danger);
+    border-color: var(--danger);
+    font-weight: 600;
+}
+
+.btn-warning {
+    background: var(--warning);
+    border-color: var(--warning);
+    color: #3a2a02;
+    font-weight: 600;
+}
+
+.badge.bg-danger { background: var(--danger) !important; }
+.badge.bg-success { background: var(--success) !important; }
+.badge.bg-warning { background: var(--warning) !important; color: #3a2a02 !important; }
+.badge.bg-primary { background: var(--accent-primary) !important; }
+.badge.bg-secondary { background: rgba(148, 163, 184, .25) !important; color: var(--text-muted) !important; }
+
+.alert {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+.alert-success { background: rgba(52, 211, 153, .12); color: #6ee7b7; }
+.alert-danger { background: rgba(248, 113, 113, .12); color: #fca5a5; }
+.alert-warning { background: rgba(251, 191, 36, .12); color: #fcd34d; }
+.alert-primary { background: rgba(91, 140, 255, .12); color: #93b4ff; }
+
+.table {
+    color: var(--text-primary);
+}
+
+.table > :not(caption) > * > * {
+    border-bottom-color: var(--border-color);
+}
+
+.form-control, .form-select {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color-strong);
+    color: var(--text-primary);
+}
+
+.form-control:focus, .form-select:focus {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(91, 140, 255, .18);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.nav-pills .nav-link {
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+}
+
+.nav-pills .nav-link.active {
+    background: var(--gradient-primary);
+    color: #fff;
+}
+
+/* ------------------------------------------------------------------
+   Icon system. One SVG source (templates/_icons.html), colored here
+   by semantic category -- never inline per-icon. Icons default to the
+   current text color (muted) and only take an accent when a category
+   class is applied, so an icon-heavy page doesn't turn into a rainbow.
+   ------------------------------------------------------------------ */
+
+.cx-icon {
+    display: inline-block;
+    vertical-align: -0.2em;
+    flex-shrink: 0;
+}
+
+.icon--violet   { color: var(--accent-secondary); }
+.icon--indigo   { color: var(--accent-primary); }
+.icon--cyan     { color: var(--accent-cyan); }
+.icon--teal     { color: var(--accent-teal); }
+.icon--amber    { color: var(--warning); }
+.icon--green    { color: var(--success); }
+.icon--danger   { color: var(--danger); }
+.icon--muted    { color: var(--text-muted); }
+
+.cx-icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cx-icon-badge.icon--violet { background: rgba(124, 92, 252, .14); }
+.cx-icon-badge.icon--indigo { background: rgba(91, 140, 255, .14); }
+.cx-icon-badge.icon--cyan   { background: rgba(34, 211, 238, .14); }
+.cx-icon-badge.icon--teal   { background: rgba(45, 212, 191, .14); }
+.cx-icon-badge.icon--amber  { background: rgba(251, 191, 36, .14); }
+.cx-icon-badge.icon--green  { background: rgba(52, 211, 153, .14); }
+.cx-icon-badge.icon--danger { background: rgba(248, 113, 113, .14); }
+
+/* ------------------------------------------------------------------
+   Admin Portal shell. Deliberately NOT a reskin of the player navbar --
+   a fixed sidebar + top header, matching an operations/SaaS dashboard
+   rather than the cognitive-gaming player experience. Shares only
+   tokens/typography/icon system with the player portal, per the brief.
+   ------------------------------------------------------------------ */
+
+.cx-admin-body {
+    background: var(--bg-secondary);
+}
+
+.cx-admin-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.cx-admin-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--bg-primary);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+.cx-admin-main {
+    flex: 1;
+    margin-left: 260px;
+    min-width: 0;
+}
+
+.cx-admin-brand {
+    padding: 1.4rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.cx-admin-brand-label {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.cx-admin-nav {
+    padding: 1rem .75rem;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    flex: 1;
+}
+
+.cx-admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    padding: .6rem .8rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: .92rem;
+    text-decoration: none;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.cx-admin-nav-link:hover {
+    background: rgba(255, 255, 255, .04);
+    color: var(--text-primary);
+}
+
+.cx-admin-nav-link.active {
+    background: rgba(91, 140, 255, .12);
+    color: var(--text-primary);
+}
+
+.cx-admin-nav-link.active .cx-icon {
+    color: var(--accent-primary);
+}
+
+.cx-admin-sidebar-footer {
+    padding: 1rem .75rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+}
+
+.cx-admin-header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.1rem 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.cx-admin-content {
+    padding: 1.75rem;
+}
+
+.cx-admin-sidebar-toggle {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .cx-admin-sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+        transition: transform var(--transition-med);
+        z-index: 1050;
+    }
+
+    .cx-admin-sidebar.show {
+        transform: translateX(0);
+        box-shadow: var(--shadow-md);
+    }
+
+    .cx-admin-main {
+        margin-left: 0;
+    }
+
+    .cx-admin-sidebar-toggle {
+        display: inline-flex;
+    }
+
+    .cx-admin-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .5);
+        z-index: 1040;
+    }
+
+    .cx-admin-backdrop.show {
+        display: block;
+    }
+}
+
+/* ==========================================================================
+   Feature styles, consolidated
+   Previously five separate files (style.css, game.css, dashboard.css,
+   shop.css, brain_lab.css) all loaded on every page. Folded in here so
+   there is one stylesheet and one place where specificity is decided.
+   Rules are carried over as-is apart from two dead ones dropped on the
+   way: `.card { padding: 20px }` (no template uses a bare .card) and
+   `h2,h3,h5 { font-weight: bold }` (the h1-h6 rule at the top of this
+   file already sets 700).
+   ========================================================================== */
+
+/* -------------------------------------------------------- reward popup
+   Injected at runtime by reward.js showReward(), so the class name is
+   referenced from JS rather than a template. */
+
+.reward-popup {
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--success);
+    color: #06281c;
+    padding: 20px;
+    font-size: 30px;
+    font-weight: bold;
+    border-radius: 15px;
+    z-index: 9999;
+    animation: reward 2s ease;
+}
+
+@keyframes reward {
+    0%   { opacity: 0; transform: translate(-50%, 50px); }
+    50%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -150px); }
+}
+
+.alert {
+    animation: pop .5s;
+}
+
+@keyframes pop {
+    0%   { transform: scale(.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---------------------------------------------------------- tic tac toe */
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    gap: 12px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.cell {
+    width: 120px;
+    height: 120px;
+    font-size: 60px;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    background: var(--card-elevated);
+    color: var(--text-primary);
+    transition: var(--transition-med);
+}
+
+.cell:hover:not(:disabled) {
+    background: var(--accent-primary);
+    transform: scale(1.05);
+}
+
+.cell:disabled {
+    cursor: not-allowed;
+    opacity: .9;
+}
+
+/* ------------------------------------------------ progress bars / hearts
+   .progress and .heart are used by guessing.html. */
+
+.progress {
+    height: 22px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width .5s ease;
+    font-weight: bold;
+}
+
+.heart {
+    font-size: 30px;
+    margin: 3px;
+    animation: heart-pop .4s;
+}
+
+@keyframes heart-pop {
+    0%   { transform: scale(.5); }
+    100% { transform: scale(1); }
+}
+
+/* ------------------------------------------------------- dashboard card
+   Still used by brain_lab/logic_grid.html. */
+
+.dashboard-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-med);
+    color: var(--text-primary);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--border-color-strong);
+    box-shadow: var(--shadow-md);
+}
+
+/* ------------------------------------------------------- notifications */
+
+.notification-unread {
+    background: rgba(13, 110, 253, 0.08);
+}
+
+.notification-dropdown {
+    max-width: 340px;
+}
+
+.notification-dropdown .dropdown-item {
+    white-space: normal;
+}
+
+/* --------------------------------------------------- avatars and frames */
+
+.avatar-wrap {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    padding: 4px;
+    display: inline-block;
+    background: var(--card-elevated);
+}
+
+.avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.frame-bronze  { background: linear-gradient(135deg, #cd7f32, #8c5a2b); }
+.frame-silver  { background: linear-gradient(135deg, #e0e0e0, #8c8c8c); }
+.frame-gold    { background: linear-gradient(135deg, #ffd700, #b8860b); }
+.frame-neon    { background: linear-gradient(135deg, #39ff14, #00c8ff); box-shadow: 0 0 16px #39ff14; }
+.frame-diamond { background: linear-gradient(135deg, #b9f2ff, #6dd5ed, #ffffff); box-shadow: 0 0 20px #6dd5ed; }
+
+.equipped-badge {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+/* -------------------------------------------------------------- the shop */
+
+.shop-item-card {
+    height: 100%;
+}
+
+.shop-item-preview {
+    font-size: 2.5rem;
+}
+
+.shop-avatar-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.shop-frame-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    padding: 4px;
+    margin: 0 auto;
+}
+
+/* ---------------------------------------------------------- brain lab
+   NOTE: the colours below are the original hardcoded hex values, not
+   design tokens. They are carried over unchanged so this consolidation
+   is a pure move with no visual change -- retokenising them alters how
+   all eight Brain Lab games look and wants its own review pass. */
+
+.memory-grid {
+    display: grid;
+    gap: 8px;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.memory-cell {
+    aspect-ratio: 1 / 1;
+    background: #1c1f26;
+    border: 2px solid #333;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    cursor: pointer;
+}
+
+.memory-cell.lit {
+    background: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.memory-cell.selected {
+    background: #f1c40f;
+    border-color: #f1c40f;
+    transform: scale(0.94);
+}
+
+.focus-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+}
+
+.focus-cell.selected {
+    background: #34495e;
+    border-color: #f1c40f;
+    box-shadow: 0 0 0 2px #f1c40f inset;
+}
+
+.reflex-box {
+    width: 100%;
+    max-width: 420px;
+    height: 260px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+}
+
+.reflex-box.waiting {
+    background: #c0392b;
+}
+
+.reflex-box.go {
+    background: #27ae60;
+}
+
+.brain-lab-best {
+    min-height: 1.5em;
+}
+
+/* The global prefers-reduced-motion rule at the top of this file kills
+   animations and transitions, but not decorative glows -- these two
+   shed their shadows explicitly. */
+@media (prefers-reduced-motion: reduce) {
+    .frame-neon,
+    .frame-diamond {
+        box-shadow: none;
+    }
+}
+
+/* ==========================================================================
+   Skill radar
+   Geometry comes from utils/radar.py, markup from templates/_radar.html.
+   Everything visual is here so the chart restyles with the tokens.
+   ========================================================================== */
+
+.cx-radar {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.cx-radar-grid polygon {
+    fill: none;
+    stroke: var(--text-primary);
+    stroke-width: 1;
+}
+
+.cx-radar-spokes line {
+    stroke: var(--text-primary);
+    stroke-width: 1;
+    opacity: .10;
+}
+
+.cx-radar-area {
+    stroke: var(--accent-primary);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    /* Grows out of the centre on load. transform-box/origin keep the
+       scale anchored to the chart's middle rather than the SVG root. */
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: cx-radar-in .7s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.cx-radar-compare {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 4;
+    stroke-linejoin: round;
+    opacity: .6;
+}
+
+.cx-radar-dot {
+    fill: var(--accent-cyan);
+    stroke: var(--bg-primary);
+    stroke-width: 2;
+    animation: cx-radar-dot-in .4s ease-out both;
+    animation-delay: .45s;
+}
+
+@keyframes cx-radar-in {
+    from { transform: scale(.4); opacity: 0; }
+    to   { transform: scale(1);  opacity: 1; }
+}
+
+@keyframes cx-radar-dot-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.cx-radar-labels text {
+    fill: var(--text-muted);
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+}
+
+/* An axis with no plays behind it: dimmed so it reads as "not measured
+   yet" rather than "scored zero". */
+.cx-radar-labels text.is-empty {
+    opacity: .45;
+}
+
+.cx-radar-empty {
+    fill: var(--text-muted);
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cx-radar-legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: .35rem;
+}
+
+.cx-radar-key {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    font-size: .8rem;
+    color: var(--text-muted);
+}
+
+.cx-radar-swatch {
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--accent-primary);
+}
+
+.cx-radar-swatch.is-compare {
+    background: repeating-linear-gradient(
+        90deg,
+        var(--text-muted) 0 4px,
+        transparent 4px 7px
+    );
+}
+
+/* ------------------------------------------------- hero: two-column
+   The hero leads with the radar rather than describing it, so the copy
+   moves off-centre on wide screens and stacks back to centred below
+   the lg breakpoint, where the chart sits under the CTAs. */
+
+.cx-hero-copy {
+    text-align: center;
+}
+
+@media (min-width: 992px) {
+    .cx-hero-copy {
+        text-align: left;
+    }
+
+    .cx-hero-copy .lead {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .cx-hero-copy .cx-hero-cta {
+        justify-content: flex-start;
+    }
+}
+
+/* The h1 shares the row with the chart now, so it tops out smaller
+   than it did spanning the full container. */
+.cx-hero .cx-hero-copy h1 {
+    font-size: clamp(2.25rem, 4.6vw, 3.5rem);
+}
+
+.cx-radar-card {
+    background: rgba(17, 24, 39, .72);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md), var(--shadow-glow);
+    padding: 1.5rem 1.25rem 1.25rem;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.cx-radar-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: .25rem;
+}
+
+.cx-radar-card-meta {
+    font-size: .78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.cx-radar-note {
+    margin: .75rem 0 0;
+    font-size: .82rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* Dots shown when there is data but not yet enough axes for a polygon:
+   no draw-in animation, since there is no shape for them to arrive with. */
+.cx-radar-dot.is-partial {
+    animation: none;
+    opacity: .9;
+}
+
+/* The SVG scales to its container, so on a narrow screen a 12px label
+   lands around 9px on screen. Bumping the user-unit size keeps the
+   rendered text legible; the labels still clear the widened viewBox. */
+@media (max-width: 575.98px) {
+    .cx-radar-labels text {
+        font-size: 14px;
+    }
+}
+
+/* ==========================================================================
+   Icon-era replacements
+   Styles for the elements that took over from emoji: rank medals, game
+   swatches, hands, hearts and Code Breaker's pegs.
+   ========================================================================== */
+
+/* ------------------------------------------------------- rank medals */
+
+.cx-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cx-rank--gold   { color: #FFD24A; filter: drop-shadow(0 0 10px rgba(255, 210, 74, .35)); }
+.cx-rank--silver { color: #CBD5E1; filter: drop-shadow(0 0 10px rgba(203, 213, 225, .28)); }
+.cx-rank--bronze { color: #D08B4F; filter: drop-shadow(0 0 10px rgba(208, 139, 79, .28)); }
+
+.cx-rank--plain {
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* --------------------------------------------- rock paper scissors */
+
+.cx-rps-hand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 72px;
+    color: var(--accent-primary);
+    transition: transform var(--transition-med), color var(--transition-fast);
+}
+
+button:hover > .cx-rps-hand,
+a:hover > .cx-rps-hand {
+    transform: translateY(-4px) scale(1.06);
+    color: var(--accent-cyan);
+}
+
+/* ------------------------------------------------- guessing: hearts */
+
+.heart {
+    display: inline-flex;
+    margin: 0 3px;
+    animation: heart-pop .4s;
+}
+
+/* A spent life keeps its outline so the row length still reads as the
+   total, rather than lives silently disappearing. */
+.heart--spent {
+    color: var(--text-muted);
+    opacity: .35;
+}
+
+/* The "too low" hint reuses the level-up arrow, flipped, instead of
+   carrying a second near-identical icon in the set. */
+.cx-flip {
+    display: inline-flex;
+    transform: rotate(180deg);
+}
+
+/* --------------------------------------------- focus shift swatches */
+
+.focus-cell .focus-dot {
+    width: 62%;
+    height: 62%;
+    border-radius: 50%;
+    display: block;
+    box-shadow: inset 0 -2px 6px rgba(0, 0, 0, .35);
+}
+
+.focus-cell[data-color="red"]    .focus-dot { background: #EF4444; }
+.focus-cell[data-color="orange"] .focus-dot { background: #F97316; }
+.focus-cell[data-color="amber"]  .focus-dot { background: #FBBF24; }
+.focus-cell[data-color="green"]  .focus-dot { background: #34D399; }
+.focus-cell[data-color="cyan"]   .focus-dot { background: #22D3EE; }
+.focus-cell[data-color="violet"] .focus-dot { background: #A78BFA; }
+.focus-cell[data-color="white"]  .focus-dot { background: #F1F5F9; }
+.focus-cell[data-color="slate"]  .focus-dot { background: #475569; }
+.focus-cell[data-color="rose"]   .focus-dot { background: #FB7185; }
+
+/* ------------------------------------------------ code breaker pegs */
+
+.cx-pegs {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.cx-peg {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Green = right digit in the right place, amber = right digit wrong
+   place. Same convention the emoji version used. */
+.cx-peg--exact { background: var(--success); }
+.cx-peg--digit { background: var(--warning); margin-left: .45rem; }
+
+/* --------------------------------------------------- shop and badges */
+
+.equipped-badge {
+    display: flex;
+    justify-content: center;
+    line-height: 1;
+}
+
+.shop-item-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+}
+
+/* Offsets page content clear of the fixed navbar. Was a hardcoded
+   72px spacer div, sized for the old 30px logo -- it silently drifted
+   out of sync (measured 77px) the moment the navbar grew, overlapping
+   the first few rows of every page. padding-top on the element that
+   actually needs clearing, sized with a few px of slack, doesn't need
+   updating by hand the next time the navbar's content changes height. */
+.cx-main-offset {
+    padding-top: 84px;
+}
+
+/* --------------------------------------------------- brain lab hero
+   Real hologram art (see _logo.html-adjacent note in the avatars
+   folder for the general asset-extraction approach; this one used a
+   radial fade mask rather than colour-keying, since the source banner
+   has a textured backdrop with no clean near-black background to key
+   against). WebP, not PNG -- this is a smooth-gradient glow image with
+   no flat colour runs, exactly the case PNG compresses worst and WebP
+   compresses well (818KB -> 124KB at unchanged visual quality). */
+.cx-brain-hologram {
+    max-width: 100%;
+    width: 340px;
+    height: auto;
+    animation: cx-hologram-float 5s ease-in-out infinite;
+}
+
+@keyframes cx-hologram-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cx-brain-hologram {
+        animation: none;
+    }
+}

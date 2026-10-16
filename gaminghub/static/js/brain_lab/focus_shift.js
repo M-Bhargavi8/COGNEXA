@@ -28,7 +28,11 @@
             const cell = document.createElement("div");
             cell.className = "memory-cell focus-cell";
             cell.dataset.index = i;
-            cell.textContent = value;
+            // The swatch is a CSS dot keyed off data-color rather than a
+            // text glyph, so every cell is the same size and shape.
+            cell.dataset.color = value;
+            cell.setAttribute("aria-label", value);
+            cell.innerHTML = '<span class="focus-dot"></span>';
             cell.addEventListener("click", () => onCellClick(cell));
             grid.appendChild(cell);
         });
@@ -95,16 +99,16 @@
         gameArea.style.display = "none";
         resultArea.style.display = "block";
 
-        resultHeading.textContent = d.accuracy >= 50 ? "🎉 Sharp eyes!" : "Keep practicing";
+        resultHeading.textContent = d.accuracy >= 50 ? "Sharp eyes!" : "Keep practicing";
 
         let details = `Accuracy ${d.accuracy}% · Score ${d.score} · +${d.xp} XP · +${d.coins} Coins`;
         if (d.streak > 1) {
-            details += ` · 🔥 ${d.streak} in a row`;
+            details += ` · ${d.streak} in a row`;
         }
         resultDetails.textContent = details;
 
         const badges = [];
-        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        if (d.is_new_best) badges.push("NEW PERSONAL BEST");
         badges.push(BrainLab.formatExtras(d));
         bestBadge.textContent = badges.filter(Boolean).join(" · ");
     }

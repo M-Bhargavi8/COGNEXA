@@ -8,7 +8,7 @@ window.BrainLab = {
         const res = await fetch(url, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type" : "application/json",
                 "X-CSRFToken": this.csrfToken()
             },
             body: JSON.stringify(body || {})
@@ -18,9 +18,9 @@ window.BrainLab = {
 
     formatExtras(d) {
         const parts = [];
-        (d.achievements_unlocked || []).forEach(a => parts.push(`🏆 ${a.badge || ""} ${a.title}`.trim()));
+        (d.achievements_unlocked || []).forEach(a => parts.push(`${a.title}`));
         if (d.challenge_completed) {
-            parts.push(`🔥 Daily Challenge Complete! +${d.challenge_completed.xp} XP · +${d.challenge_completed.coins} Coins`);
+            parts.push(`Daily Challenge Complete! +${d.challenge_completed.xp} XP · +${d.challenge_completed.coins} Coins`);
         }
         return parts.join(" · ");
     }

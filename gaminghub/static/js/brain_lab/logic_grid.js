@@ -88,7 +88,7 @@
         gameArea.style.display = "none";
         resultArea.style.display = "block";
 
-        resultHeading.textContent = d.correct_count === d.total ? "🎉 Solved it!" : `${d.correct_count} / ${d.total} correct`;
+        resultHeading.textContent = d.correct_count === d.total ? "Solved it!":`${d.correct_count} / ${d.total} correct`;
 
         let details = `Accuracy ${d.accuracy}% · Score ${d.score} · +${d.xp} XP · +${d.coins} Coins`;
         if (d.hints_used > 0) {
@@ -97,7 +97,7 @@
         resultDetails.textContent = details;
 
         const badges = [];
-        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        if (d.is_new_best) badges.push("NEW PERSONAL BEST");
         badges.push(BrainLab.formatExtras(d));
         bestBadge.textContent = badges.filter(Boolean).join(" · ");
     }

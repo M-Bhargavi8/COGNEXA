@@ -1,87 +1,83 @@
-{% extends "base.html" %}
+{% extends "admin/_admin_base.html" %}
+{% from "_icons.html" import icon, game_icon %}
 
-{% block content %}
+{% set active_page = 'overview' %}
 
-<div class="container py-5">
+{% block title %}Overview -- Admin -- COGNEXA{% endblock %}
+{% block page_title %}Overview{% endblock %}
 
-    <h2 class="text-light mb-4">🛠️ Admin Dashboard</h2>
+{% block admin_content %}
 
-    {% set view = 'overview' %}
-    {% include "admin/_nav.html" %}
+{% set cards = [
+    ('users', 'icon--indigo', 'Total Users', stats.total_users),
+    ('profile', 'icon--cyan', 'New Users (7d)', stats.new_users_7d),
+    ('shield', 'icon--green', 'Admins', stats.total_admins),
+    ('arcade', 'icon--teal', 'Games Played', stats.total_games_played),
+    ('lightning', 'icon--amber', 'Active Sessions', stats.active_sessions),
+    ('flame', 'icon--danger', 'Total Lifetime XP', stats.total_lifetime_xp),
+    ('grid', 'icon--violet', 'Active Games', stats.active_games ~ ' / ' ~ stats.total_games),
+    ('reward', 'icon--amber', 'Active Shop Items', stats.active_shop_items ~ ' / ' ~ stats.total_shop_items),
+] %}
 
-    <div class="row g-3 mb-4">
+<div class="row g-3 mb-4">
+    {% for icon_name, icon_color, label, value in cards %}
+    <div class="col-6 col-md-3">
+        <div class="cx-card text-center p-3 h-100">
+            <div class="mb-2 d-flex justify-content-center">{{ icon(icon_name, 26, icon_color) }}</div>
+            <div class="fs-5 fw-bold text-light">{{ value }}</div>
+            <div class="text-muted small">{{ label }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
-        {% set cards = [
-            ('👥', 'Total Users', stats.total_users),
-            ('🆕', 'New Users (7d)', stats.new_users_7d),
-            ('🛡️', 'Admins', stats.total_admins),
-            ('🎮', 'Games Played', stats.total_games_played),
-            ('🟢', 'Active Sessions', stats.active_sessions),
-            ('⚡', 'Total Lifetime XP', stats.total_lifetime_xp),
-            ('🕹️', 'Active Games', stats.active_games ~ ' / ' ~ stats.total_games),
-            ('🛍️', 'Active Shop Items', stats.active_shop_items ~ ' / ' ~ stats.total_shop_items),
-        ] %}
+{% if stats.most_played_game %}
+<div class="cx-card p-3 mb-4 text-center d-flex align-items-center justify-content-center gap-2">
+    {{ icon('flame', 20, 'icon--danger') }}
+    <span class="text-light d-inline-flex align-items-center gap-2">Most played game: {{ game_icon(stats.most_played_game.slug, 16, tile=false) }} <strong>{{ stats.most_played_game.name }}</strong> ({{ stats.most_played_game.plays }} plays)</span>
+</div>
+{% endif %}
 
-        {% for icon, label, value in cards %}
-        <div class="col-6 col-md-3">
-            <div class="card dashboard-card text-center p-3 h-100">
-                <div class="fs-3">{{ icon }}</div>
-                <div class="fs-5 fw-bold text-light">{{ value }}</div>
-                <div class="text-muted small">{{ label }}</div>
+<div class="row g-4">
+
+    <div class="col-lg-6">
+        <div class="cx-card">
+            <div class="card-body">
+                <h5 class="mb-3 d-flex align-items-center gap-2">{{ icon('profile', 20, 'icon--cyan') }} Recent Signups</h5>
+                {% if recent_signups %}
+                <ul class="list-group list-group-flush">
+                    {% for u in recent_signups %}
+                    <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                        <span>{{ u.username }} <span class="badge bg-secondary">{{ u.role }}</span></span>
+                        <span class="text-muted small">{{ u.created_at.strftime('%b %d, %Y') if u.created_at else '—' }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">No signups yet.</p>
+                {% endif %}
             </div>
         </div>
-        {% endfor %}
-
     </div>
 
-    {% if stats.most_played_game %}
-    <div class="card dashboard-card p-3 mb-4 text-center">
-        <span class="text-light">🔥 Most played game: <strong>{{ stats.most_played_game.icon }} {{ stats.most_played_game.name }}</strong> ({{ stats.most_played_game.plays }} plays)</span>
-    </div>
-    {% endif %}
-
-    <div class="row g-4">
-
-        <div class="col-lg-6">
-            <div class="card dashboard-card">
-                <div class="card-body">
-                    <h5 class="mb-3">🆕 Recent Signups</h5>
-                    {% if recent_signups %}
-                    <ul class="list-group list-group-flush">
-                        {% for u in recent_signups %}
-                        <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
-                            <span>{{ u.username }} <span class="badge bg-secondary">{{ u.role }}</span></span>
-                            <span class="text-muted small">{{ u.created_at.strftime('%b %d, %Y') if u.created_at else '—' }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="text-muted mb-0">No signups yet.</p>
-                    {% endif %}
-                </div>
+    <div class="col-lg-6">
+        <div class="cx-card">
+            <div class="card-body">
+                <h5 class="mb-3 d-flex align-items-center gap-2">{{ icon('arcade', 20, 'icon--teal') }} Recent Game Results</h5>
+                {% if recent_results %}
+                <ul class="list-group list-group-flush">
+                    {% for result, u, g in recent_results %}
+                    <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                        <span class="d-inline-flex align-items-center gap-2">{{ u.username }} &middot; {{ game_icon(g.slug, 16, tile=false) }} {{ g.name }} &middot; {{ result.result }}</span>
+                        <span class="text-muted small">{{ result.created_at.strftime('%b %d, %H:%M') if result.created_at else '—' }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">No games played yet.</p>
+                {% endif %}
             </div>
         </div>
-
-        <div class="col-lg-6">
-            <div class="card dashboard-card">
-                <div class="card-body">
-                    <h5 class="mb-3">🕹️ Recent Game Results</h5>
-                    {% if recent_results %}
-                    <ul class="list-group list-group-flush">
-                        {% for result, u, g in recent_results %}
-                        <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
-                            <span>{{ u.username }} &middot; {{ g.icon }} {{ g.name }} &middot; {{ result.result }}</span>
-                            <span class="text-muted small">{{ result.created_at.strftime('%b %d, %H:%M') if result.created_at else '—' }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="text-muted mb-0">No games played yet.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
     </div>
 
 </div>

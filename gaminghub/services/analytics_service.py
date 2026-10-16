@@ -20,6 +20,11 @@ GAME_SKILL_MAP = {
     "logic-grid": "Logic",
 }
 
+# Two games map to Logic, so this is 7, not len(GAME_SKILL_MAP). The
+# landing page quotes it rather than hardcoding a number that silently
+# goes stale the next time a game is added.
+SKILLS = sorted(set(GAME_SKILL_MAP.values()))
+
 
 def get_overview(user):
     """
@@ -114,6 +119,7 @@ def get_per_game_breakdown(user):
         breakdown.append({
             "name": name,
             "icon": icon,
+            "slug": slug,
             "url": game_service.get_play_url(slug),
             "plays": d["plays"],
             "win_rate": round(100 * d["wins"] / d["plays"]),
@@ -159,7 +165,7 @@ def get_skill_profile(user):
 
     profile = []
 
-    for skill in sorted(set(GAME_SKILL_MAP.values())):
+    for skill in SKILLS:
         if plays[skill] >= 1:
             profile.append({
                 "skill": skill,
@@ -168,6 +174,51 @@ def get_skill_profile(user):
             })
 
     return profile
+
+
+def get_radar_profile(user=None):
+    """
+    Win rate for every skill in SKILLS, including the ones with no plays.
+
+    get_skill_profile() above deliberately drops unplayed skills so a
+    bar chart never renders "no data" as a 0% bar. A radar can't do
+    that -- drop an axis and the polygon changes shape, so a beginner
+    would appear to have a differently-shaped mind rather than less
+    data. This variant keeps every axis and marks the empty ones with
+    plays == 0, leaving it to the chart to dim them and to the caption
+    to say what that means.
+
+    user=None aggregates across all players: the platform average, used
+    for logged-out visitors and as the comparison ring for logged-in
+    ones.
+    """
+
+    query = db.session.query(Game.slug, GameResult.result).join(
+        GameResult, GameResult.game_id == Game.id
+    )
+
+    if user is not None:
+        query = query.filter(GameResult.user_id == user.id)
+
+    plays = defaultdict(int)
+    wins = defaultdict(int)
+
+    for slug, result in query.all():
+        skill = GAME_SKILL_MAP.get(slug)
+        if not skill:
+            continue
+        plays[skill] += 1
+        if result == "win":
+            wins[skill] += 1
+
+    return [
+        {
+            "skill": skill,
+            "score": round(100 * wins[skill] / plays[skill]) if plays[skill] else 0,
+            "plays": plays[skill],
+        }
+        for skill in SKILLS
+    ]
 
 
 def get_recommendations(user, limit=3):

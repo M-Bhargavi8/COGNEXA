@@ -1,284 +1,179 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, game_icon, achievement_icon, shop_badge %}
+
+{% block title %}Dashboard -- COGNEXA{% endblock %}
 
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shop.css') }}">
-
 <div class="container py-5">
 
-    <h2 class="text-center text-light mb-5">
-        🎮 Welcome, {{ current_user.username }}
+    <h2 class="text-center mb-5">
+        Welcome back, {{ current_user.username }}
     </h2>
 
-    <div class="row g-4">
+    <!-- Tier 1 -- Featured: identity + level progress -->
 
-        <!-- Player Profile -->
-        <div class="col-lg-4">
+    <div class="cx-card cx-dashboard-hero p-4 mb-4">
+        <div class="row align-items-center g-4">
 
-            <div class="card dashboard-card text-center">
+            <div class="col-md-auto text-center">
+                <div class="avatar-wrap {{ current_user.equipped_frame or '' }}">
+                    <img src="{{ url_for('static', filename='images/avatars/' ~ current_user.avatar) }}" alt="{{ current_user.username }}'s avatar">
+                </div>
+                {% if current_user.equipped_badge %}
+                <div class="equipped-badge mt-1">{{ shop_badge(current_user.equipped_badge, 22) }}</div>
+                {% endif %}
+            </div>
 
-                <div class="avatar-wrap mx-auto mt-4 {{ current_user.equipped_frame or '' }}">
-                    <img src="{{ url_for('static', filename='images/avatars/' ~ current_user.avatar) }}">
+            <div class="col-md">
+
+                <h3 class="mb-0">{{ current_user.username }}</h3>
+                <p class="text-muted mb-3 d-flex align-items-center gap-2">{{ icon('mail', 15) }} {{ current_user.email }}</p>
+
+                <div class="d-flex flex-wrap gap-4 mb-3">
+                    <span class="d-flex align-items-center gap-2 fw-bold">{{ icon('level-up', 20, 'icon--indigo') }} Level {{ current_user.level }}</span>
+                    <span class="d-flex align-items-center gap-2 fw-bold">{{ icon('coin', 20, 'icon--amber') }} {{ current_user.coins }} Coins</span>
+                    <span class="d-flex align-items-center gap-2 fw-bold">{{ icon('lightning', 20, 'icon--cyan') }} {{ current_user.xp }} XP</span>
                 </div>
 
-                {% if current_user.equipped_badge %}
-                <div class="equipped-badge mt-1">{{ current_user.equipped_badge }}</div>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Level {{ current_user.level }} progress</span>
+                    <span>{{ current_user.xp }} / {{ xp_needed }} XP</span>
+                </div>
+                <div class="progress" style="height: 20px; background: var(--bg-secondary);">
+                    <div
+                        class="progress-bar"
+                        style="width: {{ xp_percent }}%; background: var(--gradient-primary);">
+                        {{ xp_percent }}%
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Tier 2 -- Medium: today's actionable items -->
+
+    <div class="cx-tier-label">Today</div>
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-6">
+            <div class="cx-card h-100 p-4">
+                <div class="cx-eyebrow d-flex align-items-center gap-2">{{ icon('flame', 18, 'icon--danger') }} Daily Challenge</div>
+
+                {% if challenge %}
+
+                <h5 class="mt-2 d-flex align-items-center gap-2">{{ game_icon(challenge_game.slug, 18, tile=false) }} {{ challenge_game.name }}{% if challenge.difficulty %} &middot; {{ challenge.difficulty|capitalize }}{% endif %}</h5>
+                <p class="text-muted small">{{ challenge.description }}</p>
+                <p class="fw-bold d-flex align-items-center gap-1" style="color: var(--warning);">
+                    {{ icon('lightning', 16, 'icon--amber') }} +{{ challenge.xp_reward }} XP &middot; {{ icon('coin', 16, 'icon--amber') }} +{{ challenge.coin_reward }} Coins
+                </p>
+
+                {% if challenge_done %}
+                <p class="fw-bold mb-0 d-flex align-items-center gap-2" style="color: var(--success);">{{ icon('check', 18, 'icon--green') }} Completed today</p>
+                {% elif challenge_url %}
+                <a href="{{ challenge_url }}" class="btn btn-cx-primary">Play Now</a>
                 {% endif %}
 
-                <div class="card-body">
-
-                    <h3>{{ current_user.username }}</h3>
-
-                    <p>{{ current_user.email }}</p>
-
-                    <hr>
-
-                    <h5>⭐ Level {{ current_user.level }}</h5>
-
-                    <h5>💰 {{ current_user.coins }} Coins</h5>
-
-                    <h5>⚡ {{ current_user.xp }} XP</h5>
-
-                </div>
+                {% else %}
+                <p class="text-muted mb-0 mt-2">No challenge available today.</p>
+                {% endif %}
 
             </div>
-
         </div>
 
-        <!-- Statistics -->
-
-        <div class="col-lg-8">
-
-            <div class="card dashboard-card">
-
-                <div class="card-body">
-
-                    <h3 class="mb-4">
-                        📊 Statistics
-                    </h3>
-
-                    <div class="row text-center">
-
-                        <div class="col">
-                            <h2>{{ current_user.games_played }}</h2>
-                            <p>Games</p>
-                        </div>
-
-                        <div class="col">
-                            <h2>{{ current_user.wins }}</h2>
-                            <p>Wins</p>
-                        </div>
-
-                        <div class="col">
-                            <h2>{{ current_user.losses }}</h2>
-                            <p>Losses</p>
-                        </div>
-
-                        <div class="col">
-                            <h2>{{ current_user.high_score }}</h2>
-                            <p>High Score</p>
-                        </div>
-
-                    </div>
-
-                </div>
-
+        <div class="col-lg-6">
+            <div class="cx-card h-100 p-4">
+                <div class="cx-eyebrow d-flex align-items-center gap-2">{{ icon('flame', 18, 'icon--amber') }} Daily Streak</div>
+                <h2 class="mt-2 mb-1">{{ current_user.daily_streak }} Days</h2>
+                <p class="text-muted small mb-3">Come back daily to keep your streak alive and grow your reward.</p>
+                <a href="{{ url_for('rewards.daily') }}" class="btn btn-cx-primary">Claim Reward</a>
             </div>
-
         </div>
 
     </div>
 
-</div>
-<div class="col-md-4">
+    <!-- Tier 3 -- Small: glanceable numbers + navigation -->
 
-    <div class="card shadow p-4 text-center">
+    <div class="cx-tier-label">Your Numbers</div>
 
-        <a
-href="{{ url_for('brain_lab.hub') }}"
-class="btn btn-lg btn-success mb-2">
+    <div class="row g-3 mb-4">
 
-🧠 Brain Lab
+        <div class="col-6 col-md-3">
+            <div class="cx-stat-tile">
+                <div class="cx-stat-icon d-flex justify-content-center">{{ icon('arcade', 20, 'icon--teal') }}</div>
+                <div class="cx-stat-value">{{ current_user.games_played }}</div>
+                <div class="cx-stat-label">Games</div>
+            </div>
+        </div>
 
-</a>
+        <div class="col-6 col-md-3">
+            <div class="cx-stat-tile">
+                <div class="cx-stat-icon d-flex justify-content-center">{{ icon('trophy', 20, 'icon--amber') }}</div>
+                <div class="cx-stat-value">{{ current_user.wins }}</div>
+                <div class="cx-stat-label">Wins</div>
+            </div>
+        </div>
 
-<a
-href="{{ url_for('gamehub.games_home') }}"
-class="btn btn-lg btn-outline-success mb-2">
+        <div class="col-6 col-md-3">
+            <div class="cx-stat-tile">
+                <div class="cx-stat-icon d-flex justify-content-center">{{ icon('close', 20, 'icon--muted') }}</div>
+                <div class="cx-stat-value">{{ current_user.losses }}</div>
+                <div class="cx-stat-label">Losses</div>
+            </div>
+        </div>
 
-🎮 Browse Games
+        <div class="col-6 col-md-3">
+            <div class="cx-stat-tile">
+                <div class="cx-stat-icon d-flex justify-content-center">{{ icon('target', 20, 'icon--violet') }}</div>
+                <div class="cx-stat-value">{{ current_user.high_score }}</div>
+                <div class="cx-stat-label">High Score</div>
+            </div>
+        </div>
 
-</a>
+    </div>
 
-<a
-href="{{ url_for('analytics.analytics_home') }}"
-class="btn btn-lg btn-outline-warning mb-2">
+    <div class="cx-card p-3 mb-4">
+        <div class="cx-tier-label mb-2">Quick Links</div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('brain_lab.hub') }}" class="btn btn-cx-outline btn-sm d-inline-flex align-items-center gap-2">{{ icon('brain', 16, 'icon--violet') }} Brain Lab</a>
+            <a href="{{ url_for('gamehub.games_home') }}" class="btn btn-cx-outline btn-sm d-inline-flex align-items-center gap-2">{{ icon('arcade', 16, 'icon--teal') }} Arcade</a>
+            <a href="{{ url_for('leaderboard.leaderboard_home') }}" class="btn btn-cx-outline btn-sm d-inline-flex align-items-center gap-2">{{ icon('trophy', 16, 'icon--amber') }} Leaderboard</a>
+            <a href="{{ url_for('rewards.shop') }}" class="btn btn-cx-outline btn-sm d-inline-flex align-items-center gap-2">{{ icon('reward', 16, 'icon--amber') }} Reward Shop</a>
+            <a href="{{ url_for('analytics.analytics_home') }}" class="btn btn-cx-outline btn-sm d-inline-flex align-items-center gap-2">{{ icon('analytics', 16, 'icon--cyan') }} Analytics</a>
+        </div>
+    </div>
 
-📊 My Analytics
+    <!-- Recent activity -->
 
-</a>
+    <div class="cx-card p-4">
 
-<a
-href="{{ url_for('leaderboard.leaderboard_home') }}"
-class="btn btn-lg btn-outline-info mb-2">
+        <h4 class="mb-3 d-flex align-items-center gap-2">{{ icon('achievement', 22, 'icon--violet') }} Recent Achievements</h4>
 
-🏆 Leaderboard
+        {% if current_user.achievements %}
 
-</a>
+        <div class="row g-3">
+            {% for achievement in current_user.achievements[-5:] %}
+            <div class="col-md-6 col-lg-4">
+                <div class="cx-stat-tile text-start p-3">
+                    <div class="fw-bold d-flex align-items-center gap-2">{{ achievement_icon(achievement.name, 18, tile=false) }} {{ achievement.title }}</div>
+                    <small class="text-muted">{{ achievement.description }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
 
-<a
-href="{{ url_for('rewards.shop') }}"
-class="btn btn-lg btn-outline-light">
-
-🛍️ Reward Shop
-
-</a>
+        {% else %}
+        <div class="text-center py-4">
+            {{ icon('achievement', 32, 'icon--muted') }}
+            <p class="text-muted mb-0 mt-3">No achievements yet -- play a round to start earning them.</p>
+        </div>
+        {% endif %}
 
     </div>
 
 </div>
-<div class="card shadow mt-4">
 
-<div class="card-header bg-warning text-dark">
-
-🏅 Achievements
-
-</div>
-
-<div class="card-body">
-
-{% if current_user.achievements %}
-
-{% for achievement in current_user.achievements[-5:] %}
-
-<div class="mb-2">
-
-<h5>
-
-{{ achievement.badge }}
-
-{{ achievement.title }}
-
-</h5>
-
-<small>
-
-{{ achievement.description }}
-
-</small>
-
-</div>
-
-<hr>
-
-{% endfor %}
-
-{% else %}
-
-<p>No achievements yet.</p>
-
-{% endif %}
-
-</div>
-
-</div>
-<div class="card shadow mt-4">
-
-<div class="card-header">
-
-⭐ Current Level
-
-</div>
-
-<div class="card-body">
-
-<h2>
-
-Level {{ current_user.level }}
-
-</h2>
-
-<div class="progress">
-
-<div
-class="progress-bar bg-success"
-style="width: {{ xp_percent }}%;">
-
-{{ xp_percent }}%
-
-</div>
-
-</div>
-
-<p class="mt-2">
-
-{{ current_user.xp }} / {{ xp_needed }} XP
-
-</p>
-
-</div>
-
-</div>
-<div class="card shadow mt-4">
-
-<div class="card-header bg-success text-white">
-
-🔥 Daily Streak
-
-</div>
-
-<div class="card-body text-center">
-
-<h2>
-
-{{ current_user.daily_streak }}
-
-Days
-
-</h2>
-
-<a href="{{ url_for('rewards.daily') }}"
-
-class="btn btn-success">
-
-Claim Reward
-
-</a>
-
-</div>
-
-</div>
-<div class="card shadow mt-4">
-
-<div class="card-header bg-danger text-white">
-
-🔥 Daily Challenge
-
-</div>
-
-<div class="card-body text-center">
-
-{% if challenge %}
-
-<h5>{{ challenge_game.icon }} {{ challenge_game.name }}{% if challenge.difficulty %} · {{ challenge.difficulty|capitalize }}{% endif %}</h5>
-
-<p>{{ challenge.description }}</p>
-
-<p class="text-warning fw-bold">+{{ challenge.xp_reward }} XP · +{{ challenge.coin_reward }} Coins</p>
-
-{% if challenge_done %}
-<p class="text-success fw-bold">✅ Completed today</p>
-{% elif challenge_url %}
-<a href="{{ challenge_url }}" class="btn btn-danger">Play Now</a>
-{% endif %}
-
-{% else %}
-
-<p>No challenge available today.</p>
-
-{% endif %}
-
-</div>
-
-</div>
 {% endblock %}

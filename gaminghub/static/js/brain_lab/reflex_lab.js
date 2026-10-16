@@ -20,8 +20,8 @@
 
     function formatExtras(d) {
         const parts = [];
-        (d.achievements_unlocked || []).forEach(a => parts.push(`🏆 ${a.badge || ""} ${a.title}`.trim()));
-        if (d.challenge_completed) parts.push(`🔥 Daily Challenge Complete! +${d.challenge_completed.xp} XP · +${d.challenge_completed.coins} Coins`);
+        (d.achievements_unlocked || []).forEach(a => parts.push(`${a.title}`));
+        if (d.challenge_completed) parts.push(`Daily Challenge Complete! +${d.challenge_completed.xp} XP · +${d.challenge_completed.coins} Coins`);
         return parts.join(" · ");
     }
 
@@ -29,7 +29,7 @@
         const res = await fetch(url, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type" : "application/json",
                 "X-CSRFToken": csrfToken()
             },
             body: JSON.stringify(body || {})
@@ -91,10 +91,9 @@
         const d = res.data;
 
         if (!d.valid) {
-            resultHeading.textContent = early ? "⚡ Too soon!" : "Invalid attempt";
+            resultHeading.textContent = early ? "Too soon!" : "Invalid attempt";
             resultDetails.textContent = early
-                ? "You clicked before the signal appeared."
-                : "That reaction time wasn't valid — try again.";
+                ? "You clicked before the signal appeared." : "That reaction time wasn't valid — try again.";
             bestBadge.textContent = formatExtras(d);
             return;
         }
@@ -108,7 +107,7 @@
         resultDetails.textContent = details;
 
         const badges = [];
-        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        if (d.is_new_best) badges.push("NEW PERSONAL BEST");
         badges.push(formatExtras(d));
         bestBadge.textContent = badges.filter(Boolean).join(" · ");
     }

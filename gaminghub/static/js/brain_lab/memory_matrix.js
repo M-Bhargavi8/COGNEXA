@@ -22,7 +22,7 @@
         const res = await fetch(url, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type" : "application/json",
                 "X-CSRFToken": csrfToken()
             },
             body: JSON.stringify(body || {})
@@ -110,18 +110,18 @@
         gameArea.style.display = "none";
         resultArea.style.display = "block";
 
-        resultHeading.textContent = d.accuracy >= 50 ? "🎉 Well done!" : "Keep practicing";
+        resultHeading.textContent = d.accuracy >= 50 ? "Well done!" : "Keep practicing";
 
         let details = `Accuracy ${d.accuracy}% · Score ${d.score} · +${d.xp} XP · +${d.coins} Coins`;
         if (d.streak > 1) {
-            details += ` · 🔥 ${d.streak} in a row`;
+            details += ` · ${d.streak} in a row`;
         }
         resultDetails.textContent = details;
 
         const badges = [];
-        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
-        (d.achievements_unlocked || []).forEach(a => badges.push(`🏆 ${a.badge || ""} ${a.title}`.trim()));
-        if (d.challenge_completed) badges.push(`🔥 Daily Challenge Complete! +${d.challenge_completed.xp} XP · +${d.challenge_completed.coins} Coins`);
+        if (d.is_new_best) badges.push("NEW PERSONAL BEST");
+        (d.achievements_unlocked || []).forEach(a => badges.push(`${a.title}`));
+        if (d.challenge_completed) badges.push(`Daily Challenge Complete! +${d.challenge_completed.xp} XP · +${d.challenge_completed.coins} Coins`);
         bestBadge.textContent = badges.join(" · ");
     }
 

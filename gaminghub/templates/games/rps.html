@@ -1,64 +1,46 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Rock Paper Scissors -- COGNEXA{% endblock %}
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
-    <div class="card shadow-lg p-5 rounded-4">
+    <a href="{{ url_for('gamehub.games_home') }}" class="btn btn-cx-outline btn-sm mb-4">← Back to Casual Games</a>
 
-        <h1 class="text-center mb-4">
-            ✊ Rock Paper Scissors
+    <div class="cx-card p-5 mx-auto" style="max-width: 720px;">
+
+        <h1 class="text-center fw-bold mb-2">
+            {{ icon("hands", 28, "icon--indigo") }} Rock Paper Scissors
         </h1>
+        <p class="text-center text-muted mb-4">Outsmart the computer in a classic battle of choices.</p>
 
         <form method="POST">
 
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <div class="row text-center">
+            <div class="row text-center g-3">
 
-                <div class="col-md-4 mb-3">
-
-                    <button
-                        name="choice"
-                        value="Rock"
-                        class="btn btn-outline-danger btn-lg w-100">
-
-                        <div class="display-2">✊</div>
-
+                <div class="col-md-4">
+                    <button name="choice" value="Rock" class="btn btn-cx-outline btn-lg w-100 py-4">
+                        <div class="cx-rps-hand">{{ icon("hand-rock", 56) }}</div>
                         Rock
-
                     </button>
-
                 </div>
 
-                <div class="col-md-4 mb-3">
-
-                    <button
-                        name="choice"
-                        value="Paper"
-                        class="btn btn-outline-success btn-lg w-100">
-
-                        <div class="display-2">✋</div>
-
+                <div class="col-md-4">
+                    <button name="choice" value="Paper" class="btn btn-cx-outline btn-lg w-100 py-4">
+                        <div class="cx-rps-hand">{{ icon("hand-paper", 56) }}</div>
                         Paper
-
                     </button>
-
                 </div>
 
-                <div class="col-md-4 mb-3">
-
-                    <button
-                        name="choice"
-                        value="Scissors"
-                        class="btn btn-outline-primary btn-lg w-100">
-
-                        <div class="display-2">✌️</div>
-
+                <div class="col-md-4">
+                    <button name="choice" value="Scissors" class="btn btn-cx-outline btn-lg w-100 py-4">
+                        <div class="cx-rps-hand">{{ icon("hand-scissors", 56) }}</div>
                         Scissors
-
                     </button>
-
                 </div>
 
             </div>
@@ -67,103 +49,40 @@
 
         {% if result %}
 
-        <hr>
+        <hr style="border-color: var(--border-color);" class="my-4">
 
         <div class="text-center">
 
-            <div
-                id="countdown"
-                class="display-2 fw-bold text-primary">
-
-                Ready...
-
-            </div>
+            <div id="countdown" class="display-2 fw-bold text-gradient">Ready...</div>
 
             <div id="battle" style="display:none;">
 
                 <div class="row mt-4">
-
                     <div class="col-md-6">
-
-                        <h3>You</h3>
-
+                        <h5 class="text-muted">You</h5>
                         <div class="display-1">
-
-                            {% if player=="Rock" %}
-                            ✊
-                            {% elif player=="Paper" %}
-                            ✋
-                            {% else %}
-                            ✌️
-                            {% endif %}
-
+                            {% if player=="Rock" %}{{ icon("hand-rock", 52, "icon--indigo") }}{% elif player=="Paper" %}{{ icon("hand-paper", 52, "icon--indigo") }}{% else %}{{ icon("hand-scissors", 52, "icon--indigo") }}{% endif %}
                         </div>
-
                     </div>
-
                     <div class="col-md-6">
-
-                        <h3>Computer</h3>
-
+                        <h5 class="text-muted">Computer</h5>
                         <div class="display-1">
-
-                            {% if computer=="Rock" %}
-                            ✊
-                            {% elif computer=="Paper" %}
-                            ✋
-                            {% else %}
-                            ✌️
-                            {% endif %}
-
+                            {% if computer=="Rock" %}{{ icon("hand-rock", 52, "icon--violet") }}{% elif computer=="Paper" %}{{ icon("hand-paper", 52, "icon--violet") }}{% else %}{{ icon("hand-scissors", 52, "icon--violet") }}{% endif %}
                         </div>
-
                     </div>
-
                 </div>
 
                 <br>
 
                 {% if result=="Win" %}
-
-                <div class="alert alert-success fs-4">
-
-                    🎉 YOU WIN!
-
-                    <br>
-
-                    +20 XP
-
-                    <br>
-
-                    +15 Coins
-
-                </div>
-
+                <div class="alert alert-success fs-4">{{ icon("trophy", 24, "icon--amber") }} YOU WIN! <br> +20 XP <br> +15 Coins</div>
                 {% elif result=="Lose" %}
-
-                <div class="alert alert-danger fs-4">
-
-                    😢 YOU LOST
-
-                </div>
-
+                <div class="alert alert-danger fs-4">{{ icon("close", 24) }} YOU LOST</div>
                 {% else %}
-
-                <div class="alert alert-warning fs-4">
-
-                    🤝 DRAW
-
-                </div>
-
+                <div class="alert alert-warning fs-4">{{ icon("hands", 24) }} DRAW</div>
                 {% endif %}
 
-                <a
-                    href="{{ url_for('games.rps') }}"
-                    class="btn btn-dark btn-lg mt-3">
-
-                    🔄 Play Again
-
-                </a>
+                <a href="{{ url_for('games.rps') }}" class="btn btn-cx-primary btn-lg mt-3">{{ icon("level-up", 18) }} Play Again</a>
 
             </div>
 

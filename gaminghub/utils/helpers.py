@@ -13,14 +13,14 @@ def flash_game_outcome(outcome):
         return
 
     if outcome.get("is_new_best"):
-        flash("🔥 New personal best!", "success")
+        flash("New personal best!", "success")
 
     for achievement in outcome.get("achievements_unlocked", []):
-        flash(f"🏆 Achievement Unlocked: {achievement.title}", "success")
+        flash(f"Achievement Unlocked: {achievement.title}", "success")
 
     challenge = outcome.get("challenge_completed")
     if challenge:
         flash(
-            f"🔥 Daily Challenge Complete! +{challenge.xp_reward} XP · +{challenge.coin_reward} Coins",
+            f"Daily Challenge Complete! +{challenge.xp_reward} XP · +{challenge.coin_reward} Coins",
             "success"
         )

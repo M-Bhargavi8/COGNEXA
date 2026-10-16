@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 
 from gaminghub.services import notification_service
 from gaminghub.models.notification import Notification
@@ -134,3 +134,43 @@ class TestEnsureDailyReminders:
 
         types = {n.type for n in Notification.query.filter_by(user_id=user.id).all()}
         assert "daily_reward" not in types
+
+
+class TestUtcStartOfLocalDay:
+    """
+    The daily features roll over on the local calendar day, but
+    Notification.created_at is stored in UTC. These pin the conversion
+    that reconciles the two, without depending on the machine's own
+    timezone or on what time the suite happens to run.
+    """
+
+    def test_converts_local_midnight_to_the_matching_utc_instant(self):
+        day = date(2026, 8, 15)
+        start = notification_service.utc_start_of_local_day(day)
+
+        expected = (
+            datetime.combine(day, time.min)
+            .astimezone()
+            .astimezone(timezone.utc)
+            .replace(tzinfo=None)
+        )
+        assert start == expected
+
+    def test_result_is_naive_so_it_compares_with_stored_timestamps(self):
+        start = notification_service.utc_start_of_local_day(date(2026, 8, 15))
+        assert start.tzinfo is None
+
+    def test_never_returns_an_instant_in_the_future(self):
+        """
+        The bug this replaces: east of UTC, a local-midnight timestamp
+        sits ahead of every UTC row written that morning, so the dedup
+        filter matched nothing and reminders duplicated on every visit.
+        """
+        start = notification_service.utc_start_of_local_day(date.today())
+        assert start <= datetime.utcnow()
+
+    def test_a_notification_created_now_falls_inside_today(self, make_user):
+        user = make_user()
+        n = notification_service.create(user, "daily_reward", "x")
+
+        assert n.created_at >= notification_service.utc_start_of_local_day(date.today())

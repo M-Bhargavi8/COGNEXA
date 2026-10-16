@@ -6,15 +6,17 @@ app = create_app()
 
 # (name, description, item_type, cost, asset)
 SHOP_ITEMS = [
-    ("Avatar 2", "Unlock this avatar.", "avatar", 50, "avatar2.png"),
-    ("Avatar 3", "Unlock this avatar.", "avatar", 50, "avatar3.png"),
-    ("Avatar 4", "Unlock this avatar.", "avatar", 75, "avatar4.png"),
-    ("Avatar 5", "Unlock this avatar.", "avatar", 75, "avatar5.png"),
-    ("Avatar 6", "Unlock this avatar.", "avatar", 100, "avatar6.png"),
-    ("Avatar 7", "Unlock this avatar.", "avatar", 100, "avatar7.png"),
-    ("Avatar 8", "Unlock this avatar.", "avatar", 150, "avatar8.png"),
-    ("Avatar 9", "Unlock this avatar.", "avatar", 150, "avatar9.png"),
-    ("Avatar 10", "Unlock this avatar.", "avatar", 200, "avatar10.png"),
+    ("Amara", "Unlock this avatar.", "avatar", 50, "avatar2.png"),
+    ("Scholar", "Unlock this avatar.", "avatar", 50, "avatar3.png"),
+    ("Braids", "Unlock this avatar.", "avatar", 75, "avatar4.png"),
+    ("Vivid", "Unlock this avatar.", "avatar", 75, "avatar5.png"),
+    ("Professor", "Unlock this avatar.", "avatar", 100, "avatar6.png"),
+    ("Bookworm", "Unlock this avatar.", "avatar", 100, "avatar7.png"),
+    ("Classic", "Unlock this avatar.", "avatar", 125, "avatar8.png"),
+    ("Beats", "Unlock this avatar.", "avatar", 125, "avatar9.png"),
+    ("Curly", "Unlock this avatar.", "avatar", 150, "avatar10.png"),
+    ("Neon", "Unlock this avatar.", "avatar", 175, "avatar11.png"),
+    ("Swagger", "Unlock this avatar.", "avatar", 200, "avatar12.png"),
 
     ("Bronze Frame", "A simple bronze border for your avatar.", "frame", 100, "frame-bronze"),
     ("Silver Frame", "A cool silver border for your avatar.", "frame", 200, "frame-silver"),
@@ -22,12 +24,12 @@ SHOP_ITEMS = [
     ("Neon Frame", "A glowing neon border for your avatar.", "frame", 600, "frame-neon"),
     ("Diamond Frame", "The rarest border, for the truly dedicated.", "frame", 800, "frame-diamond"),
 
-    ("Crown Badge", "Show off with a crown next to your name.", "badge", 150, "👑"),
-    ("Fire Badge", "Show off with a fire badge next to your name.", "badge", 150, "🔥"),
-    ("Star Badge", "Show off with a star badge next to your name.", "badge", 150, "🌟"),
-    ("Lightning Badge", "Show off with a lightning badge next to your name.", "badge", 150, "⚡"),
-    ("Target Badge", "Show off with a target badge next to your name.", "badge", 150, "🎯"),
-    ("Diamond Badge", "The rarest badge, for the truly dedicated.", "badge", 300, "💎"),
+    ("Crown Badge", "Show off with a crown next to your name.", "badge", 150, "crown"),
+    ("Fire Badge", "Show off with a fire badge next to your name.", "badge", 150, "fire"),
+    ("Star Badge", "Show off with a star badge next to your name.", "badge", 150, "star"),
+    ("Lightning Badge", "Show off with a lightning badge next to your name.", "badge", 150, "lightning"),
+    ("Target Badge", "Show off with a target badge next to your name.", "badge", 150, "target"),
+    ("Diamond Badge", "The rarest badge, for the truly dedicated.", "badge", 300, "diamond"),
 
     ("1 Hour XP Boost", "Double XP from everything for 1 hour after purchase.", "booster", 100, None),
 ]

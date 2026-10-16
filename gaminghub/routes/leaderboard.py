@@ -9,8 +9,8 @@ leaderboard = Blueprint("leaderboard", __name__)
 
 
 CATEGORY_LABELS = {
-    "classic-arcade": "🎮 Classic Arcade",
-    "brain-lab": "🧠 Brain Lab",
+    "classic-arcade": "Classic Arcade",
+    "brain-lab": "Brain Lab",
 }
 
 
@@ -44,7 +44,7 @@ def _render(view, title, value_label, entries, my_rank, my_value, **extra):
 @login_required
 def leaderboard_home():
     return _render(
-        "global", "🌍 Global Leaderboard", "Total XP",
+        "global", "Global Leaderboard", "Total XP",
         leaderboard_service.get_global_leaderboard(),
         leaderboard_service.get_my_global_rank(current_user),
         None
@@ -57,7 +57,7 @@ def daily():
     my_rank, my_value = leaderboard_service.get_my_period_rank(current_user, "daily")
 
     return _render(
-        "daily", "📅 Daily Leaderboard", "XP Today",
+        "daily", "Daily Leaderboard", "XP Today",
         leaderboard_service.get_period_leaderboard("daily"),
         my_rank, my_value
     )
@@ -69,7 +69,7 @@ def weekly():
     my_rank, my_value = leaderboard_service.get_my_period_rank(current_user, "weekly")
 
     return _render(
-        "weekly", "🗓️ Weekly Leaderboard", "XP This Week",
+        "weekly", "Weekly Leaderboard", "XP This Week",
         leaderboard_service.get_period_leaderboard("weekly"),
         my_rank, my_value
     )

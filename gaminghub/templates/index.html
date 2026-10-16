@@ -1,120 +1,503 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, game_icon, achievement_icon, rank_medal %}
+{% from "_logo.html" import mark %}
+{% from "_radar.html" import radar %}
+
+{% block title %}COGNEXA -- Think. Play. Perform.{% endblock %}
 
 {% block content %}
 
-<section class="hero">
+<section class="cx-hero">
 
-<div class="container text-center">
+    <svg class="cx-hero-nodes" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#5B8CFF" stroke-width="1" opacity="0.35">
+            <line x1="120" y1="120" x2="320" y2="80"></line>
+            <line x1="320" y1="80" x2="480" y2="180"></line>
+            <line x1="120" y1="120" x2="260" y2="240"></line>
+            <line x1="260" y1="240" x2="480" y2="180"></line>
+            <line x1="480" y1="180" x2="700" y2="90"></line>
+            <line x1="700" y1="90" x2="920" y2="150"></line>
+            <line x1="700" y1="90" x2="860" y2="260"></line>
+            <line x1="920" y1="150" x2="1080" y2="80"></line>
+            <line x1="260" y1="240" x2="440" y2="360"></line>
+            <line x1="440" y1="360" x2="680" y2="330"></line>
+            <line x1="860" y1="260" x2="680" y2="330"></line>
+            <line x1="860" y1="260" x2="1040" y2="330"></line>
+        </g>
+        <g fill="#7C5CFC">
+            <circle cx="120" cy="120" r="4"></circle>
+            <circle cx="320" cy="80" r="3"></circle>
+            <circle cx="480" cy="180" r="5" fill="#5B8CFF"></circle>
+            <circle cx="260" cy="240" r="3"></circle>
+            <circle cx="700" cy="90" r="4" fill="#22D3EE"></circle>
+            <circle cx="920" cy="150" r="3"></circle>
+            <circle cx="1080" cy="80" r="4"></circle>
+            <circle cx="860" cy="260" r="5" fill="#5B8CFF"></circle>
+            <circle cx="440" cy="360" r="3"></circle>
+            <circle cx="680" cy="330" r="4" fill="#22D3EE"></circle>
+            <circle cx="1040" cy="330" r="3"></circle>
+        </g>
+    </svg>
 
-<h1 class="display-3">
+    <div class="container cx-hero-content">
 
-Play.
-Compete.
-Win.
+        <div class="row align-items-center g-5">
 
-</h1>
+            <div class="col-lg-6 cx-hero-copy">
 
-<p class="lead">
+                <span class="cx-eyebrow">Cognitive Gaming &amp; Performance Platform</span>
 
-The Ultimate Gaming Platform
+                <h1>
+                    <span class="text-gradient">COGNEXA</span><br>
+                    Think. Play.<br>
+                    Perform.
+                </h1>
 
-</p>
+                <p class="lead">
+                    Games that measure how you think &mdash; memory, logic, attention, reaction and more &mdash;
+                    and turn every round into a picture of where you're sharp and where you're not.
+                </p>
 
-<br>
+                <div class="cx-hero-cta">
+                    <a href="{{ url_for('brain_lab.hub') }}" class="btn btn-cx-primary btn-lg d-inline-flex align-items-center gap-2">
+                        {{ icon('brain', 20) }} Explore Brain Lab
+                    </a>
+                    <a href="{{ url_for('gamehub.games_home') }}" class="btn btn-cx-outline btn-lg d-inline-flex align-items-center gap-2">
+                        {{ icon('arcade', 20) }} Play Arcade
+                    </a>
+                </div>
 
-<a href="#games"
-class="btn btn-success btn-lg">
+            </div>
 
-Start Playing
+            <div class="col-lg-6">
 
-</a>
+                <div class="cx-radar-card">
 
-</div>
+                    <div class="cx-radar-card-head">
+                        <span class="cx-eyebrow mb-0">
+                            {% if current_user.is_authenticated %}Your Skill Profile{% else %}Live Skill Profile{% endif %}
+                        </span>
+                        <span class="cx-radar-card-meta">{{ skill_count }} skills tracked</span>
+                    </div>
+
+                    {{ radar(hero_radar, uid='hero', label=radar_label, compare_label=radar_compare_label) }}
+
+                    <p class="cx-radar-note">
+                        {% if hero_radar and hero_radar.has_data %}
+                        Win rate per skill, from real rounds played.
+                        {% if current_user.is_authenticated %}
+                        Dimmed labels are skills you haven't tried yet.
+                        {% else %}
+                        Every COGNEXA player so far &mdash; sign up to draw your own.
+                        {% endif %}
+                        {% elif current_user.is_authenticated %}
+                        Play {{ 3 - hero_radar.measured }} more skill{{ 's' if (3 - hero_radar.measured) != 1 }} to complete your first profile.
+                        {% else %}
+                        The shape fills in as players complete scored rounds. Sign up to start yours.
+                        {% endif %}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </section>
 
 
-<section
-id="games"
-class="container mt-5">
+<section class="cx-section">
+    <div class="container">
 
-<h2 class="text-center">
+        <div class="cx-section-header">
+            <span class="cx-eyebrow">About COGNEXA</span>
+            <div class="mb-3 d-flex justify-content-center">{{ mark(56) }}</div>
+            <h2>A Platform Built Around Your Mind</h2>
+            <p>COGNEXA pairs science-inspired Brain Lab exercises with quick, casual Arcade games -- then tracks every session so you can see yourself improve. No guesswork, just your own numbers.</p>
+        </div>
 
-Featured Games
+        <div class="row g-3 justify-content-center">
+            <div class="col-6 col-md-3">
+                <div class="cx-stat-tile">
+                    <div class="cx-stat-icon d-flex justify-content-center">{{ icon('grid', 22, 'icon--indigo') }}</div>
+                    <div class="cx-stat-value">{{ total_games }}</div>
+                    <div class="cx-stat-label">Games to Play</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="cx-stat-tile">
+                    <div class="cx-stat-icon d-flex justify-content-center">{{ icon('brain', 22, 'icon--violet') }}</div>
+                    <div class="cx-stat-value">{{ skill_count }}</div>
+                    <div class="cx-stat-label">Cognitive Skills Trained</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="cx-stat-tile">
+                    <div class="cx-stat-icon d-flex justify-content-center">{{ icon('achievement', 22, 'icon--amber') }}</div>
+                    <div class="cx-stat-value">{{ total_achievements }}</div>
+                    <div class="cx-stat-label">Achievements to Unlock</div>
+                </div>
+            </div>
+        </div>
 
-</h2>
-
-<br>
-
-<div class="row">
-
-<div class="col-md-4">
-
-<div class="game-card">
-
-🎯
-
-<h4>
-
-Guess Number
-
-</h4>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="game-card">
-
-✂
-
-<h4>
-
-Rock Paper Scissors
-
-</h4>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="game-card">
-
-❓
-
-<h4>
-
-Quiz Challenge
-
-</h4>
-
-</div>
-
-</div>
-
-</div>
-
+    </div>
 </section>
 
 
-<section class="container mt-5">
+<section class="cx-section" style="background: var(--bg-secondary);">
+    <div class="container">
 
-<h2>
+        <div class="cx-section-header">
+            <span class="cx-eyebrow">Brain Lab</span>
+            <h2 class="d-flex align-items-center justify-content-center gap-2">{{ icon('brain', 26, 'icon--violet') }} Challenge Your Mind</h2>
+            <p>Eight cognitive experiences designed around memory, focus, logic, reaction and problem solving.</p>
+        </div>
 
-About Gaming Hub
+        <div class="row g-4">
+            {% for game in brain_lab_games %}
+            <div class="col-6 col-lg-3">
+                <a class="cx-game-tile" href="{{ play_url(game.slug) }}">
+                    <span class="cx-badge cx-badge-brain">Brain Lab</span>
+                    {{ game_icon(game.slug) }}
+                    <h4>{{ game.name }}</h4>
+                    <p>{{ game.description }}</p>
+                    <span class="cx-game-tile-cta">Play {{ icon('chevron-right', 16) }}</span>
+                </a>
+            </div>
+            {% endfor %}
+            {% if not brain_lab_games %}
+            <div class="col-12 text-center text-muted">Brain Lab games will appear here once available.</div>
+            {% endif %}
+        </div>
 
-</h2>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('brain_lab.hub') }}" class="btn btn-cx-outline">Explore Brain Lab</a>
+        </div>
 
-<p>
+    </div>
+</section>
 
-Gaming Hub is an interactive gaming platform where players compete, earn scores, climb the leaderboard, and enjoy fun browser-based games.
 
-</p>
+<section class="cx-section">
+    <div class="container">
 
+        <div class="cx-section-header">
+            <span class="cx-eyebrow">Arcade</span>
+            <h2 class="d-flex align-items-center justify-content-center gap-2">{{ icon('arcade', 26, 'icon--teal') }} Play Something Fun</h2>
+            <p>Take a break with quick and familiar games.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            {% for game in casual_games %}
+            <div class="col-6 col-lg-3">
+                <a class="cx-game-tile" href="{{ play_url(game.slug) }}">
+                    <span class="cx-badge cx-badge-casual">Arcade</span>
+                    {{ game_icon(game.slug) }}
+                    <h4>{{ game.name }}</h4>
+                    <p>{{ game.description }}</p>
+                    <span class="cx-game-tile-cta">Play {{ icon('chevron-right', 16) }}</span>
+                </a>
+            </div>
+            {% endfor %}
+            {% if not casual_games %}
+            <div class="col-12 text-center text-muted">Arcade games will appear here once available.</div>
+            {% endif %}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('gamehub.games_home') }}" class="btn btn-cx-outline">Explore Arcade</a>
+        </div>
+
+    </div>
+</section>
+
+
+<section class="cx-section" style="background: var(--bg-secondary);">
+    <div class="container">
+
+        <div class="cx-section-header">
+            <span class="cx-eyebrow">Today Only</span>
+            <h2 class="d-flex align-items-center justify-content-center gap-2">{{ icon('flame', 26, 'icon--danger') }} Daily Challenge</h2>
+            <p>A fresh objective every day. Complete it for a bonus XP and coin reward on top of the normal payout.</p>
+        </div>
+
+        {% if challenge and challenge_game %}
+        <div class="cx-card p-4 mx-auto text-center" style="max-width: 480px;">
+            <div class="d-flex justify-content-center">{{ game_icon(challenge_game.slug) }}</div>
+            <h5 class="mb-1">{{ challenge_game.name }}{% if challenge.difficulty %} &middot; {{ challenge.difficulty|capitalize }}{% endif %}</h5>
+            <p class="text-muted small mb-2">{{ challenge.description }}</p>
+            <p class="fw-bold mb-3 d-flex align-items-center justify-content-center gap-1" style="color: var(--warning);">
+                {{ icon('lightning', 16, 'icon--amber') }} +{{ challenge.xp_reward }} XP &middot; {{ icon('coin', 16, 'icon--amber') }} +{{ challenge.coin_reward }} Coins
+            </p>
+            <a href="{{ challenge_url }}" class="btn btn-cx-primary">Play Now</a>
+        </div>
+        {% else %}
+        <div class="cx-card p-4 mx-auto text-center text-muted" style="max-width: 480px;">
+            No challenge available today &mdash; check back soon.
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+
+<section class="cx-section">
+    <div class="container">
+
+        <div class="cx-section-header">
+            <span class="cx-eyebrow">Getting Started</span>
+            <h2>How It Works</h2>
+            <p>From sign-up to your first personal best in four steps.</p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-6 col-lg-3">
+                <div class="cx-feature-card cx-step-card">
+                    <span class="cx-step-number">01</span>
+                    <div class="cx-feature-icon">{{ icon('users', 24, 'icon--indigo') }}</div>
+                    <h5>Create an Account</h5>
+                    <p class="text-muted mb-0">Sign up free and start with 100 coins in your pocket.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="cx-feature-card cx-step-card">
+                    <span class="cx-step-number">02</span>
+                    <div class="cx-feature-icon">{{ icon('arcade', 24, 'icon--teal') }}</div>
+                    <h5>Pick a Game</h5>
+                    <p class="text-muted mb-0">Choose a Brain Lab challenge or something quick from the Arcade.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="cx-feature-card cx-step-card">
+                    <span class="cx-step-number">03</span>
+                    <div class="cx-feature-icon">{{ icon('lightning', 24, 'icon--amber') }}</div>
+                    <h5>Play &amp; Earn</h5>
+                    <p class="text-muted mb-0">Win rounds to earn XP and coins, and level up as you go.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="cx-feature-card cx-step-card">
+                    <span class="cx-step-number">04</span>
+                    <div class="cx-feature-icon">{{ icon('level-up', 24, 'icon--violet') }}</div>
+                    <h5>Track &amp; Compete</h5>
+                    <p class="text-muted mb-0">Watch your stats on the dashboard and climb the leaderboard.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<section class="cx-section" style="background: var(--bg-secondary);">
+    <div class="container">
+
+        <div class="cx-section-header">
+            <span class="cx-eyebrow">Your Stats</span>
+            <h2 class="d-flex align-items-center justify-content-center gap-2">{{ icon('level-up', 26, 'icon--indigo') }} Track Your Progress</h2>
+            <p>Every round counts toward something -- here's what's tracked behind the scenes.</p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-6 col-lg-3">
+                <div class="cx-feature-card">
+                    <div class="cx-feature-icon">{{ icon('lightning', 24, 'icon--indigo') }}</div>
+                    <h5>Level &amp; XP</h5>
+                    <p class="text-muted mb-0">Earn XP from every game and watch your level climb.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="cx-feature-card">
+                    <div class="cx-feature-icon">{{ icon('coin', 24, 'icon--amber') }}</div>
+                    <h5>Coins &amp; Rewards</h5>
+                    <p class="text-muted mb-0">Spend coins in the Reward Shop on avatars, frames and badges.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="cx-feature-card">
+                    <div class="cx-feature-icon">{{ icon('flame', 24, 'icon--danger') }}</div>
+                    <h5>Daily Streaks</h5>
+                    <p class="text-muted mb-0">Come back and complete challenges daily to build your streak.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="cx-feature-card">
+                    <div class="cx-feature-icon">{{ icon('grid', 24, 'icon--teal') }}</div>
+                    <h5>One Dashboard</h5>
+                    <p class="text-muted mb-0">Your stats, recent activity and next challenge in one place.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<section class="cx-section">
+    <div class="container">
+
+        <div class="cx-section-header">
+            <span class="cx-eyebrow">Milestones</span>
+            <h2 class="d-flex align-items-center justify-content-center gap-2">{{ icon('achievement', 26, 'icon--violet') }} Achievements</h2>
+            <p>Real milestones you can unlock as you play -- pulled straight from the reward system.</p>
+        </div>
+
+        {% if showcase_achievements %}
+        <div class="row g-3">
+            {% for a in showcase_achievements %}
+            <div class="col-md-6 col-lg-4">
+                <div class="cx-stat-tile text-start p-3">
+                    <div class="fw-bold d-flex align-items-center gap-2">{{ achievement_icon(a.name, 18, tile=false) }} {{ a.title }}</div>
+                    <small class="text-muted d-block mb-1">{{ a.description }}</small>
+                    <small class="d-flex align-items-center gap-1" style="color: var(--warning);">
+                        {{ icon('lightning', 12, 'icon--amber') }} +{{ a.xp_reward }} XP &middot; {{ icon('coin', 12, 'icon--amber') }} +{{ a.coin_reward }} Coins
+                    </small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-muted mb-0">Achievements will appear here once available.</p>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard.dashboard_home') }}" class="btn btn-cx-outline">View Your Achievements</a>
+            {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-cx-outline">Sign Up to Start Unlocking</a>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+
+<section class="cx-section" style="background: var(--bg-secondary);">
+    <div class="container">
+
+        <div class="cx-section-header">
+            <span class="cx-eyebrow">Rankings</span>
+            <h2 class="d-flex align-items-center justify-content-center gap-2">{{ icon('trophy', 26, 'icon--amber') }} Leaderboard</h2>
+            <p>Ranked by total lifetime XP across every game.</p>
+        </div>
+
+        {% if top_players %}
+        <div class="cx-card p-3 mx-auto" style="max-width: 560px;">
+            <ul class="list-group list-group-flush">
+                {% for entry in top_players %}
+                <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                    <span class="d-flex align-items-center gap-2">
+                        <span style="width: 1.75rem; display: inline-block;">
+                            {{ rank_medal(entry.rank) }}
+                        </span>
+                        {{ entry.user.username }}
+                    </span>
+                    <span class="text-muted small">{{ entry.value }} XP</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <p class="text-center text-muted mb-0">No results yet -- be the first to play.</p>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('leaderboard.leaderboard_home') }}" class="btn btn-cx-outline">View Full Leaderboard</a>
+        </div>
+
+    </div>
+</section>
+
+
+<section class="cx-section">
+    <div class="container">
+
+        <div class="row align-items-center g-4">
+
+            <div class="col-lg-6">
+                <span class="cx-eyebrow">Personalized Growth</span>
+                <h2 class="d-flex align-items-center gap-2">{{ icon('analytics', 28, 'icon--cyan') }} Insights Built From Your Play</h2>
+                <p class="text-muted">
+                    Your Analytics page turns raw game history into a clear picture: performance trends over time,
+                    a per-game breakdown, and a skill profile across all {{ skill_count }} tracked skills.
+                </p>
+                <p class="text-muted">
+                    Recommendations are rule-based, drawn directly from games you haven't tried yet or ones where a
+                    bit more practice would help -- not a black box.
+                </p>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('analytics.analytics_home') }}" class="btn btn-cx-primary">View My Analytics</a>
+                {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-cx-primary">Create an Account</a>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-6">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="cx-stat-tile">
+                            <div class="cx-stat-icon d-flex justify-content-center">{{ icon('analytics', 22, 'icon--cyan') }}</div>
+                            <div class="cx-stat-label mt-2">Performance Trends</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="cx-stat-tile">
+                            <div class="cx-stat-icon d-flex justify-content-center">{{ icon('grid', 22, 'icon--indigo') }}</div>
+                            <div class="cx-stat-label mt-2">Per-Game Breakdown</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="cx-stat-tile">
+                            <div class="cx-stat-icon d-flex justify-content-center">{{ icon('brain', 22, 'icon--violet') }}</div>
+                            <div class="cx-stat-label mt-2">Skill Profile</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="cx-stat-tile">
+                            <div class="cx-stat-icon d-flex justify-content-center">{{ icon('target', 22, 'icon--teal') }}</div>
+                            <div class="cx-stat-label mt-2">Rule-Based Tips</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<section class="cx-section text-center">
+    <div class="container">
+        <div class="mb-3 d-flex justify-content-center">{{ mark(52) }}</div>
+        {% if current_user.is_authenticated %}
+        <h2 class="mb-2">Ready to Keep Going, {{ current_user.username }}?</h2>
+        <p class="text-muted mb-4">Your dashboard, streak and next challenge are waiting.</p>
+        <div class="cx-hero-cta justify-content-center">
+            <a href="{{ url_for('dashboard.dashboard_home') }}" class="btn btn-cx-primary btn-lg">Go to Dashboard</a>
+            <a href="{{ url_for('brain_lab.hub') }}" class="btn btn-cx-outline btn-lg">Play a Round</a>
+        </div>
+        {% else %}
+        <h2 class="mb-2">Ready to Train Your Brain?</h2>
+        <p class="text-muted mb-4">Create a free account and start earning XP in minutes.</p>
+        <div class="cx-hero-cta justify-content-center">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-cx-primary btn-lg">Create Free Account</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-cx-outline btn-lg">Login</a>
+        </div>
+        {% endif %}
+    </div>
 </section>
 
 {% endblock %}

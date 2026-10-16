@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import login_required, current_user
 
 from gaminghub.services import notification_service
@@ -9,9 +9,21 @@ notifications = Blueprint("notifications", __name__)
 @notifications.route("/notifications")
 @login_required
 def notifications_home():
+    category = request.args.get("category", "all")
+
+    if category not in notification_service.CATEGORY_LABELS:
+        category = "all"
+
+    counts = notification_service.get_unread_counts_by_category(current_user)
+
     return render_template(
         "notifications.html",
-        notifications=notification_service.get_recent(current_user, limit=50)
+        notifications=notification_service.get_recent(current_user, limit=50, category=category),
+        category=category,
+        category_labels=notification_service.CATEGORY_LABELS,
+        category_counts=counts,
+        total_unread=counts["all"],
+        has_any_notifications=notification_service.has_any(current_user)
     )
 
 

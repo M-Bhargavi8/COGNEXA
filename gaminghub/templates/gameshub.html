@@ -1,142 +1,71 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon, game_icon %}
+
+{% block title %}Arcade -- COGNEXA{% endblock %}
 
 {% block content %}
 
-<div class="container mt-5">
+<div class="container py-5">
 
-<h1 class="display-4 text-center mb-5">
+    <div class="cx-section-header mb-5">
+        <span class="cx-eyebrow">Arcade</span>
+        <h2 class="d-flex align-items-center justify-content-center gap-2">{{ icon('arcade', 32, 'icon--teal') }} Arcade</h2>
+        <p>Casual entertainment. Quick games, simple rules, endless fun.</p>
+    </div>
 
-🎮 Gaming Hub
+    <div class="row g-4">
 
-</h1>
+        <div class="col-md-6 col-lg-4">
+            <a class="cx-game-tile" href="{{ url_for('games.guess') }}">
+                <span class="cx-badge cx-badge-casual">Arcade</span>
+                {{ game_icon('guess-the-number') }}
+                <h4>Guess The Number</h4>
+                <p>Test your instincts and find the hidden number.</p>
+                <span class="btn btn-cx-primary mt-2">Play</span>
+            </a>
+        </div>
 
-<div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <a class="cx-game-tile" href="{{ url_for('games.rps') }}">
+                <span class="cx-badge cx-badge-casual">Arcade</span>
+                {{ game_icon('rock-paper-scissors') }}
+                <h4>Rock Paper Scissors</h4>
+                <p>Outsmart the computer in a classic battle of choices.</p>
+                <span class="btn btn-cx-primary mt-2">Play</span>
+            </a>
+        </div>
 
-<div class="col-md-4">
+        <div class="col-md-6 col-lg-4">
+            <a class="cx-game-tile" href="{{ url_for('tictactoe.play') }}">
+                <span class="cx-badge cx-badge-casual">Arcade</span>
+                {{ game_icon('tic-tac-toe') }}
+                <h4>Tic Tac Toe</h4>
+                <p>Challenge the computer and claim three in a row.</p>
+                <span class="btn btn-cx-primary mt-2">Play</span>
+            </a>
+        </div>
 
-<div class="card shadow h-100 text-center p-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="cx-game-tile" style="opacity: .6;">
+                <span class="cx-badge cx-badge-soon">Coming Soon</span>
+                <span class="cx-icon-badge cx-game-icon icon--muted">{{ icon('info', 26) }}</span>
+                <h4>Quiz</h4>
+                <p>Trivia across topics and difficulty levels.</p>
+                <button class="btn btn-cx-outline mt-2" disabled>Coming Soon</button>
+            </div>
+        </div>
 
-<h2>🎯</h2>
+        <div class="col-md-6 col-lg-4">
+            <div class="cx-game-tile" style="opacity: .6;">
+                <span class="cx-badge cx-badge-soon">Coming Soon</span>
+                <span class="cx-icon-badge cx-game-icon icon--muted">{{ icon('search', 26) }}</span>
+                <h4>Hangman</h4>
+                <p>Guess the word one letter at a time.</p>
+                <button class="btn btn-cx-outline mt-2" disabled>Coming Soon</button>
+            </div>
+        </div>
 
-<h4>Guess The Number</h4>
-
-<p>
-Earn XP and Coins by guessing correctly.
-</p>
-
-<a
-href="{{ url_for('games.guess') }}"
-class="btn btn-success">
-
-Play
-
-</a>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="card shadow h-100 text-center p-4">
-
-<h2>✊</h2>
-
-<h4>Rock Paper Scissors</h4>
-
-<p>
-Beat the Computer.
-</p>
-
-<a
-href="{{ url_for('games.rps') }}"
-class="btn btn-primary">
-
-Play
-
-</a>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="card shadow h-100 text-center p-4">
-
-<h2>❌</h2>
-
-<h4>Tic Tac Toe</h4>
-
-<p>
-Play against AI.
-</p>
-
-<a
-href="{{ url_for('tictactoe.play') }}"
-class="btn btn-danger">
-
-Play
-
-</a>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="card shadow h-100 text-center p-4">
-
-<h2>🧠</h2>
-
-<h4>Quiz Challenge</h4>
-
-<p>
-
-Coming Soon
-
-</p>
-
-<button
-class="btn btn-secondary"
-disabled>
-
-Coming Soon
-
-</button>
-
-</div>
-
-</div>
-
-<div class="col-md-4">
-
-<div class="card shadow h-100 text-center p-4">
-
-<h2>🔤</h2>
-
-<h4>Hangman</h4>
-
-<p>
-
-Coming Soon
-
-</p>
-
-<button
-class="btn btn-secondary"
-disabled>
-
-Coming Soon
-
-</button>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 

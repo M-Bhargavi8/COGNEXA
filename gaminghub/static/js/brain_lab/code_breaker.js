@@ -20,7 +20,7 @@
         row.className = "d-flex justify-content-between border-bottom py-2";
         row.innerHTML = `
             <span>${guessDigits.join(" ")}</span>
-            <span>🟢 ${correctPosition} · 🟡 ${correctDigit}</span>
+            <span class="cx-pegs"><span class="cx-peg cx-peg--exact"></span>${correctPosition}<span class="cx-peg cx-peg--digit"></span>${correctDigit}</span>
         `;
         history.prepend(row);
     }
@@ -83,17 +83,16 @@
         resultArea.style.display = "block";
 
         if (d.won) {
-            resultHeading.textContent = `🎉 Cracked it in ${d.attempts_used}!`;
+            resultHeading.textContent = `Cracked it in ${d.attempts_used}!`;
         } else {
-            resultHeading.textContent = `💀 Out of attempts`;
+            resultHeading.textContent = `Out of attempts`;
         }
 
         resultDetails.textContent = d.won
-            ? `Score ${d.score} · +${d.xp} XP · +${d.coins} Coins`
-            : `The code was ${d.secret.join(" ")}`;
+            ? `Score ${d.score} · +${d.xp} XP · +${d.coins} Coins` : `The code was ${d.secret.join(" ")}`;
 
         const badges = [];
-        if (d.is_new_best) badges.push("🔥 NEW PERSONAL BEST");
+        if (d.is_new_best) badges.push("NEW PERSONAL BEST");
         badges.push(BrainLab.formatExtras(d));
         bestBadge.textContent = badges.filter(Boolean).join(" · ");
     }

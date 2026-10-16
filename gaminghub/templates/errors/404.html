@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_logo.html" import mark %}
+
+{% block title %}Page Not Found -- COGNEXA{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="cx-card p-5 mx-auto text-center" style="max-width: 560px;">
+
+        <div class="mb-3 d-flex justify-content-center">{{ mark(56) }}</div>
+
+        <div class="mb-3 d-flex justify-content-center">{{ icon('search', 40, 'icon--muted') }}</div>
+
+        <span class="cx-eyebrow">404</span>
+        <h2 class="mb-2">Page Not Found</h2>
+        <p class="text-muted mb-4">The page you're looking for doesn't exist, or may have moved.</p>
+
+        <div class="cx-hero-cta justify-content-center">
+            <a href="{{ url_for('main.home') }}" class="btn btn-cx-primary">{{ icon('home', 18) }} Back to Home</a>
+            <a href="{{ url_for('brain_lab.hub') }}" class="btn btn-cx-outline">{{ icon('brain', 18) }} Explore Brain Lab</a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

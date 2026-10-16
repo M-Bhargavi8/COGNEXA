@@ -1,56 +1,56 @@
-{% extends "base.html" %}
+{% extends "admin/_admin_base.html" %}
+{% from "_icons.html" import icon, game_icon %}
 
-{% block content %}
+{% set active_page = 'games' %}
 
-<div class="container py-5">
+{% block title %}Games -- Admin -- COGNEXA{% endblock %}
+{% block page_title %}Games{% endblock %}
 
-    <h2 class="text-light mb-4">🛠️ Admin Dashboard</h2>
+{% block admin_content %}
 
-    {% set view = 'games' %}
-    {% include "admin/_nav.html" %}
+<p class="text-muted small mb-3 d-flex align-items-center gap-2">
+    {{ icon('info', 16, 'icon--muted') }}
+    Inactive games are hidden from the Brain Lab hub and leaderboard pickers. Their direct URLs aren't blocked yet.
+</p>
 
-    <p class="text-muted small mb-3">Inactive games are hidden from the Brain Lab hub and leaderboard pickers. Their direct URLs aren't blocked yet.</p>
+<div class="cx-card p-3">
 
-    <div class="card dashboard-card p-3">
-
-        <div class="table-responsive">
-            <table class="table table-dark table-striped align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>Game</th>
-                        <th>Slug</th>
-                        <th>Category</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for g in games %}
-                    <tr>
-                        <td>{{ g.icon }} {{ g.name }}</td>
-                        <td class="text-muted">{{ g.slug }}</td>
-                        <td>{{ g.category }}</td>
-                        <td>
-                            <span class="badge {{ 'bg-success' if g.is_active else 'bg-secondary' }}">
-                                {{ 'active' if g.is_active else 'inactive' }}
-                            </span>
-                        </td>
-                        <td>
-                            <form method="POST" action="{{ url_for('admin.toggle_game', game_id=g.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                {% if g.is_active %}
-                                <button class="btn btn-sm btn-outline-danger" type="submit">Deactivate</button>
-                                {% else %}
-                                <button class="btn btn-sm btn-outline-success" type="submit">Activate</button>
-                                {% endif %}
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
+    <div class="table-responsive">
+        <table class="table table-dark table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Game</th>
+                    <th>Slug</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in games %}
+                <tr>
+                    <td><span class="d-inline-flex align-items-center gap-2">{{ game_icon(g.slug, 16, tile=false) }} {{ g.name }}</span></td>
+                    <td class="text-muted">{{ g.slug }}</td>
+                    <td>{{ g.category }}</td>
+                    <td>
+                        <span class="badge {{ 'bg-success' if g.is_active else 'bg-secondary' }}">
+                            {{ 'active' if g.is_active else 'inactive' }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.toggle_game', game_id=g.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% if g.is_active %}
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Deactivate</button>
+                            {% else %}
+                            <button class="btn btn-sm btn-outline-success" type="submit">Activate</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
 </div>

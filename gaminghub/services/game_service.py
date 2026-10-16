@@ -148,13 +148,13 @@ def complete_session(session, user, *, outcome, xp=0, coins=0, score=0,
     if is_new_best:
         notification_service.create(
             user, "personal_best", f"New Personal Best in {game.name}!",
-            message=f"Score: {score}", icon="🎯", link=get_play_url(game.slug)
+            message=f"Score: {score}", icon="target", link=get_play_url(game.slug)
         )
 
     if challenge_completed:
         notification_service.create(
             user, "challenge", "Daily Challenge Complete!",
-            message=challenge_completed.description, icon="🔥", link="/dashboard"
+            message=challenge_completed.description, icon="flame", link="/dashboard"
         )
 
     return {

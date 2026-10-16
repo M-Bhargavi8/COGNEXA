@@ -1,14 +1,15 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Risk &amp; Reward -- COGNEXA{% endblock %}
 
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/brain_lab.css') }}">
-
 <div class="container py-5 text-center">
 
-    <h2 class="text-light mb-2">🎲 Risk &amp; Reward</h2>
+    <h2 class="text-light mb-2 d-flex align-items-center justify-content-center gap-2">{{ icon('strategy', 28, 'icon--violet') }} Risk &amp; Reward</h2>
     <p class="text-light mb-1">Play it safe, or push your luck.</p>
-    <p class="text-muted small mb-4">🎲 Fictional in-game points only — not real money, not gambling.</p>
+    <p class="text-muted small mb-4">{{ icon("dice", 15, "icon--muted") }} Fictional in-game points only — not real money, not gambling.</p>
 
     <div id="difficultyPicker">
         <p class="text-light">Choose your challenge</p>
