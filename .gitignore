@@ -1,4 +1,3 @@
-@"
 # Byte-compiled / cache
 __pycache__/
 *.py[cod]
@@ -14,6 +13,9 @@ instance/
 *.db
 *.sqlite
 *.sqlite3
+
+# Archives (a zipped copy of the project once leaked a database)
+*.zip
 
 # Environment variables
 .env
@@ -37,4 +39,3 @@ Thumbs.db
 
 # Claude local files
 .claude/
-"@ | Set-Content .gitignore
