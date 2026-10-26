@@ -17,3 +17,7 @@ select = ["E4", "E7", "E9", "F"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# The app is imported as top-level modules (config, gaminghub) from the
+# project root. `python -m pytest` puts the root on sys.path implicitly;
+# the plain `pytest` command (used in CI) does not.
+pythonpath = ["."]
