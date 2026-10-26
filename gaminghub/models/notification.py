@@ -15,7 +15,7 @@ class Notification(db.Model):
     # achievement | level_up | personal_best | challenge | daily_reward | daily_challenge
     type = db.Column(db.String(30), nullable=False)
 
-    icon = db.Column(db.String(10))
+    icon = db.Column(db.String(30))  # icon slug, e.g. "achievement"
     title = db.Column(db.String(150), nullable=False)
     message = db.Column(db.String(255))
     link = db.Column(db.String(200))  # relative URL, shown as "view" if present

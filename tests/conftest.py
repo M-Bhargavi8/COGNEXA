@@ -5,9 +5,18 @@ import uuid
 import pytest
 from flask import g
 
+from config import normalize_database_url
 from gaminghub import create_app
 from gaminghub.database.database import db as _db
 from gaminghub.database.database import bcrypt
+
+
+# Point the suite at another database (CI runs it against PostgreSQL):
+#   TEST_DATABASE_URL=postgresql://user:pass@localhost:5432/cognexa_test pytest
+# Every test then creates the schema at start and drops it at the end, so
+# the database must be a disposable one. Unset, each test gets its own
+# SQLite file (see _make_test_config).
+TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "").strip()
 
 
 def _make_test_config(db_path):
@@ -28,7 +37,7 @@ def _make_test_config(db_path):
     class _TestConfig:
         TESTING = True
         SECRET_KEY = "test-secret-key-not-for-production"
-        SQLALCHEMY_DATABASE_URI = f"sqlite:///{db_path}"
+        SQLALCHEMY_DATABASE_URI = normalize_database_url(TEST_DATABASE_URL) if TEST_DATABASE_URL else f"sqlite:///{db_path}"
         SQLALCHEMY_TRACK_MODIFICATIONS = False
         WTF_CSRF_ENABLED = False
         RATELIMIT_ENABLED = False
@@ -65,6 +74,8 @@ def app():
         _db.create_all()
         yield application
         _db.session.remove()
+        if TEST_DATABASE_URL:
+            _db.drop_all()
         _db.engine.dispose()
 
     if os.path.exists(db_path):
@@ -93,6 +104,8 @@ def rate_limited_app():
         _db.create_all()
         yield application
         _db.session.remove()
+        if TEST_DATABASE_URL:
+            _db.drop_all()
         _db.engine.dispose()
 
     if os.path.exists(db_path):

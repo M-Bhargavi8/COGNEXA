@@ -103,7 +103,8 @@ class TestPermissions:
             _db.session.remove()
             _db.engine.dispose()
 
-        os.remove(db_path)
+        if os.path.exists(db_path):
+            os.remove(db_path)
 
 
 class TestUserStatus:

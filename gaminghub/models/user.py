@@ -38,7 +38,7 @@ class User(db.Model, UserMixin):
     title = db.Column(db.String(100), default="Beginner")
 
     equipped_frame = db.Column(db.String(50))
-    equipped_badge = db.Column(db.String(10))
+    equipped_badge = db.Column(db.String(30))
     xp_booster_expires_at = db.Column(db.DateTime)
 
     login_streak = db.Column(db.Integer, default=1)
