@@ -1,6 +1,6 @@
-from gaminghub.database.database import db as _db
 import json
 
+from gaminghub.database.database import db as _db
 from gaminghub.services import game_service
 
 

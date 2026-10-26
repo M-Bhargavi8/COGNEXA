@@ -1,0 +1,19 @@
+[tool.ruff]
+target-version = "py311"
+extend-exclude = ["migrations/versions", "venv", ".venv"]
+
+[tool.ruff.lint]
+# Pyflakes plus pycodestyle's error classes: catches real mistakes
+# (undefined names, unused imports, syntax errors) without imposing a
+# reformat of the existing code style.
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+# Package __init__ files import modules for their side effects (model
+# registration for SQLAlchemy/Alembic) and as re-exports.
+"**/__init__.py" = ["F401"]
+# Tests often bind fixtures' return values purely for readability.
+"tests/**" = ["F841"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

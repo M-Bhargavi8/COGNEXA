@@ -124,6 +124,11 @@ class BaseConfig:
     RATELIMIT_STORAGE_URI = os.environ.get("RATELIMIT_STORAGE_URI", "memory://")
     RATELIMIT_ALLOW_MEMORY_STORAGE = env_bool("RATELIMIT_ALLOW_MEMORY_STORAGE", False)
     RATELIMIT_HEADERS_ENABLED = True
+    # If the shared storage (Redis) becomes unreachable, keep enforcing
+    # the same limits per process instead of failing every request --
+    # still throttled, just counted locally until Redis is back. /healthz
+    # reports "degraded" meanwhile so monitoring notices.
+    RATELIMIT_IN_MEMORY_FALLBACK_ENABLED = env_bool("RATELIMIT_IN_MEMORY_FALLBACK_ENABLED", True)
 
     # Number of reverse proxies in front of the app whose X-Forwarded-*
     # headers should be trusted (0 = none). Needed for correct client IPs

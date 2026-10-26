@@ -68,6 +68,11 @@ def configure_logging(app):
     logger.addHandler(handler)
     logger.setLevel(level)
 
+    # Servers such as waitress-serve install their own root handler;
+    # propagating would print every record twice. Tests keep propagation
+    # so pytest's log capture still sees app records.
+    logger.propagate = bool(app.config.get("TESTING"))
+
     if app.config.get("TESTING"):
         return
 

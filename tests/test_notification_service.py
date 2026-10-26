@@ -1,6 +1,6 @@
-from gaminghub.database.database import db as _db
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, time, timezone
 
+from gaminghub.database.database import db as _db
 from gaminghub.services import notification_service
 from gaminghub.models.notification import Notification
 

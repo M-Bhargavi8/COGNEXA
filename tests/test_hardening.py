@@ -298,3 +298,58 @@ class TestRateLimitsOnAccountRoutes:
 ])
 def test_is_safe_redirect_target(target, expected):
     assert is_safe_redirect_target(target) is expected
+
+
+class TestRateLimitStorageOutage:
+
+    def _app(self, storage):
+        import os
+        import tempfile
+        import uuid
+        from tests.conftest import _make_test_config
+        from gaminghub import create_app
+
+        config = _make_test_config(os.path.join(tempfile.gettempdir(), f"gaminghub_rl_{uuid.uuid4().hex}.sqlite"))
+        config.RATELIMIT_ENABLED = True
+        config.RATELIMIT_STORAGE_URI = storage
+        return create_app(config)
+
+    def test_unreachable_storage_falls_back_to_local_limits(self, app):
+        outage_app = self._app("redis://127.0.0.1:6/0")  # nothing listens on port 6
+        _db.create_all()
+        client = outage_app.test_client()
+
+        statuses = [client.get("/login").status_code for _ in range(11)]
+
+        assert statuses[:10] == [200] * 10
+        assert statuses[10] == 429
+        assert client.get("/healthz").get_json() == {"status": "degraded"}
+
+    def test_memory_storage_reports_ok(self, client):
+        assert client.get("/healthz").get_json() == {"status": "ok"}
+
+
+def test_every_cdn_asset_has_subresource_integrity(app):
+    import pathlib
+    import re
+
+    tag = re.compile(r"<(?:script|link)\b[^>]*https://cdn\.jsdelivr\.net[^>]*>", re.I | re.S)
+    missing = []
+    for path in pathlib.Path(app.template_folder).rglob("*.html"):
+        for match in tag.finditer(path.read_text(encoding="utf-8")):
+            if 'integrity="sha384-' not in match.group(0) or 'crossorigin="anonymous"' not in match.group(0):
+                missing.append(path.name)
+    assert missing == []
+
+
+def test_notification_links_cannot_redirect_off_site(client, make_user, login_as):
+    from gaminghub.models.notification import Notification
+
+    user = make_user()
+    n = Notification(user_id=user.id, type="achievement", title="x", link="https://evil.example/")
+    _db.session.add(n)
+    _db.session.commit()
+    login_as(user)
+
+    resp = client.get(f"/notifications/open/{n.id}")
+    assert resp.headers["Location"] == "/notifications"
