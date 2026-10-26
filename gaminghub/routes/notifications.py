@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import login_required, current_user
 
 from gaminghub.services import notification_service
+from gaminghub.utils.security import is_safe_redirect_target
 
 notifications = Blueprint("notifications", __name__)
 
@@ -34,7 +35,9 @@ def open_notification(notification_id):
 
     notification = notification_service.mark_read(current_user, notification_id)
 
-    if notification and notification.link:
+    # Links are written by the app itself, but checking keeps this from
+    # ever becoming an open redirect if that changes.
+    if notification and is_safe_redirect_target(notification.link):
         return redirect(notification.link)
 
     return redirect(url_for("notifications.notifications_home"))

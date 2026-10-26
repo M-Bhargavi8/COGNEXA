@@ -7,9 +7,11 @@ from gaminghub.services import shop_service
 rewards = Blueprint("rewards", __name__)
 
 
-@rewards.route("/daily")
+@rewards.route("/daily", methods=["POST"])
 @login_required
 def daily():
+    """POST-only: claiming changes the account, so it must not be
+    triggerable by a cross-site link or image tag."""
 
     success, message, _ = reward_service.claim_daily_reward(current_user)
 

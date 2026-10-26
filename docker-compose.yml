@@ -1,0 +1,68 @@
+# Production-like local stack: app + PostgreSQL + Redis.
+#
+#   cp .env.example .env.production   # then fill in real values
+#   docker compose --env-file .env.production up -d db redis
+#   docker compose --env-file .env.production run --rm web flask --app wsgi db upgrade
+#   docker compose --env-file .env.production run --rm web python seed_games.py
+#   docker compose --env-file .env.production up -d web
+#
+# Nothing secret lives in this file: every credential comes from the env
+# file, and compose refuses to start if a required one is missing.
+
+services:
+  web:
+    build: .
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    environment:
+      APP_ENV: production
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
+      APP_BASE_URL: ${APP_BASE_URL:?set APP_BASE_URL}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cognexa}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-cognexa}
+      RATELIMIT_STORAGE_URI: redis://redis:6379/0
+      TRUSTED_PROXY_COUNT: ${TRUSTED_PROXY_COUNT:-0}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-1}
+      MAIL_BACKEND: ${MAIL_BACKEND:-smtp}
+      MAIL_SERVER: ${MAIL_SERVER:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_USE_TLS: ${MAIL_USE_TLS:-1}
+      MAIL_USE_SSL: ${MAIL_USE_SSL:-0}
+      MAIL_DEFAULT_SENDER: ${MAIL_DEFAULT_SENDER:-}
+      EMAIL_VERIFICATION_REQUIRED: ${EMAIL_VERIFICATION_REQUIRED:-0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cognexa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-cognexa}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cognexa} -d ${POSTGRES_DB:-cognexa}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:

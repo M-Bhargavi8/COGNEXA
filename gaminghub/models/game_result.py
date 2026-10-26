@@ -24,7 +24,7 @@ class GameResult(db.Model):
     reaction_time = db.Column(db.Float)
     mistakes = db.Column(db.Integer)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     def __repr__(self):
         return f"<GameResult {self.id} user={self.user_id} game={self.game_id} result={self.result}>"

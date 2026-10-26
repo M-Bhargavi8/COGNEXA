@@ -3,15 +3,14 @@ import random
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 
-from gaminghub.services import game_service
-from gaminghub.utils.helpers import flash_game_outcome
-
-games = Blueprint("games", __name__)
-
 from gaminghub.config.constants import (
     DIFFICULTIES,
     RPS_REWARD
 )
+from gaminghub.services import game_service
+from gaminghub.utils.helpers import flash_game_outcome
+
+games = Blueprint("games", __name__)
 
 
 @games.route("/guess", methods=["GET", "POST"])

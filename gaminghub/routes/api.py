@@ -1,11 +1,11 @@
 from flask import Blueprint, g, jsonify, request
 
-from gaminghub.database.database import bcrypt, limiter
-from gaminghub.models.user import User
+from gaminghub.database.database import limiter
 from gaminghub.models.game import Game
 from gaminghub.models.game_result import GameResult
 from gaminghub.models.achievement import Achievement
 from gaminghub.services import (
+    account_service,
     api_auth_service,
     leaderboard_service,
     analytics_service,
@@ -125,19 +125,28 @@ def api_root():
 @api.route("/auth/token", methods=["POST"])
 @limiter.limit("10 per minute")
 def issue_token():
-    data = request.get_json(silent=True) or {}
-    email = (data.get("email") or "").strip()
-    password = data.get("password") or ""
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        data = {}
 
-    user = User.query.filter_by(email=email).first()
+    email = data.get("email") if isinstance(data.get("email"), str) else ""
+    password = data.get("password") if isinstance(data.get("password"), str) else ""
 
-    if not user or not bcrypt.check_password_hash(user.password, password):
-        return jsonify({"error": "Invalid email or password."}), 401
+    user, error = account_service.authenticate(email, password)
 
-    token = api_auth_service.issue_token(user)
+    if not user:
+        # Unknown email and wrong password get the same 401. Inactive or
+        # unverified accounts are told why (403) -- but only after the
+        # correct password was supplied, so it reveals nothing new.
+        if error == account_service.INVALID_CREDENTIALS:
+            return jsonify({"error": "Invalid email or password."}), 401
+        return jsonify({"error": error}), 403
+
+    token, expires_at = api_auth_service.issue_token_with_expiry(user)
 
     return jsonify({
         "token": token,
+        "expires_at": expires_at.isoformat() if expires_at else None,
         "note": "This token is shown once and can't be retrieved again -- store it securely.",
         "user": _serialize_me(user)
     }), 201

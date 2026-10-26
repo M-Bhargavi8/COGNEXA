@@ -1,5 +1,6 @@
 import json
 
+from gaminghub.database.database import db as _db
 from gaminghub.services import game_service
 
 
@@ -87,7 +88,7 @@ class TestCompleteSessionAntiCheat:
             session = game_service.start_session(user, "test-game")
             result = game_service.complete_session(session, user, outcome="win", xp=10, coins=10, score=7)
 
-            row = GameResult.query.get(result["result"].id)
+            row = _db.session.get(GameResult, result["result"].id)
             assert row.user_id == user.id
             assert row.game_id == game.id
             assert row.score == 7

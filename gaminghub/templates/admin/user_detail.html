@@ -1,0 +1,175 @@
+{% extends "admin/_admin_base.html" %}
+{% from "_icons.html" import icon, game_icon %}
+
+{% set active_page = 'users' %}
+{% set is_self = target.id == current_user.id %}
+
+{% block title %}{{ target.username }} -- Admin -- COGNEXA{% endblock %}
+{% block page_title %}{{ target.username }}{% endblock %}
+
+{% block admin_content %}
+
+<p class="mb-3"><a href="{{ url_for('admin.users') }}" class="small">&larr; All users</a></p>
+
+<div class="row g-4">
+
+    <div class="col-xl-5 d-flex flex-column gap-4">
+
+        <section class="cx-card p-4" aria-labelledby="account-heading">
+            <h2 class="h5 mb-3" id="account-heading">Account</h2>
+            <dl class="cx-dl">
+                <dt>Username</dt><dd>{{ target.username }}{% if is_self %} <span class="text-muted">(you)</span>{% endif %}</dd>
+                <dt>Email</dt>
+                <dd>
+                    {{ target.email }}
+                    {% if target.is_email_verified %}
+                    <span class="badge bg-success ms-1">verified</span>
+                    {% else %}
+                    <span class="badge bg-secondary ms-1">unverified</span>
+                    {% endif %}
+                </dd>
+                <dt>Role</dt><dd><span class="badge {{ 'bg-warning text-dark' if target.role == 'admin' else 'bg-secondary' }}">{{ target.role }}</span></dd>
+                <dt>Status</dt>
+                <dd>
+                    <span class="badge {{ 'bg-success' if target.status == 'active' else 'bg-danger' }}">{{ target.status }}</span>
+                    {% if target.status_reason %}<div class="small text-muted mt-1">{{ target.status_reason }}</div>{% endif %}
+                </dd>
+                <dt>Joined</dt><dd>{{ target.created_at.strftime('%b %d, %Y %H:%M') if target.created_at else '—' }} UTC</dd>
+                <dt>Last login</dt><dd>{{ target.last_login.strftime('%b %d, %Y %H:%M') ~ ' UTC' if target.last_login else 'Never recorded' }}</dd>
+                <dt>Password changed</dt><dd>{{ target.password_changed_at.strftime('%b %d, %Y %H:%M') ~ ' UTC' if target.password_changed_at else '—' }}</dd>
+                <dt>Level / XP</dt><dd>Level {{ target.level }} &middot; {{ target.xp }} XP into level</dd>
+                <dt>Coins</dt><dd>{{ target.coins }}</dd>
+                <dt>Games</dt><dd>{{ detail.results_count }} results &middot; {{ target.wins }} W / {{ target.losses }} L</dd>
+                <dt>Owned</dt><dd>{{ detail.inventory_count }} shop items &middot; {{ detail.achievements_count }} achievements</dd>
+                <dt>API tokens</dt><dd>{{ detail.api_tokens_count }}</dd>
+            </dl>
+        </section>
+
+        <section class="cx-card p-4" aria-labelledby="role-heading">
+            <h2 class="h5 mb-1" id="role-heading">Role</h2>
+            {% if is_self %}
+            <p class="text-muted small mb-0">You can't change your own role.</p>
+            {% else %}
+            <p class="text-muted small mb-3">Administrators can manage every user, game and shop item.</p>
+            <form method="POST" action="{{ url_for('admin.toggle_user_role', user_id=target.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="return_to" value="detail">
+                {% if target.role == 'admin' %}
+                <button class="btn btn-sm btn-outline-danger" type="submit" data-confirm="Demote {{ target.username }} to player?">Demote to player</button>
+                {% else %}
+                <button class="btn btn-sm btn-outline-warning" type="submit" data-confirm="Give {{ target.username }} full administrator access?">Promote to admin</button>
+                {% endif %}
+            </form>
+            {% endif %}
+        </section>
+
+    </div>
+
+    <div class="col-xl-7 d-flex flex-column gap-4">
+
+        <section class="cx-card p-4" aria-labelledby="status-heading">
+            <h2 class="h5 mb-1" id="status-heading">Account status</h2>
+            {% if is_self %}
+            <p class="text-muted small mb-0">You can't change the status of your own account.</p>
+            {% else %}
+            <p class="text-muted small mb-3">
+                Suspended and deactivated accounts are signed out everywhere, can't log in or use the API, and are hidden from leaderboards.
+                Their history is kept, so reactivating restores everything.
+            </p>
+            <form method="POST" action="{{ url_for('admin.set_user_status', user_id=target.id) }}" class="cx-js-submit-once">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-sm-4">
+                        <label class="form-label" for="status-select">New status</label>
+                        <select id="status-select" name="status" class="form-select" required>
+                            {% for s in statuses if s != target.status %}
+                            <option value="{{ s }}">{{ s|capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-8">
+                        <label class="form-label" for="status-reason">Reason <span class="text-muted">(required unless reactivating)</span></label>
+                        <input id="status-reason" type="text" name="reason" class="form-control" maxlength="255">
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline-danger mt-3" type="submit" data-confirm="Change {{ target.username }}'s account status?">Update status</button>
+            </form>
+            {% endif %}
+        </section>
+
+        <section class="cx-card p-4" aria-labelledby="adjust-heading">
+            <h2 class="h5 mb-1" id="adjust-heading">Adjust coins / XP</h2>
+            <p class="text-muted small mb-3">
+                For corrections and support goodwill. Coins can be added or removed (never below zero); XP can only be granted.
+                Every adjustment is recorded in the audit log with your reason.
+            </p>
+            <form method="POST" action="{{ url_for('admin.adjust_user_balance', user_id=target.id) }}" class="cx-js-submit-once">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3">
+                    <div class="col-sm-3">
+                        <label class="form-label" for="adjust-coins">Coins (±)</label>
+                        <input id="adjust-coins" type="number" name="coins" class="form-control" step="1" min="-{{ max_coins }}" max="{{ max_coins }}" placeholder="0">
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label" for="adjust-xp">XP (+)</label>
+                        <input id="adjust-xp" type="number" name="xp" class="form-control" step="1" min="0" max="{{ max_xp }}" placeholder="0">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label" for="adjust-reason">Reason</label>
+                        <input id="adjust-reason" type="text" name="reason" class="form-control" maxlength="255" required minlength="3">
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline-warning mt-3" type="submit" data-confirm="Apply this balance adjustment to {{ target.username }}?">Apply adjustment</button>
+            </form>
+        </section>
+
+        <section class="cx-card p-4" aria-labelledby="history-heading">
+            <h2 class="h5 mb-3" id="history-heading">Audit history</h2>
+            {% if detail.audit_entries %}
+            <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+                {% for e in detail.audit_entries %}
+                <li>
+                    <div class="d-flex flex-wrap gap-2 align-items-baseline">
+                        <code>{{ e.action }}</code>
+                        <span class="small text-muted">by {{ e.actor_username or 'system' }} &middot; {{ e.created_at.strftime('%b %d, %Y %H:%M') }} UTC</span>
+                    </div>
+                    {% if e.reason %}<div class="small">Reason: {{ e.reason }}</div>{% endif %}
+                    {% set d = parse_details(e) %}
+                    {% if d %}<div class="cx-audit-details">{% for k, v in d.items() %}{{ k }}: {{ v }}{% if not loop.last %} &middot; {% endif %}{% endfor %}</div>{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted small mb-0">No recorded actions for this account yet.</p>
+            {% endif %}
+        </section>
+
+        <section class="cx-card p-4" aria-labelledby="results-heading">
+            <h2 class="h5 mb-3" id="results-heading">Recent games</h2>
+            {% if detail.recent_results %}
+            <div class="table-responsive">
+                <table class="table table-dark table-sm align-middle mb-0">
+                    <thead><tr><th>Game</th><th>Result</th><th>Score</th><th>XP</th><th>When (UTC)</th></tr></thead>
+                    <tbody>
+                        {% for r, g in detail.recent_results %}
+                        <tr>
+                            <td><span class="d-inline-flex align-items-center gap-2">{{ game_icon(g.slug, 14, tile=false) }} {{ g.name }}</span></td>
+                            <td>{{ r.result }}</td>
+                            <td>{{ r.score }}</td>
+                            <td>{{ r.xp_earned }}</td>
+                            <td class="small">{{ r.created_at.strftime('%b %d %H:%M') if r.created_at else '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted small mb-0">No games played yet.</p>
+            {% endif %}
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}

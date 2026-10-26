@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% from "_logo.html" import mark %}
+
+{% block title %}Slow down -- COGNEXA{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="cx-card p-5 mx-auto text-center" style="max-width: 560px;">
+
+        <div class="mb-3 d-flex justify-content-center">{{ mark(56) }}</div>
+
+        <div class="mb-3 d-flex justify-content-center">{{ icon('clock', 40, 'icon--amber') }}</div>
+
+        <span class="cx-eyebrow">429</span>
+        <h2 class="mb-2">Too many requests</h2>
+        <p class="text-muted mb-4">
+            You've tried that a few too many times. Wait a few minutes and try again.
+        </p>
+
+        <div class="cx-hero-cta justify-content-center">
+            <a href="{{ url_for('main.home') }}" class="btn btn-cx-primary">{{ icon('home', 18) }} Back to Home</a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

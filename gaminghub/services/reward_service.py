@@ -1,6 +1,9 @@
 from datetime import date, datetime, timedelta
 
+from sqlalchemy import or_, update
+
 from gaminghub.database.database import db
+from gaminghub.models.user import User
 from gaminghub.config.constants import LEVEL_XP, XP_BOOSTER
 from gaminghub.services.achievement_service import check_achievements
 from gaminghub.services import notification_service
@@ -86,13 +89,26 @@ def claim_daily_reward(user):
     if user.last_claim == today:
         return False, "You already claimed today's reward!", 0
 
-    if user.last_claim == today - timedelta(days=1):
-        user.daily_streak += 1
-    else:
-        user.daily_streak = 1
+    streak = (user.daily_streak or 0) + 1 if user.last_claim == today - timedelta(days=1) else 1
 
-    reward = user.daily_streak * 20
+    # Two claims racing each other would both pass the check above. The
+    # conditional UPDATE lets exactly one of them record today's claim;
+    # the other finds last_claim already set and gets nothing.
+    claimed = db.session.execute(
+        update(User)
+        .where(User.id == user.id, or_(User.last_claim.is_(None), User.last_claim != today))
+        .values(last_claim=today, daily_streak=streak)
+        .execution_options(synchronize_session=False)
+    ).rowcount == 1
+
+    if not claimed:
+        db.session.rollback()
+        return False, "You already claimed today's reward!", 0
+
+    user.daily_streak = streak
     user.last_claim = today
+
+    reward = streak * 20
 
     award(user, coins=reward)
 

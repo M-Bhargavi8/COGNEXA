@@ -8,6 +8,8 @@ route, not just the service layer already covered in test_game_service.py,
 to prove the wiring holds end to end.
 """
 
+from gaminghub.database.database import db as _db
+
 from gaminghub.database.database import db
 from gaminghub.models.game import Game
 from gaminghub.models.game_session import GameSession
@@ -83,7 +85,7 @@ class TestTicTacToeCannotBeWonWithoutPlaying:
 
         assert b"Invalid move" in resp.data
         assert user.xp == 0
-        assert GameSession.query.get(session.id).status == "active"
+        assert _db.session.get(GameSession, session.id).status == "active"
 
     def test_out_of_range_move_is_rejected(self, app, client, make_user, login_as, db):
         with app.test_request_context():
@@ -142,7 +144,7 @@ class TestReplayProtection:
 
         client.get("/tictactoe")  # GET with no active session starts a new one
 
-        assert GameSession.query.get(won_session_id).status == "completed"
+        assert _db.session.get(GameSession, won_session_id).status == "completed"
         new_session = game_service.get_active_session(user, game)
         assert new_session is not None
         assert new_session.id != won_session_id

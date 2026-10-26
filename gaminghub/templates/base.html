@@ -111,13 +111,24 @@
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
             <li><a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('analytics.analytics_home') }}">{{ icon('analytics', 16, 'icon--cyan') }} My Analytics</a></li>
             <li><a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('rewards.shop') }}">{{ icon('reward', 16, 'icon--amber') }} Reward Shop</a></li>
-            <li><a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('rewards.daily') }}">{{ icon('coin', 16, 'icon--amber') }} Daily Reward</a></li>
+            <li>
+                <form method="POST" action="{{ url_for('rewards.daily') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="dropdown-item d-flex align-items-center gap-2" type="submit">{{ icon('coin', 16, 'icon--amber') }} Daily Reward</button>
+                </form>
+            </li>
+            <li><a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('account.settings') }}">{{ icon('settings', 16) }} Account Settings</a></li>
             {% if current_user.is_admin %}
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('admin.admin_dashboard') }}">{{ icon('shield', 16, 'icon--green') }} Admin</a></li>
             {% endif %}
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('auth.logout') }}">{{ icon('close', 16, 'icon--muted') }} Logout</a></li>
+            <li>
+                <form method="POST" action="{{ url_for('auth.logout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="dropdown-item d-flex align-items-center gap-2" type="submit">{{ icon('close', 16, 'icon--muted') }} Logout</button>
+                </form>
+            </li>
         </ul>
     </li>
 
@@ -152,6 +163,16 @@
    glyph varied by call site for the same kind of event. The icon is now
    derived from the alert category here, so every success reads the same
    whichever service flashed it. #}
+{% if current_user.is_authenticated and not current_user.is_email_verified and request.endpoint != 'account.settings' %}
+<div class="container mt-3">
+    <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2 mb-0 cx-verify-banner" role="status">
+        {{ icon('mail', 18, 'icon--amber') }}
+        <span>Please verify your email address so you can recover your account.</span>
+        <a class="ms-auto alert-link" href="{{ url_for('account.settings') }}#email">Verify email</a>
+    </div>
+</div>
+{% endif %}
+
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="container mt-3">
@@ -222,8 +243,9 @@
    version, so winning a round threw instead of showing the popup.
    Deleted rather than repaired -- reward.js already does the job. #}
 <script
-src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
 </script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 
 </body>
 

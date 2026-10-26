@@ -73,7 +73,7 @@ class TestGuessTheNumber:
 
         assert b"Congratulations" in resp.data
         assert user.xp == DIFFICULTIES["easy"]["xp"]
-        assert GameSession.query.get(session.id).status == "completed"
+        assert db.session.get(GameSession, session.id).status == "completed"
 
     def test_a_low_guess_gives_a_hint_and_does_not_end_the_game(self, app, client, make_user, login_as, db):
         with app.test_request_context():
@@ -89,7 +89,7 @@ class TestGuessTheNumber:
         resp = client.post("/guess", data={"guess": str(guess)}, follow_redirects=True)
 
         assert (b"Too Low" in resp.data) or (b"Too High" in resp.data)
-        assert GameSession.query.get(session.id).status == "active"
+        assert db.session.get(GameSession, session.id).status == "active"
 
     def test_running_out_of_attempts_loses_and_reveals_the_answer(self, app, client, make_user, login_as, db):
         with app.test_request_context():
@@ -107,7 +107,7 @@ class TestGuessTheNumber:
             resp = client.post("/guess", data={"guess": wrong_guess}, follow_redirects=True)
 
         assert b"Game Over" in resp.data
-        assert GameSession.query.get(session.id).status == "completed"
+        assert db.session.get(GameSession, session.id).status == "completed"
 
     def test_a_non_numeric_guess_does_not_crash(self, app, client, make_user, login_as, db):
         with app.test_request_context():

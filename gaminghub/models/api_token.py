@@ -16,6 +16,7 @@ class ApiToken(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_used_at = db.Column(db.DateTime)
+    expires_at = db.Column(db.DateTime)
 
     def __repr__(self):
         return f"<ApiToken user={self.user_id}>"

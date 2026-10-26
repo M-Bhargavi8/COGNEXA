@@ -8,10 +8,16 @@
 
 {% block admin_content %}
 
-<p class="text-muted small mb-3 d-flex align-items-center gap-2">
-    {{ icon('info', 16, 'icon--muted') }}
-    Inactive games are hidden from the Brain Lab hub and leaderboard pickers. Their direct URLs aren't blocked yet.
-</p>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <p class="text-muted small mb-0 d-flex align-items-center gap-2">
+        {{ icon('info', 16, 'icon--muted') }}
+        Inactive games are hidden everywhere and their pages can't be opened or played.
+        Each game's rules are built into the app, so only the name and description are editable here.
+    </p>
+    {% if missing_slugs %}
+    <a class="btn btn-sm btn-cx-primary" href="{{ url_for('admin.new_game') }}">Register missing game ({{ missing_slugs|length }})</a>
+    {% endif %}
+</div>
 
 <div class="cx-card p-3">
 
@@ -37,15 +43,18 @@
                             {{ 'active' if g.is_active else 'inactive' }}
                         </span>
                     </td>
-                    <td>
-                        <form method="POST" action="{{ url_for('admin.toggle_game', game_id=g.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            {% if g.is_active %}
-                            <button class="btn btn-sm btn-outline-danger" type="submit">Deactivate</button>
-                            {% else %}
-                            <button class="btn btn-sm btn-outline-success" type="submit">Activate</button>
-                            {% endif %}
-                        </form>
+                    <td class="text-end">
+                        <div class="d-inline-flex gap-2">
+                            <a class="btn btn-sm btn-outline-light" href="{{ url_for('admin.edit_game', game_id=g.id) }}">Edit</a>
+                            <form method="POST" action="{{ url_for('admin.toggle_game', game_id=g.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                {% if g.is_active %}
+                                <button class="btn btn-sm btn-outline-danger" type="submit" data-confirm="Deactivate {{ g.name }}? Players won't be able to open it.">Deactivate</button>
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-success" type="submit">Activate</button>
+                                {% endif %}
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}

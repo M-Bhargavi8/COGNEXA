@@ -1,0 +1,52 @@
+{% extends "admin/_admin_base.html" %}
+{% from "_icons.html" import icon, game_icon %}
+
+{% set active_page = 'games' %}
+
+{% block title %}{{ 'Edit ' ~ game.name if game else 'Register game' }} -- Admin -- COGNEXA{% endblock %}
+{% block page_title %}{{ 'Edit game' if game else 'Register game' }}{% endblock %}
+
+{% block admin_content %}
+
+<p class="mb-3"><a href="{{ url_for('admin.games') }}" class="small">&larr; All games</a></p>
+
+<div class="cx-card p-4" style="max-width: 640px;">
+
+    <form method="POST" class="cx-js-submit-once">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        {% if game %}
+        <div class="d-flex align-items-center gap-2 mb-3">
+            {{ game_icon(game.slug, 20, tile=false) }}
+            <span class="text-muted">{{ game.slug }} &middot; {{ game.category }}</span>
+        </div>
+        {% else %}
+        <div class="mb-3">
+            <label class="form-label" for="game-slug">Game</label>
+            <select id="game-slug" name="slug" class="form-select" required aria-describedby="game-slug-hint">
+                {% for slug in missing_slugs %}
+                <option value="{{ slug }}" {{ 'selected' if form.get('slug') == slug }}>{{ slug }}</option>
+                {% endfor %}
+            </select>
+            <div class="form-text text-muted" id="game-slug-hint">Only games that are implemented in the app but have no record yet can be registered.</div>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label class="form-label" for="game-name">Name</label>
+            <input id="game-name" type="text" name="name" class="form-control" required minlength="2" maxlength="100"
+                   value="{{ form.get('name', game.name if game else '') }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="game-description">Description</label>
+            <textarea id="game-description" name="description" class="form-control" rows="3" maxlength="255">{{ form.get('description', (game.description or '') if game else '') }}</textarea>
+        </div>
+
+        <button class="btn btn-cx-primary" type="submit" data-loading-text="Saving...">{{ 'Save changes' if game else 'Register game' }}</button>
+        <a class="btn btn-outline-secondary ms-2" href="{{ url_for('admin.games') }}">Cancel</a>
+    </form>
+
+</div>
+
+{% endblock %}

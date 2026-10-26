@@ -3,10 +3,20 @@ import tempfile
 import uuid
 
 import pytest
+from flask import g
 
+from config import normalize_database_url
 from gaminghub import create_app
 from gaminghub.database.database import db as _db
 from gaminghub.database.database import bcrypt
+
+
+# Point the suite at another database (CI runs it against PostgreSQL):
+#   TEST_DATABASE_URL=postgresql://user:pass@localhost:5432/cognexa_test pytest
+# Every test then creates the schema at start and drops it at the end, so
+# the database must be a disposable one. Unset, each test gets its own
+# SQLite file (see _make_test_config).
+TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "").strip()
 
 
 def _make_test_config(db_path):
@@ -27,23 +37,45 @@ def _make_test_config(db_path):
     class _TestConfig:
         TESTING = True
         SECRET_KEY = "test-secret-key-not-for-production"
-        SQLALCHEMY_DATABASE_URI = f"sqlite:///{db_path}"
+        SQLALCHEMY_DATABASE_URI = normalize_database_url(TEST_DATABASE_URL) if TEST_DATABASE_URL else f"sqlite:///{db_path}"
         SQLALCHEMY_TRACK_MODIFICATIONS = False
         WTF_CSRF_ENABLED = False
         RATELIMIT_ENABLED = False
+        RATELIMIT_STORAGE_URI = "memory://"
+        MAIL_BACKEND = "memory"
+        APP_BASE_URL = "http://localhost"
+        APP_ENV = "testing"
 
     return _TestConfig
+
+
+def _isolate_requests(application):
+    """
+    These fixtures hold one app context open for the whole test, and
+    Flask reuses an already-pushed app context for every test-client
+    request -- so flask.g, where Flask-Login caches the current user,
+    would carry over from one request (or one test client) to the next.
+    Real requests each get a fresh g; this restores that, so session
+    invalidation is tested the way it behaves in production.
+    """
+
+    @application.before_request
+    def _fresh_login_user():
+        g.pop("_login_user", None)
 
 
 @pytest.fixture
 def app():
     db_path = os.path.join(tempfile.gettempdir(), f"gaminghub_test_{uuid.uuid4().hex}.sqlite")
     application = create_app(_make_test_config(db_path))
+    _isolate_requests(application)
 
     with application.app_context():
         _db.create_all()
         yield application
         _db.session.remove()
+        if TEST_DATABASE_URL:
+            _db.drop_all()
         _db.engine.dispose()
 
     if os.path.exists(db_path):
@@ -66,11 +98,14 @@ def rate_limited_app():
     config = _make_test_config(db_path)
     config.RATELIMIT_ENABLED = True
     application = create_app(config)
+    _isolate_requests(application)
 
     with application.app_context():
         _db.create_all()
         yield application
         _db.session.remove()
+        if TEST_DATABASE_URL:
+            _db.drop_all()
         _db.engine.dispose()
 
     if os.path.exists(db_path):

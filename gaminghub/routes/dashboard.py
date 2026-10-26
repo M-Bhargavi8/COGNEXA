@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 
 from gaminghub.services.reward_service import xp_progress
 from gaminghub.services import challenge_service, game_service, notification_service
+from gaminghub.database.database import db
 from gaminghub.models.game import Game
 
 dashboard = Blueprint("dashboard", __name__)
@@ -15,7 +16,7 @@ def dashboard_home():
     notification_service.ensure_daily_reminders(current_user)
 
     challenge = challenge_service.get_today_challenge()
-    challenge_game = Game.query.get(challenge.game_id) if challenge else None
+    challenge_game = db.session.get(Game, challenge.game_id) if challenge else None
 
     return render_template(
         "dashboard.html",

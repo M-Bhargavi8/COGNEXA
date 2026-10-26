@@ -2,7 +2,8 @@ import json
 import uuid
 from datetime import datetime
 
-from flask import url_for
+from flask import flash, jsonify, redirect, request, url_for
+from sqlalchemy import update
 
 from gaminghub.database.database import db
 from gaminghub.models.game import Game
@@ -27,6 +28,53 @@ GAME_PLAY_ENDPOINTS = {
     "risk-reward": "brain_lab.risk_reward",
     "logic-grid": "brain_lab.logic_grid",
 }
+
+
+# Endpoints that belong to a game but don't share its play endpoint's
+# name prefix (most do: brain_lab.memory_matrix_start, ..._submit).
+EXTRA_GAME_ENDPOINTS = {
+    "games.start_guess": "guess-the-number",
+}
+
+
+def category_for_slug(slug):
+    endpoint = GAME_PLAY_ENDPOINTS.get(slug, "")
+    return "brain-lab" if endpoint.startswith("brain_lab.") else "classic-arcade"
+
+
+def slug_for_endpoint(endpoint):
+    if not endpoint:
+        return None
+
+    if endpoint in EXTRA_GAME_ENDPOINTS:
+        return EXTRA_GAME_ENDPOINTS[endpoint]
+
+    for slug, play_endpoint in GAME_PLAY_ENDPOINTS.items():
+        if endpoint == play_endpoint or endpoint.startswith(play_endpoint + "_"):
+            return slug
+
+    return None
+
+
+def guard_inactive_game():
+    """before_request hook: a game an admin has disabled (or that was
+    never registered) can't be opened or played through its direct URLs
+    either -- not just hidden from the hubs. Returns a response to stop
+    the request, or None to let it through."""
+
+    slug = slug_for_endpoint(request.endpoint)
+    if slug is None:
+        return None
+
+    game = get_game(slug)
+    if game is not None and game.is_active:
+        return None
+
+    if request.method == "POST" and request.blueprint == "brain_lab":
+        return jsonify({"error": "This game is currently unavailable."}), 404
+
+    flash("This game is currently unavailable.", "warning")
+    return redirect(url_for("main.home"))
 
 
 def get_game(slug):
@@ -102,8 +150,25 @@ def complete_session(session, user, *, outcome, xp=0, coins=0, score=0,
     if session.status != "active":
         return None
 
+    # The in-memory status check above isn't enough on its own: two
+    # requests submitting the same session at the same time would both
+    # see "active". This UPDATE is the real gate -- only one of them can
+    # flip the row from active to completed, and only that one is paid.
+    ended_at = datetime.utcnow()
+    claimed = db.session.execute(
+        update(GameSession)
+        .where(GameSession.id == session.id, GameSession.status == "active")
+        .values(status="completed", ended_at=ended_at)
+        .execution_options(synchronize_session=False)
+    ).rowcount == 1
+
+    if not claimed:
+        db.session.rollback()
+        db.session.refresh(session)
+        return None
+
     session.status = "completed"
-    session.ended_at = datetime.utcnow()
+    session.ended_at = ended_at
 
     achievements_unlocked = award(user, xp=xp, coins=coins, outcome=outcome)
 
@@ -143,7 +208,7 @@ def complete_session(session, user, *, outcome, xp=0, coins=0, score=0,
 
     is_new_best = previous_best is not None and score > previous_best
 
-    game = Game.query.get(session.game_id)
+    game = db.session.get(Game, session.game_id)
 
     if is_new_best:
         notification_service.create(

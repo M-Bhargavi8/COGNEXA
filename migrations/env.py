@@ -97,6 +97,20 @@ def run_migrations_online():
     connectable = get_engine()
 
     with connectable.connect() as connection:
+        is_sqlite = connection.dialect.name == "sqlite"
+
+        if is_sqlite:
+            # The app turns SQLite foreign-key enforcement on for every
+            # connection. Batch migrations rebuild a table by copying it,
+            # dropping the original and renaming the copy -- a DROP that
+            # enforcement refuses while other tables reference it. Turn it
+            # off for the migration run (it has to happen outside a
+            # transaction, hence the raw DBAPI connection) and verify
+            # integrity explicitly afterwards instead.
+            connection.connection.driver_connection.execute("PRAGMA foreign_keys=OFF")
+            violations_before = set(connection.exec_driver_sql("PRAGMA foreign_key_check").fetchall())
+            connection.commit()
+
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
@@ -105,6 +119,20 @@ def run_migrations_online():
 
         with context.begin_transaction():
             context.run_migrations()
+
+        if is_sqlite:
+            violations_after = set(connection.exec_driver_sql("PRAGMA foreign_key_check").fetchall())
+            introduced = violations_after - violations_before
+            if introduced:
+                raise RuntimeError(f"Migration introduced foreign key violations: {sorted(introduced)[:10]}")
+            if violations_after:
+                # Rows that already pointed at missing parents before this
+                # run (e.g. hand-deleted users). Not this migration's doing,
+                # but worth knowing about.
+                logger.warning(
+                    "Pre-existing foreign key violations (table, rowid, parent, fk): %s",
+                    sorted(violations_after)[:10]
+                )
 
 
 if context.is_offline_mode():

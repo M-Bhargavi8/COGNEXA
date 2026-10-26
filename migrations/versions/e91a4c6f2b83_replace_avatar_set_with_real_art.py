@@ -60,14 +60,17 @@ def upgrade():
             {"new_name": new_name, "cost": cost, "asset": asset, "old_name": old_name},
         )
 
+    # is_active is bound as a Python bool rather than a literal 1: SQLite
+    # stores either as 1, but PostgreSQL rejects an integer for a boolean
+    # column. (Portability fix -- the result on SQLite is unchanged.)
     for name, description, item_type, cost, asset in NEW_ITEMS:
         connection.execute(
             sa.text(
                 "INSERT INTO shop_items (name, description, item_type, cost, asset, is_active) "
-                "VALUES (:name, :description, :item_type, :cost, :asset, 1)"
+                "VALUES (:name, :description, :item_type, :cost, :asset, :is_active)"
             ),
             {"name": name, "description": description, "item_type": item_type,
-             "cost": cost, "asset": asset},
+             "cost": cost, "asset": asset, "is_active": True},
         )
 
     connection.execute(

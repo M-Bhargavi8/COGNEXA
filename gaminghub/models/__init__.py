@@ -10,3 +10,5 @@ from gaminghub.models.shop_item import ShopItem
 from gaminghub.models.user_inventory import UserInventory
 from gaminghub.models.notification import Notification
 from gaminghub.models.api_token import ApiToken
+from gaminghub.models.account_token import AccountToken
+from gaminghub.models.audit_log import AuditLog
