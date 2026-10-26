@@ -1,0 +1,75 @@
+{% extends "admin/_admin_base.html" %}
+{% from "_icons.html" import icon %}
+
+{% set active_page = 'shop' %}
+{% set current_type = item.item_type if item else form.get('item_type', 'avatar') %}
+{% set current_asset = form.get('asset', item.asset if item else '') %}
+
+{% block title %}{{ 'Edit ' ~ item.name if item else 'New shop item' }} -- Admin -- COGNEXA{% endblock %}
+{% block page_title %}{{ 'Edit shop item' if item else 'New shop item' }}{% endblock %}
+
+{% block admin_content %}
+
+<p class="mb-3"><a href="{{ url_for('admin.shop') }}" class="small">&larr; All items</a></p>
+
+<div class="cx-card p-4" style="max-width: 640px;">
+
+    <form method="POST" class="cx-js-submit-once">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="mb-3">
+            <label class="form-label" for="item-type">Type</label>
+            {% if item %}
+            <input id="item-type" type="text" class="form-control" value="{{ item.item_type }}" disabled aria-describedby="item-type-hint">
+            <div class="form-text text-muted" id="item-type-hint">An item's type can't change after it's created -- owners have it equipped as that type.</div>
+            {% else %}
+            <select id="item-type" name="item_type" class="form-select" required>
+                {% for t in item_types %}
+                <option value="{{ t }}" {{ 'selected' if t == current_type }}>{{ t|capitalize }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="item-name">Name</label>
+            <input id="item-name" type="text" name="name" class="form-control" required minlength="2" maxlength="100"
+                   value="{{ form.get('name', item.name if item else '') }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="item-description">Description</label>
+            <textarea id="item-description" name="description" class="form-control" rows="2" maxlength="255">{{ form.get('description', (item.description or '') if item else '') }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="item-cost">Cost (coins)</label>
+            <input id="item-cost" type="number" name="cost" class="form-control" required min="0" max="{{ max_cost }}" step="1"
+                   value="{{ form.get('cost', item.cost if item else '') }}">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label" for="item-asset">Asset</label>
+            <select id="item-asset" name="asset" class="form-select" aria-describedby="item-asset-hint">
+                <option value="">None (boosters only)</option>
+                {% for t in item_types if asset_options[t] and (not item or t == item.item_type) %}
+                <optgroup label="{{ t|capitalize }}">
+                    {% for a in asset_options[t] %}
+                    <option value="{{ a }}" {{ 'selected' if a == current_asset }}>{{ a }}</option>
+                    {% endfor %}
+                </optgroup>
+                {% endfor %}
+            </select>
+            <div class="form-text text-muted" id="item-asset-hint">
+                Pick an asset matching the type: an avatar image, a frame style or a badge icon. Boosters have no asset;
+                their effect (double XP for one hour) is fixed by the app.
+            </div>
+        </div>
+
+        <button class="btn btn-cx-primary" type="submit" data-loading-text="Saving...">{{ 'Save changes' if item else 'Create item' }}</button>
+        <a class="btn btn-outline-secondary ms-2" href="{{ url_for('admin.shop') }}">Cancel</a>
+    </form>
+
+</div>
+
+{% endblock %}

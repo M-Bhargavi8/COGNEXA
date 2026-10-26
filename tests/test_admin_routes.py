@@ -1,3 +1,6 @@
+from gaminghub.database.database import db as _db
+
+
 ADMIN_PATHS = ["/admin/", "/admin/users", "/admin/games", "/admin/shop"]
 
 
@@ -37,7 +40,7 @@ class TestUserRoleToggleRoute:
         resp = client.post(f"/admin/users/{player.id}/role", follow_redirects=True)
 
         assert resp.status_code == 200
-        assert User.query.get(player.id).role == "admin"
+        assert _db.session.get(User, player.id).role == "admin"
 
     def test_cannot_change_own_role_through_the_route(self, client, make_user, login_as):
         admin = make_user(username="admin1", role="admin")
@@ -67,7 +70,7 @@ class TestGameAndShopToggleRoutes:
 
         client.post(f"/admin/games/{game.id}/toggle")
 
-        assert Game.query.get(game.id).is_active is False
+        assert _db.session.get(Game, game.id).is_active is False
 
     def test_toggling_a_shop_item_flips_is_active(self, client, make_user, make_shop_item, login_as, db):
         from gaminghub.models.shop_item import ShopItem
@@ -78,7 +81,7 @@ class TestGameAndShopToggleRoutes:
 
         client.post(f"/admin/shop/{item.id}/toggle")
 
-        assert ShopItem.query.get(item.id).is_active is False
+        assert _db.session.get(ShopItem, item.id).is_active is False
 
     def test_a_deactivated_game_disappears_from_the_brain_lab_hub(self, client, make_user, make_game, login_as):
         admin = make_user(role="admin")

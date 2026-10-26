@@ -4,6 +4,9 @@ from gaminghub.database.database import db
 
 class Notification(db.Model):
     __tablename__ = "notifications"
+    __table_args__ = (
+        db.Index("ix_notifications_user_id_is_read", "user_id", "is_read"),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
 

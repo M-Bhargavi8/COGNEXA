@@ -103,8 +103,8 @@
         {{ icon("reward", 18, "icon--amber") }} Reward Shop
     </a>
 
-    <a href="#" class="btn btn-cx-outline">
-        Edit Profile
+    <a href="{{ url_for('account.settings') }}" class="btn btn-cx-outline">
+        {{ icon("settings", 18) }} Edit Profile
     </a>
 
     <a href="{{ url_for('dashboard.dashboard_home') }}"

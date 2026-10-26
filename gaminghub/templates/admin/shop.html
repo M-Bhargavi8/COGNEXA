@@ -8,10 +8,13 @@
 
 {% block admin_content %}
 
-<p class="text-muted small mb-3 d-flex align-items-center gap-2">
-    {{ icon('info', 16, 'icon--muted') }}
-    Inactive items disappear from the shop immediately and can't be bought or equipped, even by a resubmitted request.
-</p>
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <p class="text-muted small mb-0 d-flex align-items-center gap-2">
+        {{ icon('info', 16, 'icon--muted') }}
+        Inactive items disappear from the shop immediately and can't be bought or equipped, even by a resubmitted request.
+    </p>
+    <a class="btn btn-sm btn-cx-primary" href="{{ url_for('admin.new_shop_item') }}">New item</a>
+</div>
 
 <div class="cx-card p-3">
 
@@ -21,6 +24,7 @@
                 <tr>
                     <th>Item</th>
                     <th>Type</th>
+                    <th>Asset</th>
                     <th>Cost</th>
                     <th>Status</th>
                     <th></th>
@@ -31,23 +35,29 @@
                 <tr>
                     <td>{{ item.name }}</td>
                     <td>{{ item.item_type }}</td>
-                    <td class="d-flex align-items-center gap-1">{{ icon('coin', 14, 'icon--amber') }} {{ item.cost }}</td>
+                    <td class="text-muted small">{{ item.asset or '—' }}</td>
+                    <td><span class="d-inline-flex align-items-center gap-1">{{ icon('coin', 14, 'icon--amber') }} {{ item.cost }}</span></td>
                     <td>
                         <span class="badge {{ 'bg-success' if item.is_active else 'bg-secondary' }}">
                             {{ 'active' if item.is_active else 'inactive' }}
                         </span>
                     </td>
-                    <td>
-                        <form method="POST" action="{{ url_for('admin.toggle_shop_item', item_id=item.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            {% if item.is_active %}
-                            <button class="btn btn-sm btn-outline-danger" type="submit">Deactivate</button>
-                            {% else %}
-                            <button class="btn btn-sm btn-outline-success" type="submit">Activate</button>
-                            {% endif %}
-                        </form>
+                    <td class="text-end">
+                        <div class="d-inline-flex gap-2">
+                            <a class="btn btn-sm btn-outline-light" href="{{ url_for('admin.edit_shop_item', item_id=item.id) }}">Edit</a>
+                            <form method="POST" action="{{ url_for('admin.toggle_shop_item', item_id=item.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                {% if item.is_active %}
+                                <button class="btn btn-sm btn-outline-danger" type="submit" data-confirm="Deactivate {{ item.name }}? It will disappear from the shop.">Deactivate</button>
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-success" type="submit">Activate</button>
+                                {% endif %}
+                            </form>
+                        </div>
                     </td>
                 </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center text-muted py-4">No shop items yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -55,7 +55,7 @@
 
             <div id="countdown" class="display-2 fw-bold text-gradient">Ready...</div>
 
-            <div id="battle" style="display:none;">
+            <div id="battle" style="display:none;" data-result="{{ result }}">
 
                 <div class="row mt-4">
                     <div class="col-md-6">
@@ -108,59 +108,6 @@
 
 <script src="{{ url_for('static', filename='js/reward.js') }}"></script>
 
-<script>
-
-const countdown = document.getElementById("countdown");
-const battle = document.getElementById("battle");
-
-if (countdown){
-
-    let number = 3;
-
-    countdown.innerHTML = number;
-
-    let timer = setInterval(function(){
-
-        number--;
-
-        if(number > 0){
-
-            countdown.innerHTML = number;
-
-        }
-
-        else if(number == 0){
-
-            countdown.innerHTML = "GO!";
-
-        }
-
-        else{
-
-            clearInterval(timer);
-
-            countdown.style.display = "none";
-
-            battle.style.display = "block";
-
-            {% if result=="Win" %}
-
-                document.getElementById("winSound").play();
-
-                showReward(20,15);
-
-            {% elif result=="Lose" %}
-
-                document.getElementById("loseSound").play();
-
-            {% endif %}
-
-        }
-
-    },1000);
-
-}
-
-</script>
+<script src="{{ url_for('static', filename='js/rps.js') }}"></script>
 
 {% endblock %}

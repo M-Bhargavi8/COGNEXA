@@ -89,7 +89,10 @@
                 <div class="cx-eyebrow d-flex align-items-center gap-2">{{ icon('flame', 18, 'icon--amber') }} Daily Streak</div>
                 <h2 class="mt-2 mb-1">{{ current_user.daily_streak }} Days</h2>
                 <p class="text-muted small mb-3">Come back daily to keep your streak alive and grow your reward.</p>
-                <a href="{{ url_for('rewards.daily') }}" class="btn btn-cx-primary">Claim Reward</a>
+                <form method="POST" action="{{ url_for('rewards.daily') }}" class="cx-js-submit-once">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-cx-primary" data-loading-text="Claiming...">Claim Reward</button>
+                </form>
             </div>
         </div>
 

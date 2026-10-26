@@ -1,3 +1,4 @@
+from gaminghub.database.database import db as _db
 from datetime import date, datetime, time, timedelta, timezone
 
 from gaminghub.services import notification_service
@@ -56,7 +57,7 @@ class TestMarkRead:
         result = notification_service.mark_read(attacker, n.id)
 
         assert result is None
-        assert Notification.query.get(n.id).is_read is False
+        assert _db.session.get(Notification, n.id).is_read is False
 
     def test_marking_an_already_read_one_is_a_harmless_no_op(self, make_user):
         user = make_user()

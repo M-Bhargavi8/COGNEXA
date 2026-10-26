@@ -8,10 +8,22 @@
 
 {% block admin_content %}
 
-<form method="GET" class="mb-4 d-flex gap-2" style="max-width: 400px;">
-    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by username..." aria-label="Search by username">
+<form method="GET" class="mb-4 d-flex flex-wrap gap-2 align-items-end" role="search">
+    <div>
+        <label class="form-label" for="user-search">Search</label>
+        <input id="user-search" type="text" name="q" value="{{ query }}" class="form-control" placeholder="Username or email" maxlength="100">
+    </div>
+    <div>
+        <label class="form-label" for="user-status">Status</label>
+        <select id="user-status" name="status" class="form-select">
+            <option value="">All statuses</option>
+            {% for s in statuses %}
+            <option value="{{ s }}" {{ 'selected' if s == status }}>{{ s|capitalize }}</option>
+            {% endfor %}
+        </select>
+    </div>
     <button class="btn btn-outline-light" type="submit">{{ icon('search', 16) }} Search</button>
-    {% if query %}
+    {% if query or status %}
     <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary">Clear</a>
     {% endif %}
 </form>
@@ -26,9 +38,9 @@
                     <th>Username</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Level</th>
                     <th>Coins</th>
-                    <th>Games Played</th>
                     <th>Joined</th>
                     <th></th>
                 </tr>
@@ -36,26 +48,18 @@
             <tbody>
                 {% for u in users %}
                 <tr>
-                    <td>{{ u.username }}{% if u.id == current_user.id %} (you){% endif %}</td>
-                    <td>{{ u.email }}</td>
+                    <td>{{ u.username }}{% if u.id == current_user.id %} <span class="text-muted">(you)</span>{% endif %}</td>
+                    <td>
+                        {{ u.email }}
+                        {% if u.is_email_verified %}<span class="visually-hidden">(verified)</span>{{ icon('check', 14, 'icon--green') }}{% endif %}
+                    </td>
                     <td><span class="badge {{ 'bg-warning text-dark' if u.role == 'admin' else 'bg-secondary' }}">{{ u.role }}</span></td>
+                    <td><span class="badge {{ 'bg-success' if u.status == 'active' else 'bg-danger' }}">{{ u.status }}</span></td>
                     <td>{{ u.level }}</td>
                     <td>{{ u.coins }}</td>
-                    <td>{{ u.games_played }}</td>
                     <td>{{ u.created_at.strftime('%b %d, %Y') if u.created_at else '—' }}</td>
-                    <td>
-                        {% if u.id == current_user.id %}
-                        <span class="text-muted small">can't edit yourself</span>
-                        {% else %}
-                        <form method="POST" action="{{ url_for('admin.toggle_user_role', user_id=u.id, q=query) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            {% if u.role == 'admin' %}
-                            <button class="btn btn-sm btn-outline-danger" type="submit">Demote to player</button>
-                            {% else %}
-                            <button class="btn btn-sm btn-outline-warning" type="submit">Promote to admin</button>
-                            {% endif %}
-                        </form>
-                        {% endif %}
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-light" href="{{ url_for('admin.user_detail', user_id=u.id) }}">Manage</a>
                     </td>
                 </tr>
                 {% endfor %}

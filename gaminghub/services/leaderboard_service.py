@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import func, desc
 
 from gaminghub.database.database import db
-from gaminghub.models.user import User
+from gaminghub.models.user import User, STATUS_ACTIVE
 from gaminghub.models.game import Game
 from gaminghub.models.game_result import GameResult
 from gaminghub.config.constants import LEVEL_XP
@@ -68,6 +68,7 @@ def _ranked_leaderboard(value_query, limit):
     rows = (
         db.session.query(User, value_query.c.value)
         .join(value_query, value_query.c.user_id == User.id)
+        .filter(User.status == STATUS_ACTIVE)
         .order_by(desc(value_query.c.value), User.id)
         .limit(limit)
         .all()
@@ -83,7 +84,8 @@ def _my_rank(value_query, my_value):
     higher = (
         db.session.query(func.count())
         .select_from(value_query)
-        .filter(value_query.c.value > my_value)
+        .join(User, User.id == value_query.c.user_id)
+        .filter(User.status == STATUS_ACTIVE, value_query.c.value > my_value)
         .scalar()
     )
 
@@ -93,6 +95,7 @@ def _my_rank(value_query, my_value):
 def get_global_leaderboard(limit=20):
     rows = (
         db.session.query(User, TOTAL_XP_EXPR.label("total_xp"))
+        .filter(User.status == STATUS_ACTIVE)
         .order_by(desc("total_xp"), User.id)
         .limit(limit)
         .all()
@@ -102,7 +105,9 @@ def get_global_leaderboard(limit=20):
 
 
 def get_my_global_rank(user):
-    higher = db.session.query(func.count(User.id)).filter(TOTAL_XP_EXPR > _total_xp(user)).scalar()
+    higher = db.session.query(func.count(User.id)).filter(
+        User.status == STATUS_ACTIVE, TOTAL_XP_EXPR > _total_xp(user)
+    ).scalar()
     return higher + 1
 
 

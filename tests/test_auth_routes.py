@@ -105,7 +105,7 @@ class TestLogin:
         user = make_user()
         login_as(user)
 
-        client.get("/logout")
+        client.post("/logout")
         resp = client.get("/dashboard", follow_redirects=False)
 
         assert resp.status_code == 302

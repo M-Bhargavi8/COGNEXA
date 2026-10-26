@@ -140,81 +140,14 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script>
-(function () {
-    if (typeof Chart === "undefined") return;
-
-    const activityLabels = {{ activity.labels | tojson }};
-    const gamesData = {{ activity.games_played | tojson }};
-    const xpData = {{ activity.xp_earned | tojson }};
-
-    const shortLabels = activityLabels.map(d => d.slice(5));
-
-    const gamesEl = document.getElementById("gamesChart");
-    if (gamesEl) {
-        new Chart(gamesEl, {
-            type: "line",
-            data: {
-                labels: shortLabels,
-                datasets: [{
-                    label: "Games Played",
-                    data: gamesData,
-                    borderColor: "#34D399",
-                    backgroundColor: "rgba(52, 211, 153, 0.15)",
-                    tension: 0.25,
-                    fill: true
-                }]
-            },
-            options: {
-                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-
-    const xpEl = document.getElementById("xpChart");
-    if (xpEl) {
-        new Chart(xpEl, {
-            type: "line",
-            data: {
-                labels: shortLabels,
-                datasets: [{
-                    label: "XP Earned",
-                    data: xpData,
-                    borderColor: "#FBBF24",
-                    backgroundColor: "rgba(251, 191, 36, 0.15)",
-                    tension: 0.25,
-                    fill: true
-                }]
-            },
-            options: {
-                scales: { y: { beginAtZero: true } },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-
-    const skillEl = document.getElementById("skillChart");
-    if (skillEl) {
-        const skillProfile = {{ skill_profile | tojson }};
-        new Chart(skillEl, {
-            type: "bar",
-            data: {
-                labels: skillProfile.map(s => s.skill),
-                datasets: [{
-                    label: "Win Rate",
-                    data: skillProfile.map(s => s.score),
-                    backgroundColor: "#5B8CFF"
-                }]
-            },
-            options: {
-                indexAxis: "y",
-                scales: { x: { beginAtZero: true, max: 100 } },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-})();
-</script>
+{# Data only -- a JSON block is never executed, so it is allowed under
+   the strict script CSP; static/js/analytics.js reads it. #}
+<script type="application/json" id="analytics-data">{{ {
+    "labels": activity.labels,
+    "games_played": activity.games_played,
+    "xp_earned": activity.xp_earned,
+    "skill_profile": skill_profile
+} | tojson }}</script>
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
 
 {% endblock %}

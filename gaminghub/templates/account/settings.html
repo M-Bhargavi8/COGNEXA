@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Account settings -- COGNEXA{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+        <div>
+            <div class="cx-eyebrow">Account</div>
+            <h1 class="h2 mb-0">Account settings</h1>
+        </div>
+        <a href="{{ url_for('profile.profile_page') }}" class="btn btn-cx-outline btn-sm">
+            {{ icon('profile', 16) }} View profile
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-3">
+            <nav class="cx-card p-2 cx-settings-nav" aria-label="Account settings sections">
+                <a href="#profile">{{ icon('profile', 18) }} Profile</a>
+                <a href="#email">{{ icon('mail', 18) }} Email</a>
+                <a href="#password">{{ icon('lock', 18) }} Password</a>
+            </nav>
+        </div>
+
+        <div class="col-lg-9 d-flex flex-column gap-4">
+
+            {# ---------------------------------------------------- profile #}
+            <section class="cx-card p-4 cx-settings-section" id="profile" aria-labelledby="profile-heading">
+                <h2 class="h5 mb-1" id="profile-heading">Profile</h2>
+                <p class="text-muted small mb-4">Shown on your profile and the leaderboards. Your avatar, frame and badge are chosen in the <a href="{{ url_for('rewards.shop') }}">Reward Shop</a>.</p>
+
+                <form method="POST" action="{{ url_for('account.update_profile') }}" class="cx-js-submit-once">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="settings-username">Username</label>
+                            <input id="settings-username" type="text" name="username" class="form-control"
+                                   value="{{ current_user.username }}" minlength="3" maxlength="30"
+                                   autocomplete="username" required aria-describedby="settings-username-hint">
+                            <div class="form-text text-muted" id="settings-username-hint">3-30 letters, numbers, dots, dashes or underscores.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="settings-country">Country</label>
+                            <input id="settings-country" type="text" name="country" class="form-control"
+                                   value="{{ current_user.country or '' }}" maxlength="{{ country_max }}" autocomplete="country-name">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="settings-favorite">Favorite game</label>
+                            <select id="settings-favorite" name="favorite_game" class="form-select">
+                                <option value="">No favorite</option>
+                                {% if current_user.favorite_game and current_user.favorite_game not in favorite_games %}
+                                <option value="{{ current_user.favorite_game }}" selected>{{ current_user.favorite_game }}</option>
+                                {% endif %}
+                                {% for name in favorite_games %}
+                                <option value="{{ name }}" {{ 'selected' if name == current_user.favorite_game }}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="settings-bio">Bio</label>
+                            <textarea id="settings-bio" name="bio" class="form-control" rows="3"
+                                      maxlength="{{ bio_max }}" aria-describedby="settings-bio-hint">{{ current_user.bio or '' }}</textarea>
+                            <div class="form-text text-muted" id="settings-bio-hint">Up to {{ bio_max }} characters.</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-cx-primary mt-4" type="submit" data-loading-text="Saving...">Save profile</button>
+                </form>
+            </section>
+
+            {# ------------------------------------------------------ email #}
+            <section class="cx-card p-4 cx-settings-section" id="email" aria-labelledby="email-heading">
+                <h2 class="h5 mb-1" id="email-heading">Email</h2>
+                <p class="text-muted small mb-3">Used to sign in and to recover your account.</p>
+
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <span class="fw-semibold">{{ current_user.email }}</span>
+                    {% if current_user.is_email_verified %}
+                    <span class="badge bg-success d-inline-flex align-items-center gap-1">{{ icon('check', 12) }} Verified</span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark d-inline-flex align-items-center gap-1">{{ icon('warning', 12) }} Not verified</span>
+                    {% endif %}
+                </div>
+
+                {% if not current_user.is_email_verified and mail_enabled %}
+                <form method="POST" action="{{ url_for('account.resend_verification') }}" class="mb-4 cx-js-submit-once">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-cx-outline btn-sm" type="submit" data-loading-text="Sending...">Send verification link</button>
+                </form>
+                {% endif %}
+
+                {% if pending_email %}
+                <div class="alert alert-info d-flex align-items-center gap-2" role="status">
+                    {{ icon('info', 18, 'icon--cyan') }}
+                    <span>Waiting for confirmation of <strong>{{ pending_email }}</strong>. Open the link we emailed there to finish the change.</span>
+                </div>
+                {% endif %}
+
+                {% if mail_enabled %}
+                <form method="POST" action="{{ url_for('account.change_email') }}" class="cx-js-submit-once">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="settings-new-email">New email</label>
+                            <input id="settings-new-email" type="email" name="email" class="form-control" maxlength="120" autocomplete="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="settings-email-password">Current password</label>
+                            <input id="settings-email-password" type="password" name="current_password" class="form-control" autocomplete="current-password" required>
+                        </div>
+                    </div>
+                    <p class="form-text text-muted mt-2 mb-0">Your email only changes after you confirm the new address.</p>
+                    <button class="btn btn-cx-primary mt-3" type="submit" data-loading-text="Sending...">Change email</button>
+                </form>
+                {% else %}
+                <p class="text-muted small mb-0">Email changes are unavailable until email delivery is configured.</p>
+                {% endif %}
+            </section>
+
+            {# --------------------------------------------------- password #}
+            <section class="cx-card p-4 cx-settings-section" id="password" aria-labelledby="password-heading">
+                <h2 class="h5 mb-1" id="password-heading">Password</h2>
+                <p class="text-muted small mb-4">Changing your password signs you out on every other device and revokes your API tokens.</p>
+
+                <form method="POST" action="{{ url_for('account.change_password') }}" class="cx-js-submit-once">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="settings-current-password">Current password</label>
+                            <input id="settings-current-password" type="password" name="current_password" class="form-control" autocomplete="current-password" required>
+                        </div>
+                        <div class="w-100 d-none d-md-block"></div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="settings-new-password">New password</label>
+                            <input id="settings-new-password" type="password" name="new_password" class="form-control"
+                                   minlength="{{ password_rules.min }}" autocomplete="new-password" required aria-describedby="settings-new-password-hint">
+                            <div class="form-text text-muted" id="settings-new-password-hint">At least {{ password_rules.min }} characters ({{ password_rules.max }} bytes maximum).</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="settings-confirm-password">Confirm new password</label>
+                            <input id="settings-confirm-password" type="password" name="confirm_password" class="form-control"
+                                   minlength="{{ password_rules.min }}" autocomplete="new-password" required>
+                        </div>
+                    </div>
+                    <button class="btn btn-cx-primary mt-4" type="submit" data-loading-text="Updating...">Update password</button>
+                </form>
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

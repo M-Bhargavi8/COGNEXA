@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 
+from sqlalchemy import update
+from sqlalchemy.exc import IntegrityError
+
 from gaminghub.database.database import db
+from gaminghub.models.user import User
 from gaminghub.models.shop_item import ShopItem
 from gaminghub.models.user_inventory import UserInventory
 from gaminghub.config.constants import XP_BOOSTER
@@ -40,7 +44,20 @@ def purchase_item(user, item_id):
     if user.coins < item.cost:
         return False, "Not enough coins."
 
-    user.coins -= item.cost
+    # The debit is a conditional UPDATE rather than user.coins -= cost:
+    # two purchases racing each other would otherwise both read the same
+    # balance and both succeed. Only a request that finds enough coins
+    # *in the database* gets to spend them.
+    debited = db.session.execute(
+        update(User)
+        .where(User.id == user.id, User.coins >= item.cost)
+        .values(coins=User.coins - item.cost)
+        .execution_options(synchronize_session=False)
+    ).rowcount == 1
+
+    if not debited:
+        db.session.rollback()
+        return False, "Not enough coins."
 
     if item.item_type == "booster":
         base = user.xp_booster_expires_at if is_booster_active(user) else datetime.utcnow()
@@ -48,7 +65,13 @@ def purchase_item(user, item_id):
     else:
         db.session.add(UserInventory(user_id=user.id, shop_item_id=item.id))
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        # uq_user_shop_item: a concurrent purchase of the same item won.
+        # Rolling back also undoes this request's debit.
+        db.session.rollback()
+        return False, "You already own this."
 
     return True, f"Purchased {item.name}!"
 

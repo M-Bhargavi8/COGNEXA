@@ -62,7 +62,7 @@ def check_game_achievements(user, game_result):
     """Achievements that depend on a specific GameResult. Returns newly unlocked achievements."""
 
     unlocked = []
-    game = Game.query.get(game_result.game_id)
+    game = db.session.get(Game, game_result.game_id)
 
     if not game:
         return unlocked

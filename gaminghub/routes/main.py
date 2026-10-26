@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 from flask_login import current_user
 
+from gaminghub.database.database import db
 from gaminghub.models.game import Game
 from gaminghub.models.achievement import Achievement
 from gaminghub.services import (
@@ -35,7 +36,7 @@ def home():
     top_players = leaderboard_service.get_global_leaderboard(limit=5)
 
     challenge = challenge_service.get_today_challenge()
-    challenge_game = Game.query.get(challenge.game_id) if challenge else None
+    challenge_game = db.session.get(Game, challenge.game_id) if challenge else None
 
     # The hero chart shows the visitor their own shape where there is
     # one, and the platform average otherwise -- real numbers either
