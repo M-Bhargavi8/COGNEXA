@@ -389,3 +389,19 @@ class TestAuditLog:
         for entry in AuditLog.query.all():
             blob = f"{entry.details} {entry.reason} {entry.target_label}"
             assert "sekretpass99" not in blob and "currentpass1" not in blob
+
+
+class TestPromoteAdminCli:
+
+    def test_promotes_and_audits(self, app, make_user):
+        user = make_user(username="founder")
+        result = app.test_cli_runner().invoke(args=["promote-admin", "founder"])
+
+        assert result.exit_code == 0, result.output
+        assert _db.session.get(User, user.id).role == "admin"
+        entry = AuditLog.query.filter_by(action="user_role_changed").one()
+        assert entry.actor_id is None and entry.reason == "promote-admin CLI"
+
+    def test_unknown_user_fails(self, app):
+        result = app.test_cli_runner().invoke(args=["promote-admin", "ghost"])
+        assert result.exit_code != 0

@@ -546,3 +546,27 @@ class TestDailyClaimIsPostOnly:
         login_as(user)
         client.post("/daily")
         assert _db.session.get(User, user.id).coins == 20
+
+
+class TestLegacyCaseVariantEmails:
+    """Accounts created before emails were normalised can differ only by
+    case. Each must still be reachable, and nothing may guess between them."""
+
+    def test_each_case_variant_logs_into_its_own_account(self, client, make_user):
+        make_user(username="lower", email="dup@test.com", password="lowerpass1")
+        make_user(username="upper", email="Dup@test.com", password="upperpass1")
+
+        resp = client.post("/login", data={"email": "Dup@test.com", "password": "upperpass1"}, follow_redirects=True)
+        assert b"Login Successful" in resp.data
+        client.post("/logout")
+
+        resp = client.post("/login", data={"email": "dup@test.com", "password": "lowerpass1"}, follow_redirects=True)
+        assert b"Login Successful" in resp.data
+
+    def test_ambiguous_reset_request_sends_nothing(self, app, client, make_user):
+        make_user(username="lower", email="dup@test.com")
+        make_user(username="upper", email="Dup@test.com")
+
+        client.post("/forgot-password", data={"email": "DUP@TEST.COM"})
+
+        assert _outbox(app) == []

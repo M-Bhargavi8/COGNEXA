@@ -353,3 +353,9 @@ def test_notification_links_cannot_redirect_off_site(client, make_user, login_as
 
     resp = client.get(f"/notifications/open/{n.id}")
     assert resp.headers["Location"] == "/notifications"
+
+
+def test_favicon_redirects_to_the_real_icon(client):
+    resp = client.get("/favicon.ico")
+    assert resp.status_code == 301
+    assert resp.headers["Location"].endswith("/static/images/favicon.png")

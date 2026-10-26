@@ -125,10 +125,21 @@ def check_password(user, password):
 
 
 def find_user_by_email(email):
-    email = normalize_email(email)
-    if not email:
+    """Exact match first, then case-insensitive -- but only when that
+    finds exactly one account. Accounts created before emails were
+    normalised can differ only by case; guessing between them could log
+    someone into, or send a reset link for, the wrong account."""
+
+    raw = (email or "").strip()
+    if not raw:
         return None
-    return User.query.filter(func.lower(User.email) == email).first()
+
+    exact = User.query.filter(User.email == raw).first()
+    if exact:
+        return exact
+
+    matches = User.query.filter(func.lower(User.email) == normalize_email(raw)).limit(2).all()
+    return matches[0] if len(matches) == 1 else None
 
 
 def authenticate(email, password):

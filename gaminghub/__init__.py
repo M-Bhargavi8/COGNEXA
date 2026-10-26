@@ -154,6 +154,10 @@ def create_app(config_class=None):
 
     app.before_request(guard_inactive_game)
 
+    from gaminghub.cli import register_cli
+
+    register_cli(app)
+
     @app.context_processor
     def inject_notifications():
         if current_user.is_authenticated:

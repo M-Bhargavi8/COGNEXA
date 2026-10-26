@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, redirect, render_template, url_for
 from flask_login import current_user
 
 from gaminghub.database.database import db
@@ -72,3 +72,10 @@ def home():
         challenge_game=challenge_game,
         challenge_url=game_service.get_play_url(challenge_game.slug) if challenge_game else None
     )
+
+
+@main.route("/favicon.ico")
+def favicon():
+    """Browsers request /favicon.ico even when the page declares its icon;
+    without this every page view logs a 404."""
+    return redirect(url_for("static", filename="images/favicon.png"), code=301)

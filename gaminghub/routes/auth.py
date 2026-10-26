@@ -124,9 +124,11 @@ def logout():
 def forgot_password():
 
     if request.method == "POST":
-        email = account_service.normalize_email(request.form.get("email"))
+        # Validated in normalised form, but looked up as typed: an exact
+        # match must win over legacy accounts that differ only by case.
+        email = (request.form.get("email") or "").strip()
 
-        if account_service.validate_email(email):
+        if account_service.validate_email(account_service.normalize_email(email)):
             flash("Enter a valid email address.", "danger")
             return redirect(url_for("auth.forgot_password"))
 
